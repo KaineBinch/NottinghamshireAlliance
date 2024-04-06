@@ -17,10 +17,9 @@ const FixtureCard = ({
             <div className="absolute top-0 left-0 w-full h-full "></div>
           </div>
           <div className="px-8 relative z-10">
-            <h3 className="text-sm pb-4 pt-2">Next Fixture</h3>
-            <h1 className="text-2xl font-bold pb-5">{name}</h1>
+            <h1 className="text-2xl font-extrabold py-5">{name}</h1>
             <h3 className="text-sm pb-5">{address}</h3>
-            <h2 className="text-md">{comp} competition</h2>
+            <h2 className="text-sm">{comp} competition</h2>
           </div>
           <div className="absolute right-0 mt-3 mr-3 bg-[#D9D9D9] h-[100px] w-[100px]">
             <div className="flex items-center justify-center h-full w-full">
