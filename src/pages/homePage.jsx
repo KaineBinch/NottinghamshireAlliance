@@ -3,6 +3,7 @@ import Navbar from "../components/nav/navbar";
 import logo from "../assets/Logo.png";
 import FixtureCard from "../components/fixtureCard.jsx";
 import { clubs } from "../constants/golfClubs";
+import MobFoot from "../components/mobileFooter.jsx";
 
 const HomePage = () => {
   return (
@@ -60,28 +61,51 @@ const HomePage = () => {
                 Results
               </a>
             </div>
-            {clubs.map((club, i) => (
-              <FixtureCard
-                key={i}
-                name={club.name}
-                address={club.address}
-                courseImage={club.courseImage}
-                comp={club.comp}
-                dayName={club.dayName}
-                day={club.day}
-                month={club.month}
-                year={club.year}
-              />
-            ))}
+            {clubs
+              .filter((club, index) => index < 3)
+              .map((club, i) => (
+                <FixtureCard
+                  key={i}
+                  name={club.name}
+                  address={club.address}
+                  courseImage={club.courseImage}
+                  comp={club.comp}
+                  dayName={club.dayName}
+                  day={club.day}
+                  month={club.month}
+                  year={club.year}
+                />
+              ))}
           </div>
           <hr className="border-black" />
-          <div>img</div>
+          <div className="bg-[#D9D9D9]">
+            <div className="text-start mx-5 py-[25px] text-black">
+              <h1 className="text-4xl font-semibold ">Courses</h1>
+              <div className="flex items-center">
+                <p className="py-6">
+                  Explore the courses within our alliance by clicking here.
+                </p>
+                <a className="btn rounded-none ml-3 w-[125px] border-black text-black bg-white ">
+                  Courses
+                </a>
+              </div>
+            </div>
+          </div>
           <hr className="border-black" />
-          <div>crses</div>
+          <div>
+            <div className="flex items-center text-start mx-5 py-[25px] text-black">
+              <h1 className="text-4xl font-semibold ">
+                Order Of Merit Standings
+              </h1>
+              <div className="">
+                <a className="btn rounded-none w-[125px] border-black text-white bg-[#214A27] ">
+                  Results
+                </a>
+              </div>
+            </div>
+          </div>
           <hr className="border-black" />
-          <div>OOM</div>
-          <hr className="border-black" />
-          <div>Foot</div>
+          <MobFoot />
         </div>
       </div>
     </>
