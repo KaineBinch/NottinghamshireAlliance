@@ -41,10 +41,16 @@ const HomePage = () => {
                   competitions.
                 </p>
 
-                <a className="btn rounded-none w-[125px] border-black">
+                <a
+                  className="btn rounded-none w-[125px] border-black"
+                  href="/#/starttimes"
+                >
                   Start Times
                 </a>
-                <a className="btn rounded-none ml-3 w-[125px] border-black text-white bg-[#214A27] ">
+                <a
+                  className="btn rounded-none ml-3 w-[125px] border-black text-white bg-[#214A27]"
+                  href="/#/results"
+                >
                   Results
                 </a>
               </div>
@@ -57,14 +63,18 @@ const HomePage = () => {
               <p className="py-6">
                 All the latest information about upcoming fixtures
               </p>
-              <a className="btn rounded-none ml-3 w-[125px] border-black text-white bg-[#214A27] ">
-                Results
+              <a
+                className="btn rounded-none ml-3 w-[125px] border-black text-white bg-[#214A27]"
+                href="/#/fixtures"
+              >
+                Fixtures
               </a>
             </div>
             {clubs
               .filter((club, index) => index < 3)
               .map((club, i) => (
                 <FixtureCard
+                  className=""
                   key={i}
                   name={club.name}
                   address={club.address}
@@ -85,7 +95,10 @@ const HomePage = () => {
                 <p className="py-6">
                   Explore the courses within our alliance by clicking here.
                 </p>
-                <a className="btn rounded-none ml-3 w-[125px] border-black text-black bg-white ">
+                <a
+                  className="btn rounded-none ml-3 w-[125px] border-black text-black bg-white"
+                  href="/#/courses"
+                >
                   Courses
                 </a>
               </div>
@@ -98,7 +111,10 @@ const HomePage = () => {
                 Order Of Merit Standings
               </h1>
               <div className="">
-                <a className="btn rounded-none w-[125px] border-black text-white bg-[#214A27] ">
+                <a
+                  className="btn rounded-none w-[125px] border-black text-white bg-[#214A27]"
+                  href="/#/results"
+                >
                   Results
                 </a>
               </div>
