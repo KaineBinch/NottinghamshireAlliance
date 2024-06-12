@@ -13,6 +13,7 @@ import {
 } from "./pages";
 import { appRoutes } from "./constants/appRoutes";
 import ScrollToTop from "./components/scrollToTop";
+import Navbar from "./components/navbar";
 
 function App() {
   const location = useLocation();
@@ -20,6 +21,7 @@ function App() {
   return (
     <>
       <ScrollToTop />
+      <Navbar />
       <Routes location={location} key={location.pathname}>
         <Route exact path={appRoutes.home} element={<HomePage />} />
         <Route exact path={appRoutes.contact} element={<ContactPage />} />
