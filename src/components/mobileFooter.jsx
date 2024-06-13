@@ -24,7 +24,7 @@ const MobFoot = () => {
       </div>
       <hr className="border-1 border-neutral mt-8" />
       <p className="flex flex-col py-8 leading-6 text-center text-xs">
-        Copyright © 2024 Express Tool Hire Ltd
+        Copyright © 2024 Nottinghamshire Golf Alliance
         <a
           href={"https://kainebinch.dev"}
           target="_blank"

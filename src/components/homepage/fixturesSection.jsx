@@ -1,27 +1,28 @@
-import { clubs } from "../../constants/golfClubs";
-import FixtureCard from "../fixtureCard";
+import { clubs } from "../../constants/golfClubs.js";
+import FixtureCard from "../fixtureCard.jsx";
 
 const FixturesSection = () => {
   return (
     <>
-      <div className="text-start mx-5 py-[25px] text-black">
-        <h1 className="text-4xl font-semibold ">Fixtures</h1>
-        <div className="flex items-center">
-          <p className="py-6">
+      <div className="mx-5 py-[50px]">
+        <div className="sm:text-start md:text-center text-black">
+          <h1>Fixtures</h1>
+          <p className="py-[25px]">
             All the latest information about upcoming fixtures
           </p>
           <a
-            className="btn rounded-none ml-3 w-[125px] border-black text-white bg-[#214A27]"
+            className="btn rounded-none w-[125px] border-black text-white bg-[#214A27]"
             href="/#/fixtures"
           >
             Fixtures
           </a>
         </div>
+      </div>
+      <div className="mx-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-[50px]">
         {clubs
           .filter((club, index) => index < 3)
           .map((club, i) => (
             <FixtureCard
-              className=""
               key={i}
               name={club.name}
               address={club.address}
