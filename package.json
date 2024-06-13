@@ -17,6 +17,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.5.1",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "add-to-calendar-button": "^2.6.16",
     "autoprefixer": "^10.4.19",
     "framer-motion": "^11.0.22",
     "postcss-cli": "^11.0.0",
