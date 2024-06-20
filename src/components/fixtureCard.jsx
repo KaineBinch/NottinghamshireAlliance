@@ -14,17 +14,17 @@ const FixtureCard = ({
         <img src={courseImage} className="w-full h-[250px] object-cover" />
       </div>
       <div className="px-[30px] py-[10px] relative text-center">
-        <h2>{name}</h2>
-        <h3>{comp} competition</h3>
-        <h3>{address}</h3>
+        <h2 className="">{name}</h2>
+        <h3 className="">{comp} competition</h3>
+        <h3 className="pb-2 pt-5">{address}</h3>
       </div>
-      <div className="absolute right-0 top-0 mt-3 mr-3 bg-[#D9D9D9] h-[100px] w-[100px] flex items-center justify-center">
-        <div className="flex flex-col items-center justify-center">
-          <p className="text-xs font-semibold">{dayName}</p>
-          <p className="text-2xl font-black my-1">{day}</p>
-          <p className="text-xs font-semibold">
+      <div className="absolute right-0 top-0 mt-4 mr-4 bg-[#D9D9D9] h-[115px] w-[115px] flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center px-1">
+          <h3 className="font-semibold">{dayName}</h3>
+          <h2 className="font-black py-1">{day}</h2>
+          <h3 className="font-semibold">
             {month} {year}
-          </p>
+          </h3>
         </div>
       </div>
     </div>

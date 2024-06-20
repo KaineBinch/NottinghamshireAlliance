@@ -9,12 +9,12 @@ const MobFoot = () => {
         </div>
         <div className="text-center pb-10">
           <h2 className="text-center mt-[5px] text-md mx-[10px] ">
-            <a href="tel:07734924889">
-              <span className="font-bold">Telephone: </span>07734 924 889
+            <a className="text-base" href="tel:07734924889">
+              <span className="font-bold ">Telephone: </span>07734 924 889
               <br />
               <br />
             </a>
-            <a href="mailto:drivewithglenn@hotmail.co.uk">
+            <a className="text-base" href="mailto:drivewithglenn@hotmail.co.uk">
               <span className="font-bold">Email: </span>
               drivewithglenn@hotmail.co.uk
             </a>

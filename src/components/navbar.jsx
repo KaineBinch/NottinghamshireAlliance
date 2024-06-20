@@ -40,7 +40,7 @@ const Navbar = () => {
   return (
     <>
       <div className="w-screen fixed flex bg-[#214A27] justify-center h-[60px] z-10">
-        <div className="flex navbar max-w-7xl h-[50px] place-content-between">
+        <div className="flex navbar max-w-5xl h-[50px] place-content-between">
           <div className="dropdown visible lg:invisible justify-start items-start lg:w-0 w-auto z-20">
             <label
               tabIndex={0}
@@ -57,9 +57,14 @@ const Navbar = () => {
             <div className="flex flex-row">
               <ul
                 tabIndex={0}
-                className="menu absolute left-0 dropdown-content shadow bg-[#214A27] w-[175px] items-start text-lg"
+                className="menu absolute left-0 dropdown-content bg-[#214A27] w-[175px] items-start rounded-b-[4px] text-lg -ml-3"
               >
-                {links.map(({ title, to }) => LinkItem(title, to, location, 5))}
+                {links.map(({ title, to }) => (
+                  <div key={title} className="ml-3">
+                    {" "}
+                    {LinkItem(title, to, location, 5)}
+                  </div>
+                ))}
               </ul>
             </div>
           </div>
