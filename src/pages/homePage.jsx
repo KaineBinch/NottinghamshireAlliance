@@ -4,6 +4,7 @@ import MobFoot from "../components/mobileFooter.jsx";
 import OOMSection from "../components/homepage/oomSection.jsx";
 import CoursesSection from "../components/homepage/coursesSection.jsx";
 import FixturesSection from "../components/homepage/fixturesSection.jsx";
+import Scroller from "../components/homepage/logoScroller.jsx";
 
 const HomePage = () => {
   return (
@@ -27,9 +28,9 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-        <div>
-          <div className="bg-[#D9D9D9]">
-            <div className="text-center text-black px-5 py-[50px]">
+        <div className="flex flex-col">
+          <div className="bg-[#D9D9D9] flex place-content-center">
+            <div className="text-center text-black px-5 py-[50px] max-w-5xl">
               <h1>Welcome to the Nottinghamshire Golf Alliance</h1>
               <p className="py-[25px]">
                 Experience the best golf courses in Nottinghamshire and compete
@@ -60,6 +61,7 @@ const HomePage = () => {
           <CoursesSection />
           <hr className="border-black" />
           <OOMSection />
+          <Scroller />
           <hr className="border-black" />
           <MobFoot />
         </div>
