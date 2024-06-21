@@ -1,4 +1,4 @@
-import image from "../assets/homeTopImage.jpg";
+import image from "../assets/homepageHole.jpg";
 import logo from "../assets/Logo.png";
 import MobFoot from "../components/mobileFooter.jsx";
 import OOMSection from "../components/homepage/oomSection.jsx";
