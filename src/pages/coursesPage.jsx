@@ -1,6 +1,7 @@
 import CourseCard from "../components/courseCard";
 import PageHeader from "../components/pageHeader";
 import { clubs } from "../constants/golfClubs";
+const azCompare = (a, b) => +(a.name > b.name) * 2 - 0.5)
 
 const CoursesPage = () => {
   return (
