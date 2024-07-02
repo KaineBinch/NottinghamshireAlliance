@@ -19,7 +19,9 @@ export const clubs = [
     month: "March",
     year: "2024",
     comp: "Order of Merit",
-    courseImage: coxmoor
+    courseImage: coxmoor,
+    contact: "01623 557359",
+    link: "https://www.coxmoorgolfclub.co.uk/",
   },
   {
     name: "Worksop Golf Club",
@@ -29,7 +31,9 @@ export const clubs = [
     month: "March",
     year: "2024",
     comp: "Order of Merit",
-    courseImage: worksop
+    courseImage: worksop,
+    contact: "01909 477731",
+    link: "https://www.worksopgolfclub.com/",
   },
   {
     name: "Newark Golf Club",
@@ -39,7 +43,9 @@ export const clubs = [
     month: "April",
     year: "2024",
     comp: "Order of Merit",
-    courseImage: newark
+    courseImage: newark,
+    contact: "01636 626282",
+    link: "https://www.newarkgolfclub.co.uk/",
   },
   {
     name: "Radcliffe On Trent",
@@ -49,7 +55,9 @@ export const clubs = [
     month: "September",
     year: "2023",
     comp: "Order of Merit",
-    courseImage: radcliffe
+    courseImage: radcliffe,
+    contact: "01159 333000",
+    link: "https://www.radcliffeontrentgc.co.uk/",
   },
   {
     name: "Bondhay Golf Club",
@@ -59,7 +67,9 @@ export const clubs = [
     month: "September",
     year: "2023",
     comp: "Order of Merit",
-    courseImage: bondhay
+    courseImage: bondhay,
+    contact: "01909 723608",
+    link: "https://bondhaygolfclub.com/",
   },
   {
     name: "Wollaton Park Golf Club",
@@ -69,7 +79,9 @@ export const clubs = [
     month: "October",
     year: "2023",
     comp: "Order of Merit",
-    courseImage: wollaton
+    courseImage: wollaton,
+    contact: "0115 9787574",
+    link: "https://www.wollatonparkgolfclub.com/",
   },
   {
     name: "Brierley Forest Golf Club",
@@ -79,7 +91,9 @@ export const clubs = [
     month: "October",
     year: "2023",
     comp: "Team Event Pairs",
-    courseImage: brierly
+    courseImage: brierly,
+    contact: "01623 550761",
+    link: "https://www.brierleyforestgolfclub.com/",
   },
   {
     name: "Ramsdale Golf Club",
@@ -89,7 +103,9 @@ export const clubs = [
     month: "November",
     year: "2023",
     comp: "Order of Merit",
-    courseImage: ramsdale
+    courseImage: ramsdale,
+    contact: "0115 9655600",
+    link: "https://ramsdaleparkgc.co.uk/",
   },
   {
     name: "Oakmere Park Golf Club",
@@ -99,7 +115,9 @@ export const clubs = [
       "",
     ],
     comp: "Order of Merit",
-    courseImage: oakmere
+    courseImage: oakmere,
+    contact: "0115 9653545",
+    link: "https://oakmerepark.co.uk/",
   },
   {
     name: "Ruddington Golf Club",
@@ -108,7 +126,9 @@ export const clubs = [
       "28/11/2023",
     ],
     comp: "Order of Merit",
-    courseImage: ruddington
+    courseImage: ruddington,
+    contact: "0115 9214139",
+    link: "https://www.ruddingtongrange.com/",
   },
   {
     name: "Bulwell Forest Golf Club",
@@ -117,6 +137,8 @@ export const clubs = [
       "17/01/2024",
     ],
     comp: "Order of Merit",
-    courseImage: bulwell
+    courseImage: bulwell,
+    contact: "0115 9763172",
+    link: "https://www.bulwellforestgolfclub.co.uk/",
   },
 ]
