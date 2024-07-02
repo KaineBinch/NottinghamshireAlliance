@@ -11,7 +11,7 @@ const CoursesPage = () => {
         <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="">
             {clubs
-              .sort((a, b) => +(a.name > b.name) * 2 - 0.5)
+              .sort((a, b) => azCompare(a.name, b.name))
               .map((club, i) => (
                 <CourseCard
                   key={i}
