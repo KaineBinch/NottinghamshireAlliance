@@ -1,9 +1,9 @@
+import PageHeader from "../components/pageHeader";
+
 const StartTimesPage = () => {
   return (
     <>
-      <div>
-        <h1>Start Times</h1>
-      </div>
+      <PageHeader title="Order of Play" />
     </>
   );
 };

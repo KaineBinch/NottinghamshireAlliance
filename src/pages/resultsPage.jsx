@@ -1,9 +1,9 @@
+import PageHeader from "../components/pageHeader";
+
 const ResultsPage = () => {
   return (
     <>
-      <div>
-        <h1>Results</h1>
-      </div>
+      <PageHeader title="Results" />
     </>
   );
 };

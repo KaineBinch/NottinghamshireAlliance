@@ -1,9 +1,9 @@
+import PageHeader from "../components/pageHeader";
+
 const RulesPage = () => {
   return (
     <>
-      <div>
-        <h1>Rules</h1>
-      </div>
+      <PageHeader title="Rules" />
     </>
   );
 };

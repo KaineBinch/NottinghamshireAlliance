@@ -1,9 +1,9 @@
+import PageHeader from "../components/pageHeader";
+
 const GalleryPage = () => {
   return (
     <>
-      <div>
-        <h1>Gallery</h1>
-      </div>
+      <PageHeader title="Gallery" />
     </>
   );
 };

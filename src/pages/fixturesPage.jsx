@@ -1,9 +1,9 @@
+import PageHeader from "../components/pageHeader";
+
 const FixturesPage = () => {
   return (
     <>
-      <div>
-        <h1>Fixtures</h1>
-      </div>
+      <PageHeader title="Fixtures" />
     </>
   );
 };

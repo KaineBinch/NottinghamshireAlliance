@@ -1,9 +1,9 @@
+import PageHeader from "../components/pageHeader";
+
 const ContactPage = () => {
   return (
     <>
-      <div>
-        <h1>Contact</h1>
-      </div>
+      <PageHeader title="Contact" />
     </>
   );
 };
