@@ -9,7 +9,7 @@ import Scroller from "../components/homepage/logoScroller.jsx";
 const HomePage = () => {
   return (
     <>
-      <div className="flex flex-col w-screen">
+      <div className="flex flex-col w-full">
         <div
           className="mt-[58px] w-full "
           style={{
