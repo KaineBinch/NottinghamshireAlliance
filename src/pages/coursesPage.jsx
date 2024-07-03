@@ -13,7 +13,7 @@ const CoursesPage = () => {
         <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="">
             {clubs
-              .sort((a, b) => azCompare(a.name, b.name))
+              .toSorted((a, b) => azCompare(a.name, b.name))
               .map((club, i) => (
                 <CourseCard
                   key={i}
@@ -22,6 +22,7 @@ const CoursesPage = () => {
                   contact={club.contact}
                   link={club.link}
                   courseImage={club.courseImage}
+                  logo={club.logo}
                 />
               ))}
           </div>
