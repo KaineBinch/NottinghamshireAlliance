@@ -57,7 +57,7 @@ const Navbar = () => {
             <div className="flex flex-row">
               <ul
                 tabIndex={0}
-                className="menu absolute left-0 dropdown-content bg-[#214A27] w-[175px] items-start rounded-b-[1px] text-lg -ml-4"
+                className="menu absolute left-0 dropdown-content bg-[#214A27] w-[175px] items-start rounded-b-[1px] text-lg -ml-5"
               >
                 {links.map(({ title, to }) => (
                   <div key={title} className="ml-3">
@@ -71,7 +71,7 @@ const Navbar = () => {
             Nottinghamshire Golf Alliance
           </div>
           <div className="hidden lg:flex h-full items-center justify-center flex-grow">
-            <ul className="h-full flex menu menu-horizontal place-content-between w-full">
+            <ul className="h-full flex menu menu-horizontal place-content-between w-full -ml-5">
               {links.map(({ title, to }) => LinkItem(title, to, location))}
             </ul>
           </div>
