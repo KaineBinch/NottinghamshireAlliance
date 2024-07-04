@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const CourseCard = ({ name, address, contact, link, courseImage, logo }) => {
   return (
     <>
-      <div className="flex text-black">
+      <div className="flex">
         <div
           className="relative flex w-2/5 h-50 md:h-60"
           style={{
