@@ -49,6 +49,7 @@ const GalleryPage = () => {
           <ImageGallery items={images} infinite={true} showIndex={true} />
         </div>
       </div>
+      <hr className="border-black" />
     </>
   );
 };
