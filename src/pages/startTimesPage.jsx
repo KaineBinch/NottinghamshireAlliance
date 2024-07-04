@@ -22,6 +22,10 @@ const StartTimesPage = () => {
         </div>
         <hr className="border-black my-5" />
       </div>
+      <div className="">
+        <h2>Coxmoor Golf Club</h2>
+        <h3>07 March 2024</h3>
+      </div>
       <div className="flex justify-center">
         <div className="max-w-5xl w-full">
           <div className="m-5">
