@@ -20,7 +20,7 @@ const StartTimesPage = () => {
             Entry fee payable if you fail to arrive without prior notification.
           </p>
         </div>
-        <hr className="border-black mt-5" />
+        <hr className="border-black my-5" />
       </div>
       <div className="flex justify-center">
         <div className="max-w-5xl w-full">
