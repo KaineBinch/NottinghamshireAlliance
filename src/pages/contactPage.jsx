@@ -9,7 +9,7 @@ const ContactPage = () => {
     <>
       <PageHeader title="Contact" />
       <hr className="border-black" />
-      <div className="bg-[#D9D9D9] h-screen">
+      <div className="bg-[#D9D9D9] h-full">
         <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 ">
           <div>
             {socials.map((social, i) => (

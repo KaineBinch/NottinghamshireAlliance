@@ -1,6 +1,5 @@
 import image from "../assets/homepageHole.jpg";
 import logo from "../assets/Logo.png";
-import MobFoot from "../components/mobileFooter.jsx";
 import OOMSection from "../components/homepage/oomSection.jsx";
 import CoursesSection from "../components/homepage/coursesSection.jsx";
 import FixturesSection from "../components/homepage/fixturesSection.jsx";
@@ -62,8 +61,6 @@ const HomePage = () => {
           <hr className="border-black" />
           <OOMSection />
           <Scroller />
-          <hr className="border-black" />
-          <MobFoot />
         </div>
       </div>
     </>

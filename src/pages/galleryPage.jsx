@@ -44,12 +44,11 @@ const GalleryPage = () => {
     <>
       <PageHeader title="Gallery" />
       <hr className="border-black" />
-      <div className="bg-[#D9D9D9] h-screen">
+      <div className="bg-[#D9D9D9] h-full">
         <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-start">
           <ImageGallery items={images} infinite={true} showIndex={true} />
         </div>
       </div>
-      <hr className="border-black" />
     </>
   );
 };
