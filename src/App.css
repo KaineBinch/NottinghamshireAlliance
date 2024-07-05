@@ -30,6 +30,7 @@
   .fullscreen .image-gallery-slide img {
     max-height: 100vh;
   }
+
   .excel-table {
     border-collapse: collapse;
   }
@@ -47,6 +48,34 @@
 
   .excel-table td div {
     margin-bottom: 4px;
+  }
+
+  .custom-header-cell {
+    font-size: 10px;
+  }
+
+  .custom-cell {
+    font-size: 10px;
+  }
+
+  @media (min-width: 768px) {
+    .custom-header-cell {
+      font-size: 14px;
+    }
+
+    .custom-cell {
+      font-size: 14px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .custom-header-cell {
+      font-size: 14px;
+    }
+
+    .custom-cell {
+      font-size: 14px;
+    }
   }
 }
 

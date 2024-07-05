@@ -20,6 +20,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@mui/material": "^5.15.21",
+    "@mui/x-data-grid": "^7.8.0",
     "add-to-calendar-button": "^2.6.16",
     "autoprefixer": "^10.4.19",
     "font-awesome": "^4.7.0",

@@ -14,6 +14,7 @@ import {
 import { appRoutes } from "./constants/appRoutes";
 import ScrollToTop from "./components/scrollToTop";
 import Navbar from "./components/navbar";
+import MobFoot from "./components/mobileFooter";
 
 function App() {
   const location = useLocation();
@@ -33,6 +34,7 @@ function App() {
         <Route exact path={appRoutes.startTimes} element={<StartTimesPage />} />
         <Route path={appRoutes.notFound} element={<NotFound />} />
       </Routes>
+      <MobFoot />
     </>
   );
 }
