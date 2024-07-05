@@ -3,6 +3,7 @@ import logo from "../assets/Logo.png";
 const MobFoot = () => {
   return (
     <>
+      <hr className="border-black mt-10" />
       <div className="bg-[#D9D9D9] text-black">
         <div className="flex flex-col items-center justify-center py-8">
           <img className="h-[150px] w-[150px]" src={logo} />
