@@ -1,6 +1,7 @@
 @tailwind base;
 
 @layer base {
+  /* Global Styles */
   h1 {
     @apply text-4xl;
     @apply font-semibold;
@@ -76,6 +77,18 @@
     .custom-cell {
       font-size: 14px;
     }
+  }
+
+  @font-face {
+    font-family: "WeatherIcons";
+    src: url("public/assets/fonts/weathericons-regular-webfont.woff2")
+      format("woff2");
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  .weather-icon {
+    font-family: "WeatherIcons";
   }
 }
 
