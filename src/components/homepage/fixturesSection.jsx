@@ -21,9 +21,9 @@ const FixturesSection = () => {
         </div>
       </div>
       <div className="flex place-content-center">
-        <div className="max-w-5xl mx-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-[50px]">
+        <div className="max-w-5xl mx-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 mb-[50px]">
           {clubs
-            .filter((club, index) => index < 4)
+            .filter((_, i) => i < 4)
             .map((club, i) => (
               <FixtureCard
                 key={i}
@@ -33,7 +33,7 @@ const FixturesSection = () => {
                 comp={club.comp}
                 dayName={club.dayName}
                 day={club.day}
-                month={club.month}
+                monthName={club.monthName}
                 year={club.year}
               />
             ))}
