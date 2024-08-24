@@ -32,7 +32,7 @@ const MobFoot = () => {
           rel="noreferrer"
           className="pt-4 text-xs"
         >
-          Web Design
+          Web Design by Kaine Binch
         </a>
       </p>
     </>
