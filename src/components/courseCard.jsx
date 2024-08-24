@@ -1,17 +1,21 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const CourseCard = ({ name, address, contact, link, courseImage }) => {
+const CourseCard = ({ name, address, contact, link, courseImage, logo }) => {
   return (
     <>
-      <div className="flex text-black">
+      <div className="flex">
         <div
-          className="flex w-2/5 h-50 md:h-60"
+          className="relative flex w-2/5 h-50 md:h-60"
           style={{
             backgroundImage: `url(${courseImage})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
-        ></div>
+        >
+          <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2">
+            <img src={logo} className="max-w-[100px] max-h-[100px]" />
+          </div>
+        </div>
         <div className="flex flex-col w-3/5 text-start pl-5 md:pl-10 justify-center">
           <div className="font-bold text-xl md:text-2xl py-4">{name}</div>
           <div className="pb-4 md:text-lg">{address}</div>

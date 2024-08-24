@@ -1,8 +1,7 @@
-/* app.css */
-
 @tailwind base;
 
 @layer base {
+  /* Global Styles */
   h1 {
     @apply text-4xl;
     @apply font-semibold;
@@ -13,6 +12,83 @@
   }
   h3 {
     @apply text-sm;
+  }
+
+  .image-gallery {
+    width: 40%;
+    height: auto;
+  }
+
+  .image-gallery-slide img {
+    width: 100%;
+    height: auto;
+    max-height: 80vh;
+    object-fit: cover;
+    overflow: hidden;
+    object-position: center center;
+  }
+
+  .fullscreen .image-gallery-slide img {
+    max-height: 100vh;
+  }
+
+  .excel-table {
+    border-collapse: collapse;
+  }
+
+  .excel-table th,
+  .excel-table td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+  }
+
+  .excel-table th {
+    background-color: #f2f2f2;
+  }
+
+  .excel-table td div {
+    margin-bottom: 4px;
+  }
+
+  .custom-header-cell {
+    font-size: 10px;
+  }
+
+  .custom-cell {
+    font-size: 10px;
+  }
+
+  @media (min-width: 768px) {
+    .custom-header-cell {
+      font-size: 14px;
+    }
+
+    .custom-cell {
+      font-size: 14px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .custom-header-cell {
+      font-size: 14px;
+    }
+
+    .custom-cell {
+      font-size: 14px;
+    }
+  }
+
+  @font-face {
+    font-family: "WeatherIcons";
+    src: url("public/assets/fonts/weathericons-regular-webfont.woff2")
+      format("woff2");
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  .weather-icon {
+    font-family: "WeatherIcons";
   }
 }
 

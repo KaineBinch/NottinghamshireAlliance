@@ -5,11 +5,11 @@ const FixtureCard = ({
   comp,
   dayName,
   day,
-  month,
+  monthName,
   year,
 }) => {
   return (
-    <div className="flex flex-col bg-[#D9D9D9] text-black border border-black relative max-w-[500px]">
+    <div className="flex flex-col bg-[#D9D9D9] text-black border border-black relative max-w-[500px] mt-5">
       <div className="relative">
         <img src={courseImage} className="w-full h-[250px] object-cover" />
       </div>
@@ -23,7 +23,7 @@ const FixtureCard = ({
           <h3 className="font-semibold">{dayName}</h3>
           <h2 className="font-black py-1">{day}</h2>
           <h3 className="font-semibold">
-            {month} {year}
+            {monthName} {year}
           </h3>
         </div>
       </div>

@@ -1,6 +1,5 @@
-import image from "../assets/homepageHole.jpg";
-import logo from "../assets/Logo.png";
-import MobFoot from "../components/mobileFooter.jsx";
+import Weather from "../components/weather.jsx";
+import image from "../assets/background.jpg";
 import OOMSection from "../components/homepage/oomSection.jsx";
 import CoursesSection from "../components/homepage/coursesSection.jsx";
 import FixturesSection from "../components/homepage/fixturesSection.jsx";
@@ -9,9 +8,9 @@ import Scroller from "../components/homepage/logoScroller.jsx";
 const HomePage = () => {
   return (
     <>
-      <div className="flex flex-col w-screen">
+      <div className="flex flex-col w-full">
         <div
-          className="mt-[58px] w-full "
+          className="mt-[58px] w-full h-[40svh] place-content-end"
           style={{
             backgroundImage: `url(${image})`,
             backgroundRepeat: "no-repeat",
@@ -19,14 +18,7 @@ const HomePage = () => {
             backgroundPosition: "center",
           }}
         >
-          <div className="flex justify-center h-[40svh] items-end pb-5">
-            <img src={logo} className="max-w-[100px] max-h-[100px]" />
-          </div>
-          <div className="flex place-content-center h-[50px] w-auto z-10 bg-[#222222] bg-opacity-50 backdrop-blur-[2.75px] drop-shadow-2xl">
-            <div className="flex text-white items-center justify-center">
-              ***WEATHER ICONS***
-            </div>
-          </div>
+          <Weather city="Nottinghamshire" />
         </div>
         <div className="flex flex-col">
           <div className="bg-[#D9D9D9] flex place-content-center">
@@ -62,11 +54,10 @@ const HomePage = () => {
           <hr className="border-black" />
           <OOMSection />
           <Scroller />
-          <hr className="border-black" />
-          <MobFoot />
         </div>
       </div>
     </>
   );
 };
+
 export default HomePage;

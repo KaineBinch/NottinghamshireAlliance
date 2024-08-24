@@ -39,12 +39,12 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="w-screen fixed flex bg-[#214A27] justify-center h-[60px] z-10">
-        <div className="flex navbar max-w-5xl h-[50px] place-content-between">
+      <div className="fixed w-full flex bg-[#214A27] justify-center h-[60px] z-10">
+        <div className="flex max-w-5xl w-full items-center justify-between h-full px-4">
           <div className="dropdown visible lg:invisible justify-start items-start lg:w-0 w-auto z-20">
             <label
               tabIndex={0}
-              className="btn btn-ghost btn-square text-white justify-center items-center "
+              className="btn btn-ghost btn-square text-white justify-center items-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -57,11 +57,10 @@ const Navbar = () => {
             <div className="flex flex-row">
               <ul
                 tabIndex={0}
-                className="menu absolute left-0 dropdown-content bg-[#214A27] w-[175px] items-start rounded-b-[4px] text-lg -ml-3"
+                className="menu absolute left-0 dropdown-content bg-[#214A27] w-[175px] items-start rounded-b-[1px] text-lg -ml-5"
               >
                 {links.map(({ title, to }) => (
                   <div key={title} className="ml-3">
-                    {" "}
                     {LinkItem(title, to, location, 5)}
                   </div>
                 ))}
@@ -71,15 +70,13 @@ const Navbar = () => {
           <div className="lg:invisible visible absolute w-full left-0 flex items-center justify-center text-white text-lg">
             Nottinghamshire Golf Alliance
           </div>
-          <div className="h-full hidden lg:inline-block flex grow">
-            <ul className="h-full flex menu menu-horizontal invisible lg:visible place-content-evenly">
+          <div className="hidden lg:flex h-full items-center justify-center flex-grow">
+            <ul className="h-full flex menu menu-horizontal place-content-between w-full text-lg -ml-5">
               {links.map(({ title, to }) => LinkItem(title, to, location))}
             </ul>
           </div>
-        </div>
-        <div className="flex w-full md:w-0 justify-end ml-10">
-          <div className="flex items-center justify-center text-sm font-normal text-white pr-5">
-            <img src={logo} className="max-h-[50px] max-w-[50px]"></img>
+          <div className="flex items-center h-full">
+            <img src={logo} className="max-h-[50px] max-w-[50px]" alt="Logo" />
           </div>
         </div>
       </div>
