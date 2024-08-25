@@ -9,7 +9,7 @@ const FixtureCard = ({
   year,
 }) => {
   return (
-    <div className="flex flex-col bg-[#D9D9D9] text-black border border-black relative max-w-[500px] mt-5">
+    <div className="flex flex-col bg-[#D9D9D9] text-black border border-black relative max-w-[500px]">
       <div className="relative">
         <img src={courseImage} className="w-full h-[250px] object-cover" />
       </div>
