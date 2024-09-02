@@ -10,7 +10,6 @@ const CoursesSection = () => {
           btnName="Courses"
           btnStyle="text-black bg-white"
         />
-        <div>Content</div>
       </div>
     </>
   );

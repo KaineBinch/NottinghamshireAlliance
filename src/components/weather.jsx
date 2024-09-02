@@ -8,7 +8,7 @@ const Weather = ({ city }) => {
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        const apiKey = `108420021ecb38be356c6fc8dc3bc241`;
+        const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
         const response = await axios.get(
           `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`
         );
@@ -59,7 +59,7 @@ const Weather = ({ city }) => {
           ? dailyForecast.map((day, index) => (
               <div key={index} className="mx-4 text-center">
                 <div className="flex items-center justify-center mr-4">
-                  <span className="weather-icon text-2xl">
+                  <span className="weather-icon text-2xl [text-shadow:_2px_3px_2px_rgb(0_0_0_/_60%)]">
                     {getWeatherIcon(day.icon)}
                   </span>
                   <div className="text-white text-sm ml-3">

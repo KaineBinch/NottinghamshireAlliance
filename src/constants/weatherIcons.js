@@ -9,6 +9,7 @@ export const getWeatherIcon = (icon) => {
     '10d': '\uf019', // Rain
     '11d': '\uf01d', // Thunderstorm
     '13d': '\uf076', // Snow
+    '50d': '\uf021', // Mist
   };
 
   return iconMap[normalizedIcon] || '\uf041'; // Default to 'unknown' icon if code not found
