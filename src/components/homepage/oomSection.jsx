@@ -9,7 +9,6 @@ const OOMSection = () => {
         btnName="Results"
         btnStyle="text-white bg-[#214A27]"
       />
-      <div>Content</div>
     </>
   );
 };

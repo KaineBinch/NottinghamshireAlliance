@@ -9,13 +9,13 @@ const HomePage = () => {
     <>
       <div className="flex flex-col w-full">
         <WelcomeSection />
+        <Scroller />
         <hr className="border-black" />
         <FixturesSection />
         <hr className="border-black" />
         <CoursesSection />
         <hr className="border-black" />
         <OOMSection />
-        <Scroller />
       </div>
     </>
   );
