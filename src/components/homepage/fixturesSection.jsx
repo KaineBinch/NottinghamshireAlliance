@@ -10,11 +10,12 @@ const FixturesSection = () => {
         subtext="All the latest information about upcoming fixtures"
         btnName="Fixtures"
         btnStyle="text-white bg-[#214A27]"
+        page="fixtures"
       />
       <div className="flex place-content-center">
         <div className="max-w-5xl mx-5 mb-[50px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {clubs
-            .filter((_, i) => i < 6)
+            .filter((_, i) => i < 4)
             .map((club, i) => (
               <FixtureCard
                 key={i}

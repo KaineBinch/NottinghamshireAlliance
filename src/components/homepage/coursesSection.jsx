@@ -9,6 +9,7 @@ const CoursesSection = () => {
           subtext="Explore the courses within our alliance by clicking here."
           btnName="Courses"
           btnStyle="text-black bg-white"
+          page="courses"
         />
       </div>
     </>
