@@ -1,52 +1,99 @@
+import { useState } from "react";
 import { teeTimes } from "../constants/teeTimes";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-} from "@mui/material";
 
-function TeeTimesTable() {
-  return (
-    <>
-      <TableContainer component={Paper} style={{ marginTop: 20 }}>
-        <Table stickyHeader aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Time</TableCell>
-              <TableCell>Names</TableCell>
-              <TableCell>Club</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {teeTimes.map((teeTime, index) => (
-              <TableRow key={index}>
-                <TableCell>{teeTime.time}</TableCell>
-                <TableCell>
-                  {teeTime.names.map((player, i) => (
-                    <div key={i}>
-                      {player.name}
-                      {player.isSenior && (
-                        <span className="text-sm font-semibold"> (S) </span>
-                      )}
-                    </div>
-                  ))}
-                </TableCell>
-                <TableCell>
-                  {teeTime.names.map((player, i) => (
-                    <div key={i}>{player.club}</div>
-                  ))}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </>
+const TeeTimesTable = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [clubQuery, setClubQuery] = useState("");
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value.toLowerCase());
+  };
+
+  const handleClubChange = (event) => {
+    setClubQuery(event.target.value.toLowerCase());
+  };
+
+  // Extract unique clubs for the dropdown
+  const uniqueClubs = [
+    ...new Set(
+      teeTimes.flatMap((teeTime) => teeTime.names.map((player) => player.club))
+    ),
+  ];
+
+  // Filter tee times based on the player name search query
+  const filteredTeeTimesByName = teeTimes.filter((teeTime) =>
+    teeTime.names.some((player) =>
+      player.name.toLowerCase().includes(searchQuery)
+    )
   );
-}
+
+  // Filter tee times based on the selected club
+  const filteredTeeTimesByClub = filteredTeeTimesByName.filter(
+    (teeTime) =>
+      !clubQuery ||
+      teeTime.names.some((player) => player.club.toLowerCase() === clubQuery)
+  );
+
+  return (
+    <div className="w-full">
+      <div className="flex justify-between mb-4">
+        {/* Search by Name */}
+        <div className="w-1/2 pr-2">
+          <input
+            type="text"
+            placeholder="Search for a name..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="p-2 border border-gray-300 rounded w-full placeholder-gray-500 text-base h-12"
+          />
+        </div>
+
+        {/* Dropdown for Club Filter */}
+        <div className="w-1/2 pl-2">
+          <select
+            value={clubQuery}
+            onChange={handleClubChange}
+            className="p-2 border border-gray-300 rounded w-full placeholder-gray-500 text-base h-12"
+          >
+            <option value="">Select a club...</option>
+            {uniqueClubs.map((club, index) => (
+              <option key={index} value={club.toLowerCase()}>
+                {club}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Tee Times Table */}
+      <div className="grid md:grid-cols-2 grid-cols-1 gap-4 w-full">
+        {filteredTeeTimesByClub.map((teeTime, index) => (
+          <div key={index} className="col-span-1 border border-gray-300">
+            <div className="p-2 border-b border-gray-300 bg-gray-200">
+              <h2 className="text-lg font-semibold">{teeTime.time}</h2>
+            </div>
+            <div className="">
+              <div className="grid md:grid-cols-2 grid-cols-1">
+                {teeTime.names.map((player, playerIndex) => (
+                  <div key={playerIndex} className="p-2">
+                    <p>
+                      <span>{player.name}</span>
+                      <span className="ml-2 text-sm text-gray-500">
+                        {player.club}
+                      </span>
+                    </p>
+                    {player.isSenior && (
+                      <p className="text-sm text-red-500">Senior</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export default TeeTimesTable;
