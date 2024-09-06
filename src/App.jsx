@@ -10,6 +10,7 @@ import {
   ResultsPage,
   RulesPage,
   StartTimesPage,
+  OrderOfMeritPage,
 } from "./pages";
 import { appRoutes } from "./constants/appRoutes";
 import ScrollToTop from "./components/scrollToTop";
@@ -29,6 +30,7 @@ function App() {
         <Route exact path={appRoutes.courses} element={<CoursesPage />} />
         <Route exact path={appRoutes.fixtures} element={<FixturesPage />} />
         <Route exact path={appRoutes.gallery} element={<GalleryPage />} />
+        <Route exact path={appRoutes.oom} element={<OrderOfMeritPage />} />
         <Route exact path={appRoutes.results} element={<ResultsPage />} />
         <Route exact path={appRoutes.rules} element={<RulesPage />} />
         <Route exact path={appRoutes.startTimes} element={<StartTimesPage />} />

@@ -8,4 +8,5 @@ export const appRoutes = {
   results: "/results",
   rules: "/rules",
   startTimes: "/starttimes",
+  oom: "/oom",
 }

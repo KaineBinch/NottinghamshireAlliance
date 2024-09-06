@@ -7,6 +7,7 @@ const Navbar = () => {
     { title: "Home", to: "/" },
     { title: "Start Times", to: "/starttimes" },
     { title: "Results", to: "/results" },
+    { title: "Order Of Merit", to: "/oom" },
     { title: "Courses", to: "/courses" },
     { title: "Fixtures", to: "/fixtures" },
     { title: "Contact", to: "/contact" },
