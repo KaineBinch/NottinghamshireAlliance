@@ -8,7 +8,7 @@ const FixturesPage = () => {
       <PageHeader title="Fixtures" />
       <hr className="border-black" />
       <div
-        className="-mt-5 w-full"
+        className="w-full pt-5"
         style={{
           background: "linear-gradient(to bottom, #214A27, #17331B)",
           backgroundRepeat: "no-repeat",
@@ -16,8 +16,8 @@ const FixturesPage = () => {
           backgroundPosition: "center",
         }}
       >
-        <div className="flex place-content-center mt-5">
-          <div className="max-w-5xl mx-5 grid grid-cols-1 md:grid-cols-2 gap-x-4 lg:grid-cols-4 mb-[50px]">
+        <div className="flex place-content-center">
+          <div className="max-w-5xl mx-5 mb-[50px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {clubs.map((club, i) => (
               <FixtureCard
                 key={i}

@@ -44,7 +44,7 @@ const TeeTimesTable = () => {
             placeholder="Search for a name..."
             value={searchQuery}
             onChange={handleSearchChange}
-            className="p-2 border border-gray-300 rounded w-full placeholder-gray-500 text-base h-12"
+            className="p-2 border border-gray-300 w-full placeholder-gray-500 text-base h-12"
           />
         </div>
 
@@ -53,7 +53,7 @@ const TeeTimesTable = () => {
           <select
             value={clubQuery}
             onChange={handleClubChange}
-            className="p-2 border border-gray-300 rounded w-full placeholder-gray-500 text-base h-12"
+            className="p-2 border border-gray-300 w-full placeholder-gray-500 text-base h-12"
           >
             <option value="">Select a club...</option>
             {uniqueClubs.map((club, index) => (
