@@ -4,7 +4,7 @@ import { calculateTotalPoints } from "../../utils/transformResults";
 import TableHeader from "../resultsTable/tableHeader";
 import TableRow from "../resultsTable/tableRow";
 
-const ResultsTable = () => {
+const ResultsTable = ({ limit }) => {
   const [expandedRow, setExpandedRow] = useState(null);
   const [category, setCategory] = useState("Amateur");
 
@@ -30,7 +30,7 @@ const ResultsTable = () => {
       return Object.values(clubMap).map(({ club, totalPoints, players }) => ({
         name: club,
         totalPoints,
-        result: players.flatMap((player) => player.result), // Flatten results for club view
+        result: players.flatMap((player) => player.result),
       }));
     }
     return results.filter((row) => !row.isPro);
@@ -42,11 +42,15 @@ const ResultsTable = () => {
     return totalPointsB - totalPointsA;
   });
 
+  const displayedResults = limit
+    ? sortedResults.slice(0, limit)
+    : sortedResults;
+
   return (
     <div className="flex justify-center my-8">
-      <div className="bg-white shadow-md rounded-lg w-full max-w-5xl">
+      <div className="bg-white shadow-md w-full max-w-5xl">
         <TableHeader onCategoryChange={setCategory} category={category} />
-        {sortedResults.map((row, rowIndex) => (
+        {displayedResults.map((row, rowIndex) => (
           <TableRow
             key={rowIndex}
             row={row}
