@@ -21,9 +21,9 @@ const StartTimesPage = () => {
             notification.
           </p>
         </div>
-        <hr className="border-black my-5" />
+        <hr className="border-black" />
       </div>
-      <div className="">
+      <div className="mt-5">
         <h2>Coxmoor Golf Club</h2>
         <h3>07 March 2024</h3>
       </div>

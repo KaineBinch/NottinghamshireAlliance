@@ -13,21 +13,18 @@ const TeeTimesTable = () => {
     setClubQuery(event.target.value.toLowerCase());
   };
 
-  // Extract unique clubs for the dropdown
   const uniqueClubs = [
     ...new Set(
       teeTimes.flatMap((teeTime) => teeTime.names.map((player) => player.club))
     ),
   ];
 
-  // Filter tee times based on the player name search query
   const filteredTeeTimesByName = teeTimes.filter((teeTime) =>
     teeTime.names.some((player) =>
       player.name.toLowerCase().includes(searchQuery)
     )
   );
 
-  // Filter tee times based on the selected club
   const filteredTeeTimesByClub = filteredTeeTimesByName.filter(
     (teeTime) =>
       !clubQuery ||
