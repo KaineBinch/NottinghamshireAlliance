@@ -2,96 +2,421 @@ export const results = [
   {
     name: "Tiger Woods",
     club: "BUL",
-    result: [{ date: "21-Mar", score: "34", }, { date: "04-Apr", score: "32", }, { date: "07-Sep", score: "26", }, { date: "27-Sep", score: "35", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "37", }, { date: "01-Nov", score: "39", },]
+    isSenior: false,
+    isPro: false,
+    result: [
+      { date: "21-Mar", score: "34" },
+      { date: "04-Apr", score: "32" },
+      { date: "07-Sep", score: "26" },
+      { date: "27-Sep", score: "35" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "37" },
+      { date: "01-Nov", score: "39" },
+      { date: "05-Nov", score: "33" },
+      { date: "12-Nov", score: "30" },
+      { date: "19-Nov", score: "31" },
+      { date: "26-Nov", score: "29" },
+      { date: "03-Dec", score: "32" },
+      { date: "10-Dec", score: "30" }
+    ]
   },
   {
     name: "Rory McIlroy",
     club: "OP",
-    result: [{ date: "21-Mar", score: "34", }, { date: "04-Apr", score: "31", }, { date: "07-Sep", score: "26", }, { date: "27-Sep", score: "35", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "37", }, { date: "01-Nov", score: "38", },]
+    isSenior: false,
+    isPro: false,
+    result: [
+      { date: "21-Mar", score: "34" },
+      { date: "04-Apr", score: "31" },
+      { date: "07-Sep", score: "26" },
+      { date: "27-Sep", score: "35" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "37" },
+      { date: "01-Nov", score: "38" },
+      { date: "05-Nov", score: "30" },
+      { date: "12-Nov", score: "33" },
+      { date: "19-Nov", score: "32" },
+      { date: "26-Nov", score: "34" },
+      { date: "03-Dec", score: "31" },
+      { date: "10-Dec", score: "30" }
+    ]
   },
   {
-    name: "Scotty Scheffler",
+    name: "Scottie Scheffler",
     club: "BON",
-    result: [{ date: "21-Mar", score: "34", }, { date: "04-Apr", score: "30", }, { date: "07-Sep", score: "26", }, { date: "27-Sep", score: "35", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "35", }, { date: "01-Nov", score: "37", },]
+    isSenior: true,
+    isPro: false,
+    result: [
+      { date: "21-Mar", score: "34" },
+      { date: "04-Apr", score: "30" },
+      { date: "07-Sep", score: "26" },
+      { date: "27-Sep", score: "35" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "35" },
+      { date: "01-Nov", score: "37" },
+      { date: "05-Nov", score: "33" },
+      { date: "12-Nov", score: "31" },
+      { date: "19-Nov", score: "29" },
+      { date: "26-Nov", score: "32" },
+      { date: "03-Dec", score: "34" },
+      { date: "10-Dec", score: "30" }
+    ]
   },
   {
     name: "Tommy Fleetwood",
     club: "WP",
-    result: [{ date: "21-Mar", score: "32", }, { date: "04-Apr", score: "34", }, { date: "07-Sep", score: "30", }, { date: "27-Sep", score: "32", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "33", }, { date: "01-Nov", score: "34", },]
-  }, {
-    name: "Phil Mickleson",
+    isSenior: false,
+    isPro: true,
+    result: [
+      { date: "21-Mar", score: "32" },
+      { date: "04-Apr", score: "34" },
+      { date: "07-Sep", score: "30" },
+      { date: "27-Sep", score: "32" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "33" },
+      { date: "01-Nov", score: "34" },
+      { date: "05-Nov", score: "31" },
+      { date: "12-Nov", score: "30" },
+      { date: "19-Nov", score: "29" },
+      { date: "26-Nov", score: "33" },
+      { date: "03-Dec", score: "32" },
+      { date: "10-Dec", score: "34" }
+    ]
+  },
+  {
+    name: "Phil Mickelson",
     club: "BUL",
-    result: [{ date: "21-Mar", score: "34", }, { date: "04-Apr", score: "32", }, { date: "07-Sep", score: "26", }, { date: "27-Sep", score: "35", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "37", }, { date: "01-Nov", score: "39", },]
+    isSenior: true,
+    isProf: true,
+    result: [
+      { date: "21-Mar", score: "34" },
+      { date: "04-Apr", score: "32" },
+      { date: "07-Sep", score: "26" },
+      { date: "27-Sep", score: "35" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "37" },
+      { date: "01-Nov", score: "39" },
+      { date: "05-Nov", score: "30" },
+      { date: "12-Nov", score: "33" },
+      { date: "19-Nov", score: "31" },
+      { date: "26-Nov", score: "32" },
+      { date: "03-Dec", score: "34" },
+      { date: "10-Dec", score: "30" },
+    ]
   },
   {
     name: "Jack Nicklaus",
-    club: "OP",
-    result: [{ date: "21-Mar", score: "34", }, { date: "04-Apr", score: "31", }, { date: "07-Sep", score: "26", }, { date: "27-Sep", score: "35", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "37", }, { date: "01-Nov", score: "38", },]
+    club: "COX",
+    isSenior: false,
+    isPro: true,
+    result: [
+      { date: "21-Mar", score: "34" },
+      { date: "04-Apr", score: "31" },
+      { date: "07-Sep", score: "26" },
+      { date: "27-Sep", score: "35" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "37" },
+      { date: "01-Nov", score: "38" },
+      { date: "05-Nov", score: "33" },
+      { date: "12-Nov", score: "30" },
+      { date: "19-Nov", score: "31" },
+      { date: "26-Nov", score: "29" },
+      { date: "03-Dec", score: "32" },
+      { date: "10-Dec", score: "30" }
+    ]
   },
   {
     name: "Justin Thomas",
     club: "BON",
-    result: [{ date: "21-Mar", score: "34", }, { date: "04-Apr", score: "30", }, { date: "07-Sep", score: "26", }, { date: "27-Sep", score: "35", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "35", }, { date: "01-Nov", score: "37", },]
+    isSenior: false,
+    isPro: true,
+    result: [
+      { date: "21-Mar", score: "34" },
+      { date: "04-Apr", score: "30" },
+      { date: "07-Sep", score: "26" },
+      { date: "27-Sep", score: "35" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "35" },
+      { date: "01-Nov", score: "37" },
+      { date: "05-Nov", score: "33" },
+      { date: "12-Nov", score: "30" },
+      { date: "19-Nov", score: "29" },
+      { date: "26-Nov", score: "32" },
+      { date: "03-Dec", score: "34" },
+      { date: "10-Dec", score: "30" }
+    ]
   },
   {
     name: "Matt Fitzpatrick",
     club: "WP",
-    result: [{ date: "21-Mar", score: "32", }, { date: "04-Apr", score: "34", }, { date: "07-Sep", score: "30", }, { date: "27-Sep", score: "32", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "33", }, { date: "01-Nov", score: "34", },]
-  }, {
-    name: "John Rahm",
-    club: "BUL",
-    result: [{ date: "21-Mar", score: "34", }, { date: "04-Apr", score: "32", }, { date: "07-Sep", score: "26", }, { date: "27-Sep", score: "35", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "37", }, { date: "01-Nov", score: "39", },]
+    isSenior: false,
+    isPro: true,
+    result: [
+      { date: "21-Mar", score: "32" },
+      { date: "04-Apr", score: "34" },
+      { date: "07-Sep", score: "30" },
+      { date: "27-Sep", score: "32" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "33" },
+      { date: "01-Nov", score: "34" },
+      { date: "05-Nov", score: "30" },
+      { date: "12-Nov", score: "31" },
+      { date: "19-Nov", score: "29" },
+      { date: "26-Nov", score: "32" },
+      { date: "03-Dec", score: "34" },
+      { date: "10-Dec", score: "30" }
+    ]
   },
   {
-    name: "Victor Hovland",
-    club: "OP",
-    result: [{ date: "21-Mar", score: "34", }, { date: "04-Apr", score: "31", }, { date: "07-Sep", score: "26", }, { date: "27-Sep", score: "35", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "37", }, { date: "01-Nov", score: "38", },]
+    name: "Jon Rahm",
+    club: "BUL",
+    isSenior: true,
+    isPro: false,
+    result: [
+      { date: "21-Mar", score: "34" },
+      { date: "04-Apr", score: "32" },
+      { date: "07-Sep", score: "26" },
+      { date: "27-Sep", score: "35" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "37" },
+      { date: "01-Nov", score: "39" },
+      { date: "05-Nov", score: "30" },
+      { date: "12-Nov", score: "33" },
+      { date: "19-Nov", score: "31" },
+      { date: "26-Nov", score: "32" },
+      { date: "03-Dec", score: "34" },
+      { date: "10-Dec", score: "30" }
+    ]
+  },
+  {
+    name: "Andrew Richardson",
+    club: "RUD",
+    isSenior: true,
+    isPro: false,
+    result: [
+      { date: "21-Mar", score: "34" },
+      { date: "04-Apr", score: "31" },
+      { date: "07-Sep", score: "26" },
+      { date: "27-Sep", score: "35" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "37" },
+      { date: "01-Nov", score: "38" },
+      { date: "05-Nov", score: "33" },
+      { date: "12-Nov", score: "30" },
+      { date: "19-Nov", score: "31" },
+      { date: "26-Nov", score: "29" },
+      { date: "03-Dec", score: "32" },
+      { date: "10-Dec", score: "30" }
+    ]
   },
   {
     name: "Max Homa",
     club: "BON",
-    result: [{ date: "21-Mar", score: "34", }, { date: "04-Apr", score: "30", }, { date: "07-Sep", score: "26", }, { date: "27-Sep", score: "35", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "35", }, { date: "01-Nov", score: "37", },]
+    isSenior: true,
+    isPro: false,
+    result: [
+      { date: "21-Mar", score: "34" },
+      { date: "04-Apr", score: "30" },
+      { date: "07-Sep", score: "26" },
+      { date: "27-Sep", score: "35" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "35" },
+      { date: "01-Nov", score: "37" },
+      { date: "05-Nov", score: "33" },
+      { date: "12-Nov", score: "30" },
+      { date: "19-Nov", score: "29" },
+      { date: "26-Nov", score: "32" },
+      { date: "03-Dec", score: "34" },
+      { date: "10-Dec", score: "30" }
+    ]
   },
   {
-    name: "Vijay Singh",
+    name: "Trevor Broadley-Jameison",
     club: "WP",
-    result: [{ date: "21-Mar", score: "32", }, { date: "04-Apr", score: "34", }, { date: "07-Sep", score: "30", }, { date: "27-Sep", score: "32", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "33", }, { date: "01-Nov", score: "34", },]
-  }, {
+    isSenior: true,
+    isPro: false,
+    result: [
+      { date: "21-Mar", score: "32" },
+      { date: "04-Apr", score: "34" },
+      { date: "07-Sep", score: "30" },
+      { date: "27-Sep", score: "32" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "33" },
+      { date: "01-Nov", score: "34" },
+      { date: "05-Nov", score: "30" },
+      { date: "12-Nov", score: "31" },
+      { date: "19-Nov", score: "29" },
+      { date: "26-Nov", score: "32" },
+      { date: "03-Dec", score: "34" },
+      { date: "10-Dec", score: "30" }
+    ]
+  },
+  {
     name: "Sahith Theegala",
     club: "BUL",
-    result: [{ date: "21-Mar", score: "34", }, { date: "04-Apr", score: "32", }, { date: "07-Sep", score: "26", }, { date: "27-Sep", score: "35", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "37", }, { date: "01-Nov", score: "39", },]
+    isSenior: true,
+    isPro: true,
+    result: [
+      { date: "21-Mar", score: "34" },
+      { date: "04-Apr", score: "32" },
+      { date: "07-Sep", score: "26" },
+      { date: "27-Sep", score: "35" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "37" },
+      { date: "01-Nov", score: "39" },
+      { date: "05-Nov", score: "30" },
+      { date: "12-Nov", score: "33" },
+      { date: "19-Nov", score: "31" },
+      { date: "26-Nov", score: "32" },
+      { date: "03-Dec", score: "34" },
+      { date: "10-Dec", score: "30" }
+    ]
   },
   {
-    name: "Jordan Speith",
+    name: "Jordan Spieth",
     club: "OP",
-    result: [{ date: "21-Mar", score: "34", }, { date: "04-Apr", score: "31", }, { date: "07-Sep", score: "26", }, { date: "27-Sep", score: "35", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "37", }, { date: "01-Nov", score: "38", },]
+    isSenior: false,
+    isPro: false,
+    result: [
+      { date: "21-Mar", score: "34" },
+      { date: "04-Apr", score: "31" },
+      { date: "07-Sep", score: "26" },
+      { date: "27-Sep", score: "35" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "37" },
+      { date: "01-Nov", score: "38" },
+      { date: "05-Nov", score: "30" },
+      { date: "12-Nov", score: "33" },
+      { date: "19-Nov", score: "31" },
+      { date: "26-Nov", score: "29" },
+      { date: "03-Dec", score: "32" },
+      { date: "10-Dec", score: "30" }
+    ]
   },
   {
-    name: "Colin Morikawa",
-    club: "BON",
-    result: [{ date: "21-Mar", score: "34", }, { date: "04-Apr", score: "30", }, { date: "07-Sep", score: "26", }, { date: "27-Sep", score: "35", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "35", }, { date: "01-Nov", score: "37", },]
+    name: "Collin Morikawa",
+    club: "RAD",
+    isSenior: false,
+    isPro: false,
+    result: [
+      { date: "21-Mar", score: "34" },
+      { date: "04-Apr", score: "30" },
+      { date: "07-Sep", score: "26" },
+      { date: "27-Sep", score: "35" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "35" },
+      { date: "01-Nov", score: "37" },
+      { date: "05-Nov", score: "33" },
+      { date: "12-Nov", score: "30" },
+      { date: "19-Nov", score: "29" },
+      { date: "26-Nov", score: "32" },
+      { date: "03-Dec", score: "34" },
+      { date: "10-Dec", score: "30" }
+    ]
   },
   {
-    name: "Ludvig Aberg",
+    name: "Ludvig Åberg",
     club: "WP",
-    result: [{ date: "21-Mar", score: "32", }, { date: "04-Apr", score: "34", }, { date: "07-Sep", score: "30", }, { date: "27-Sep", score: "32", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "33", }, { date: "01-Nov", score: "34", },]
-  }, {
+    isSenior: false,
+    isPro: false,
+    result: [
+      { date: "21-Mar", score: "32" },
+      { date: "04-Apr", score: "34" },
+      { date: "07-Sep", score: "30" },
+      { date: "27-Sep", score: "32" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "33" },
+      { date: "01-Nov", score: "34" },
+      { date: "05-Nov", score: "30" },
+      { date: "12-Nov", score: "31" },
+      { date: "19-Nov", score: "29" },
+      { date: "26-Nov", score: "32" },
+      { date: "03-Dec", score: "34" },
+      { date: "10-Dec", score: "30" }
+    ]
+  },
+  {
     name: "Tony Finau",
     club: "BUL",
-    result: [{ date: "21-Mar", score: "34", }, { date: "04-Apr", score: "32", }, { date: "07-Sep", score: "26", }, { date: "27-Sep", score: "35", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "37", }, { date: "01-Nov", score: "39", },]
+    isSenior: false,
+    isPro: false,
+    result: [
+      { date: "21-Mar", score: "34" },
+      { date: "04-Apr", score: "32" },
+      { date: "07-Sep", score: "26" },
+      { date: "27-Sep", score: "35" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "37" },
+      { date: "01-Nov", score: "39" },
+      { date: "05-Nov", score: "30" },
+      { date: "12-Nov", score: "33" },
+      { date: "19-Nov", score: "31" },
+      { date: "26-Nov", score: "32" },
+      { date: "03-Dec", score: "34" },
+      { date: "10-Dec", score: "30" }
+    ]
   },
   {
     name: "Ernie Els",
     club: "OP",
-    result: [{ date: "21-Mar", score: "34", }, { date: "04-Apr", score: "31", }, { date: "07-Sep", score: "26", }, { date: "27-Sep", score: "35", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "37", }, { date: "01-Nov", score: "38", },]
+    isSenior: true,
+    isPro: false,
+    result: [
+      { date: "21-Mar", score: "34" },
+      { date: "04-Apr", score: "31" },
+      { date: "07-Sep", score: "26" },
+      { date: "27-Sep", score: "35" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "37" },
+      { date: "01-Nov", score: "38" },
+      { date: "05-Nov", score: "30" },
+      { date: "12-Nov", score: "33" },
+      { date: "19-Nov", score: "31" },
+      { date: "26-Nov", score: "29" },
+      { date: "03-Dec", score: "32" },
+      { date: "10-Dec", score: "30" }
+    ]
   },
   {
-    name: "Steve Ballesteros",
+    name: "Seve Ballesteros",
     club: "BON",
-    result: [{ date: "21-Mar", score: "34", }, { date: "04-Apr", score: "30", }, { date: "07-Sep", score: "26", }, { date: "27-Sep", score: "35", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "35", }, { date: "01-Nov", score: "37", },]
+    isSenior: true,
+    isPro: false,
+    result: [
+      { date: "21-Mar", score: "34" },
+      { date: "04-Apr", score: "30" },
+      { date: "07-Sep", score: "26" },
+      { date: "27-Sep", score: "35" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "35" },
+      { date: "01-Nov", score: "37" },
+      { date: "05-Nov", score: "33" },
+      { date: "12-Nov", score: "30" },
+      { date: "19-Nov", score: "29" },
+      { date: "26-Nov", score: "32" },
+      { date: "03-Dec", score: "34" },
+      { date: "10-Dec", score: "30" }
+    ]
   },
   {
     name: "Rickie Fowler",
     club: "WP",
-    result: [{ date: "21-Mar", score: "32", }, { date: "04-Apr", score: "34", }, { date: "07-Sep", score: "30", }, { date: "27-Sep", score: "32", }, { date: "10-Oct", score: "32", }, { date: "18-Oct", score: "33", }, { date: "01-Nov", score: "34", },]
-  },]
+    isSenior: true,
+    isPro: true,
+    result: [
+      { date: "21-Mar", score: "32" },
+      { date: "04-Apr", score: "34" },
+      { date: "07-Sep", score: "30" },
+      { date: "27-Sep", score: "32" },
+      { date: "10-Oct", score: "32" },
+      { date: "18-Oct", score: "33" },
+      { date: "01-Nov", score: "34" },
+      { date: "05-Nov", score: "30" },
+      { date: "12-Nov", score: "31" },
+      { date: "19-Nov", score: "29" },
+      { date: "26-Nov", score: "32" },
+      { date: "03-Dec", score: "34" },
+      { date: "10-Dec", score: "30" }
+    ]
+  }
+];
