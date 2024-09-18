@@ -8,5 +8,6 @@ import ResultsPage from "./resultsPage"
 import RulesPage from "./rulesPage"
 import StartTimesPage from "./startTimesPage"
 import OrderOfMeritPage from "./oomPage"
+import FurtherResultsPage from "./furtherResultsPage"
 
-export { HomePage, NotFound, ContactPage, CoursesPage, FixturesPage, GalleryPage, ResultsPage, RulesPage, StartTimesPage, OrderOfMeritPage }
+export { HomePage, NotFound, ContactPage, CoursesPage, FixturesPage, GalleryPage, ResultsPage, RulesPage, StartTimesPage, OrderOfMeritPage, FurtherResultsPage }

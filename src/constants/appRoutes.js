@@ -9,4 +9,6 @@ export const appRoutes = {
   rules: "/rules",
   startTimes: "/starttimes",
   oom: "/oom",
-}
+
+  furtherResult: (clubName) => `/results/${clubName}`,
+};
