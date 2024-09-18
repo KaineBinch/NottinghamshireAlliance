@@ -1,34 +1,51 @@
-import { clubs } from "../../constants/golfClubs.js";
+import { futureClubs } from "../../constants/golfClubs.js";
 import FixtureCard from "../fixtureCard.jsx";
 import HomePageHeader from "./homepageHeader.jsx";
 
 const FixturesSection = () => {
+  const nextFixture = futureClubs[0];
+  const nextFourFixtures = futureClubs.slice(1, 5);
+
   return (
     <>
-      <HomePageHeader
-        title="Fixtures"
-        subtext="All the latest information about upcoming fixtures"
-        btnName="Fixtures"
-        btnStyle="text-white bg-[#214A27]"
-        page="fixtures"
-      />
-      <div className="flex place-content-center">
-        <div className="max-w-5xl mx-5 mb-[50px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {clubs
-            .filter((_, i) => i < 4)
-            .map((club, i) => (
-              <FixtureCard
-                key={i}
-                name={club.name}
-                address={club.address}
-                courseImage={club.courseImage}
-                comp={club.comp}
-                dayName={club.dayName}
-                day={club.day}
-                monthName={club.monthName}
-                year={club.year}
-              />
+      <div className="bg-[#d9d9d9]">
+        <HomePageHeader
+          title="Fixtures"
+          subtext="Stay updated with the latest details on upcoming fixtures. Click here for more information."
+          btnName="Fixtures"
+          btnStyle="text-white bg-[#214A27]"
+          page="fixtures"
+        />
+        <div className="flex flex-col items-center mb-10 px-5 ">
+          <h2 className="text-2xl font-bold text-black mb-4">Next Fixture</h2>
+
+          <div className="w-auto max-w-5xl mb-10">
+            <FixtureCard
+              name={nextFixture.name}
+              address={nextFixture.address}
+              courseImage={nextFixture.courseImage}
+              comp={nextFixture.comp}
+              date={nextFixture.date}
+            />
+          </div>
+
+          <h3 className="text-xl font-semibold text-black mb-6">
+            Upcoming Fixtures
+          </h3>
+
+          <div className="w-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {nextFourFixtures.map((club, i) => (
+              <div key={i}>
+                <FixtureCard
+                  name={club.name}
+                  address={club.address}
+                  courseImage={club.courseImage}
+                  comp={club.comp}
+                  date={club.date}
+                />
+              </div>
             ))}
+          </div>
         </div>
       </div>
     </>
