@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const Socials = ({ link, icon }) => {
   return (
     <>
-      <div className="flex w-full text-start items-center text-lg ">
+      <div className="flex w-full text-start items-center text-base ">
         <a
           className="flex items-center justify-center"
           href={link}

@@ -3,10 +3,10 @@ import HomePageHeader from "./homepageHeader";
 const CoursesSection = () => {
   return (
     <>
-      <div className="bg-[#D9D9D9]">
+      <div className="">
         <HomePageHeader
           title="Courses"
-          subtext="Explore the courses within our alliance by clicking here."
+          subtext="Discover the courses in our alliance by clicking here to explore them."
           btnName="Courses"
           btnStyle="text-black bg-white"
           page="courses"

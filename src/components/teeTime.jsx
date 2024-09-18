@@ -41,7 +41,7 @@ const TeeTimesTable = () => {
             placeholder="Search for a name..."
             value={searchQuery}
             onChange={handleSearchChange}
-            className="p-2 border border-gray-300 w-full placeholder-gray-500 text-base h-12"
+            className="p-2 border border-gray-400 w-full placeholder-gray-500 text-black h-12 bg-[#ffffff] drop-shadow"
           />
         </div>
 
@@ -50,7 +50,7 @@ const TeeTimesTable = () => {
           <select
             value={clubQuery}
             onChange={handleClubChange}
-            className="p-2 border border-gray-300 w-full placeholder-gray-500 text-base h-12"
+            className="p-2 border border-gray-400 w-full placeholder-gray-500 text-base h-12 bg-[#ffffff] drop-shadow"
           >
             <option value="">Select a club...</option>
             {uniqueClubs.map((club, index) => (
@@ -63,13 +63,16 @@ const TeeTimesTable = () => {
       </div>
 
       {/* Tee Times Table */}
-      <div className="grid md:grid-cols-2 grid-cols-1 gap-4 w-full">
+      <div className="grid md:grid-cols-2 grid-cols-1 gap-4 w-full drop-shadow-sm">
         {filteredTeeTimesByClub.map((teeTime, index) => (
-          <div key={index} className="col-span-1 border border-gray-300">
+          <div
+            key={index}
+            className="col-span-1 border border-gray-300 bg-[#ffffff] drop-shadow"
+          >
             <div className="p-2 border-b border-gray-300 bg-gray-200">
               <h2 className="text-lg font-semibold">{teeTime.time}</h2>
             </div>
-            <div className="">
+            <div className="p-1">
               <div className="grid md:grid-cols-2 grid-cols-1">
                 {teeTime.names.map((player, playerIndex) => (
                   <div key={playerIndex} className="p-2">

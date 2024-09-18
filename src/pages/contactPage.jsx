@@ -10,8 +10,9 @@ const ContactPage = () => {
       <PageHeader title="Contact" />
       <hr className="border-black" />
       <div className="bg-[#D9D9D9] h-full">
-        <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 ">
+        <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-black">
           <div>
+            <h2 className="text-left my-3">Social Media</h2>
             {socials.map((social, i) => (
               <Socials key={i} icon={social.icon} link={social.link} />
             ))}

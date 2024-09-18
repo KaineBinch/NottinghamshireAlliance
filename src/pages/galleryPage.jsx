@@ -46,7 +46,12 @@ const GalleryPage = () => {
       <hr className="border-black" />
       <div className="bg-[#D9D9D9] h-full">
         <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-start">
-          <ImageGallery items={images} infinite={true} showIndex={true} />
+          <ImageGallery
+            eagerload={true}
+            items={images}
+            infinite={true}
+            showIndex={true}
+          />
         </div>
       </div>
     </>

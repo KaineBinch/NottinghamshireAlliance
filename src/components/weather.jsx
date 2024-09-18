@@ -62,7 +62,7 @@ const Weather = ({ city }) => {
                   <span className="weather-icon text-2xl [text-shadow:_2px_3px_2px_rgb(0_0_0_/_60%)]">
                     {getWeatherIcon(day.icon)}
                   </span>
-                  <div className="text-white text-sm ml-3">
+                  <div className="text-white text-sm ml-1 md:ml-2">
                     <div>{formatDate(day.date)}</div>
                     <div className="">{day.temp}°C</div>
                   </div>

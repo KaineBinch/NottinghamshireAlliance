@@ -13,13 +13,18 @@ const CourseCard = ({ name, address, contact, link, courseImage, logo }) => {
           }}
         >
           <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2">
-            <img src={logo} className="max-w-[100px] max-h-[100px]" />
+            <img
+              src={logo}
+              className="md:max-w-[100px] md:max-h-[100px] max-w-[75px] max-h-[75px] "
+              alt="logo"
+            />
           </div>
         </div>
+
         <div className="flex flex-col w-3/5 text-start pl-5 md:pl-10 justify-center">
           <div className="font-bold text-xl md:text-2xl py-4">{name}</div>
           <div className="pb-4 md:text-lg">{address}</div>
-          <div className="flex items-center justify-between md:text-lg ">
+          <div className="flex items-center justify-between md:text-lg">
             <a href={`tel:${contact}`}>
               <FontAwesomeIcon
                 icon="fa-solid fa-phone"
@@ -28,7 +33,7 @@ const CourseCard = ({ name, address, contact, link, courseImage, logo }) => {
               {contact}
             </a>
             <a
-              className="btn border-black rounded-none md:text-lg "
+              className="btn border-black rounded-none md:text-lg"
               href={link}
               target="_blank"
               rel="noreferrer"
@@ -38,6 +43,7 @@ const CourseCard = ({ name, address, contact, link, courseImage, logo }) => {
           </div>
         </div>
       </div>
+
       <hr className="my-4 border-[#A0A0A0] ml-auto w-2/4 md:mr-8 mr-2" />
     </>
   );

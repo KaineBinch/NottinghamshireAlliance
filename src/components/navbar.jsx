@@ -69,7 +69,7 @@ const Navbar = () => {
             </div>
           </div>
           <div className="lg:invisible visible absolute w-full left-0 flex items-center justify-center text-white text-lg">
-            Nottinghamshire Golf Alliance
+            <a href={"/"}>Nottinghamshire Golf Alliance</a>
           </div>
           <div className="hidden lg:flex h-full items-center justify-center flex-grow">
             <ul className="h-full flex menu menu-horizontal place-content-between w-full text-lg -ml-5">

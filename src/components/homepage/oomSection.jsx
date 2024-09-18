@@ -8,16 +8,17 @@ const OOMSection = () => {
 
   return (
     <>
-      <HomePageHeader
-        title="Order Of Merit Standings"
-        subtext="Click here to check on the current standings"
-        btnName="Order of Merit"
-        btnStyle="text-white bg-[#214A27]"
-        page="oom"
-      />
-      <div className="max-w-5xl -mt-6 w-full mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Passing the limit prop to show only top 10 results */}
-        <ResultsTable columns={columns} rows={rows} limit={12} />
+      <div className="bg-[#D9D9D9]">
+        <HomePageHeader
+          title="Order Of Merit Standings"
+          subtext="See the top 12 rankings at a glance, or click here for the complete standings."
+          btnName="Order of Merit"
+          btnStyle="text-white bg-[#214A27]"
+          page="oom"
+        />
+        <div className="max-w-5xl -mt-8 w-full mx-auto px-4 sm:px-6 lg:px-8">
+          <ResultsTable columns={columns} rows={rows} limit={12} />
+        </div>
       </div>
     </>
   );
