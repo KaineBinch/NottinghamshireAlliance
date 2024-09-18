@@ -1,21 +1,28 @@
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { results } from "../../constants/results";
 import { calculateTotalPoints } from "../../utils/transformResults";
 import TableHeader from "../resultsTable/tableHeader";
 import TableRow from "../resultsTable/tableRow";
+import SearchFilter from "../SearchFilter";
 
 const ResultsTable = ({ limit }) => {
   const [expandedRow, setExpandedRow] = useState(null);
   const [category, setCategory] = useState("Amateur");
+  const [rankedResults, setRankedResults] = useState([]);
+  const [filteredResults, setFilteredResults] = useState([]);
 
-  const handleRowClick = (rowIndex) => {
-    setExpandedRow(expandedRow === rowIndex ? null : rowIndex);
-  };
+  const uniqueClubs = [...new Set(results.map((row) => row.club))];
 
-  const filteredResults = () => {
-    if (category === "Professional") return results.filter((row) => row.isPro);
-    if (category === "Senior") return results.filter((row) => row.isSenior);
-    if (category === "Club") {
+  const categorizeData = useCallback(() => {
+    let categorizedData = [];
+
+    if (category === "Professional") {
+      categorizedData = results.filter((row) => row.isPro);
+    } else if (category === "Senior") {
+      categorizedData = results.filter((row) => row.isSenior);
+    } else if (category === "Amateur") {
+      categorizedData = results.filter((row) => !row.isPro);
+    } else if (category === "Club") {
       const clubMap = results.reduce((acc, row) => {
         const totalPoints = calculateTotalPoints(row.result);
         if (acc[row.club]) {
@@ -27,35 +34,65 @@ const ResultsTable = ({ limit }) => {
         return acc;
       }, {});
 
-      return Object.values(clubMap).map(({ club, totalPoints, players }) => ({
-        name: club,
-        totalPoints,
-        result: players.flatMap((player) => player.result),
-      }));
+      categorizedData = Object.values(clubMap).map(
+        ({ club, totalPoints, players }) => ({
+          name: club,
+          totalPoints,
+          result: players.flatMap((player) => player.result),
+          players,
+        })
+      );
     }
-    return results.filter((row) => !row.isPro);
+
+    return categorizedData;
+  }, [category]);
+
+  const sortAndRankData = useCallback((data) => {
+    const sortedData = data
+      .map((row) => ({
+        ...row,
+        totalPoints: row.totalPoints || calculateTotalPoints(row.result),
+      }))
+      .sort((a, b) => b.totalPoints - a.totalPoints);
+
+    return sortedData.map((row, index) => ({
+      ...row,
+      rank: index + 1,
+    }));
+  }, []);
+
+  useEffect(() => {
+    const categorizedData = categorizeData();
+    const rankedData = sortAndRankData(categorizedData);
+    setRankedResults(rankedData);
+    setFilteredResults(rankedData);
+  }, [categorizeData, sortAndRankData]);
+
+  const handleFilteredDataChange = (data) => {
+    setFilteredResults(data);
   };
 
-  const sortedResults = filteredResults().sort((a, b) => {
-    const totalPointsA = a.totalPoints || calculateTotalPoints(a.result);
-    const totalPointsB = b.totalPoints || calculateTotalPoints(b.result);
-    return totalPointsB - totalPointsA;
-  });
-
   const displayedResults = limit
-    ? sortedResults.slice(0, limit)
-    : sortedResults;
+    ? filteredResults.slice(0, limit)
+    : filteredResults;
 
   return (
-    <div className="flex justify-center my-8">
+    <div className="flex flex-col justify-center my-8">
+      <SearchFilter
+        data={rankedResults}
+        onFilteredDataChange={handleFilteredDataChange}
+        uniqueClubs={uniqueClubs}
+      />
       <div className="bg-white shadow-md w-full max-w-5xl">
         <TableHeader onCategoryChange={setCategory} category={category} />
         {displayedResults.map((row, rowIndex) => (
           <TableRow
             key={rowIndex}
             row={row}
-            rowIndex={rowIndex}
-            handleRowClick={handleRowClick}
+            rowIndex={row.rank - 1}
+            handleRowClick={() =>
+              setExpandedRow(expandedRow === rowIndex ? null : rowIndex)
+            }
             expandedRow={expandedRow}
             isClubView={category === "Club"}
           />
