@@ -13,6 +13,7 @@ const Navbar = () => {
     { title: "Contact", to: "/contact" },
     { title: "Rules", to: "/rules" },
     { title: "Gallery", to: "/gallery" },
+    { title: "Admin", to: "/admin" },
   ];
   const loseActiveFocus = () => {
     const elem = document.activeElement;
@@ -31,7 +32,10 @@ const Navbar = () => {
           marginBottom: my,
         }}
       >
-        <Link to={to} className="text-center font-normal text-white inline">
+        <Link
+          to={to}
+          className="text-center font-normal text-white inline hover:bg-green-600 rounded-none"
+        >
           {title}
         </Link>
       </li>
@@ -72,7 +76,7 @@ const Navbar = () => {
             <a href={"/"}>Nottinghamshire Golf Alliance</a>
           </div>
           <div className="hidden lg:flex h-full items-center justify-center flex-grow">
-            <ul className="h-full flex menu menu-horizontal place-content-between w-full text-lg -ml-5">
+            <ul className="h-full flex menu menu-horizontal place-content-evenly w-full text-base -ml-5 ">
               {links.map(({ title, to }) => LinkItem(title, to, location))}
             </ul>
           </div>
