@@ -4,7 +4,7 @@ import HomePageHeader from "./homepageHeader.jsx";
 
 const FixturesSection = () => {
   const nextFixture = futureClubs[0];
-  const nextFourFixtures = futureClubs.slice(1, 5);
+  const nextTwoFixtures = futureClubs.slice(1, 3);
 
   return (
     <>
@@ -33,8 +33,8 @@ const FixturesSection = () => {
             Upcoming Fixtures
           </h3>
 
-          <div className="w-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {nextFourFixtures.map((club, i) => (
+          <div className="w-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-4">
+            {nextTwoFixtures.map((club, i) => (
               <div key={i}>
                 <FixtureCard
                   name={club.name}

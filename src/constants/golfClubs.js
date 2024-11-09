@@ -25,7 +25,7 @@ export const clubs = [
   {
     name: "Coxmoor Golf Club",
     address: "Coxmoor House, Coxmoor Road, Sutton-in-Ashfield, NG17 5LF",
-    date: "07/03/2024",
+    date: "22/05/2025",
     comp: "Order of Merit",
     courseImage: coxmoor,
     contact: "01623 557359",
@@ -35,7 +35,7 @@ export const clubs = [
   {
     name: "Worksop Golf Club",
     address: "51 Windmill Lane, Worksop, S80 2SQ",
-    date: "21/03/2024",
+    date: "27/03/2025",
     comp: "Order of Merit",
     courseImage: worksop,
     contact: "01909 477731",
@@ -45,7 +45,7 @@ export const clubs = [
   {
     name: "Newark Golf Club",
     address: "Sleaford Road, Coddington, Newark, NG24 2QX",
-    date: "04/04/2024",
+    date: "16/04/2025",
     comp: "Order of Merit",
     courseImage: newark,
     contact: "01636 626282",
@@ -55,7 +55,7 @@ export const clubs = [
   {
     name: "Radcliffe On Trent",
     address: "Dewberry Ln, Radcliffe on Trent, Nottingham NG12 2JH",
-    date: "07/09/2024",
+    date: "19/09/2024",
     comp: "Order of Merit",
     courseImage: radcliffe,
     contact: "01159 333000",
@@ -65,7 +65,7 @@ export const clubs = [
   {
     name: "Bondhay Golf Club",
     address: "Bondhay Ln, Whitwell Common, Worksop S80 3EH",
-    date: "27/09/2024",
+    date: "16/10/2024",
     comp: "Order of Merit",
     courseImage: bondhay,
     contact: "01909 723608",
@@ -75,7 +75,7 @@ export const clubs = [
   {
     name: "Wollaton Park Golf Club",
     address: "Lime Tree Ave, Nottingham NG8 1BT",
-    date: "10/10/2024",
+    date: "03/09/2024",
     comp: "Order of Merit",
     courseImage: wollaton,
     contact: "0115 9787574",
@@ -85,7 +85,7 @@ export const clubs = [
   {
     name: "Brierley Forest Golf Club",
     address: "160 Main St, Huthwaite, Sutton-in-Ashfield NG17 2LG",
-    date: "18/10/2024",
+    date: "02/10/2024",
     comp: "Team Event Pairs",
     courseImage: brierly,
     contact: "01623 550761",
@@ -95,7 +95,7 @@ export const clubs = [
   {
     name: "Ramsdale Golf Club",
     address: "Oxton Rd, Calverton, Nottingham NG14 6NU",
-    date: "01/11/2024",
+    date: "30/10/2024",
     comp: "Order of Merit",
     courseImage: ramsdale,
     contact: "0115 9655600",
@@ -105,7 +105,7 @@ export const clubs = [
   {
     name: "Oakmere Park Golf Club",
     address: "Oaks Ln, Oxton, Southwell NG25 0RH",
-    date: "15/11/2024",
+    date: "27/11/2024",
     comp: "Order of Merit",
     courseImage: oakmere,
     contact: "0115 9653545",
@@ -115,7 +115,7 @@ export const clubs = [
   {
     name: "Ruddington Golf Club",
     address: "Wilford Rd, Ruddington, Nottingham NG11 6NB",
-    date: "28/11/2024",
+    date: "12/11/2024",
     comp: "Order of Merit",
     courseImage: ruddington,
     contact: "0115 9214139",
@@ -125,7 +125,7 @@ export const clubs = [
   {
     name: "Bulwell Forest Golf Club",
     address: "Forest Golf Club, Hucknall Rd, Bulwell, Nottingham NG6 9LQ",
-    date: "17/01/2024",
+    date: "12/03/2024",
     comp: "Order of Merit",
     courseImage: bulwell,
     contact: "0115 9763172",
