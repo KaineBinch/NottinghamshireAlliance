@@ -2,25 +2,28 @@ import { useAuth0 } from "@auth0/auth0-react";
 import PageHeader from "../components/pageHeader";
 import { useNavigate } from "react-router-dom";
 import DownloadCSVFile from "../components/csv/downloadCSV";
+import SheetTemplate from "../components/sheetTemplate";
+import CSVPreview from "../components/csv/csvPreview";
+import { useState, useEffect } from "react";
 
 const AdminPage = () => {
-  const { isAuthenticated, isLoading, loginWithRedirect, logout } = useAuth0();
+  const { isAuthenticated, isLoading, loginWithPopup, logout } = useAuth0();
   const navigate = useNavigate();
+  const [csvData, setCsvData] = useState([]);
+  const [groupedData, setGroupedData] = useState({});
 
-  const handleLogin = () => {
-    // Trigger the Auth0 login process with redirect
-    loginWithRedirect({
-      redirectUri: window.location.href, // Stay on the same page after login
-    });
-  };
+  useEffect(() => {
+    // Automatically open login popup if the user is not authenticated
+    if (!isAuthenticated && !isLoading) {
+      loginWithPopup().catch((error) => console.error("Login failed", error));
+    }
+  }, [isAuthenticated, isLoading, loginWithPopup]);
 
   const handleLogout = () => {
-    // Log out and redirect to the homepage
     logout({ returnTo: window.location.origin });
-    navigate("/"); // Redirecting to the homepage on logout
+    navigate("/");
   };
 
-  // Show loading state until Auth0 determines authentication status
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -28,8 +31,6 @@ const AdminPage = () => {
   return (
     <>
       <PageHeader title="Admin" />
-
-      {/* Log out button, visible only if authenticated */}
       {isAuthenticated && (
         <div className="relative">
           <button
@@ -42,17 +43,28 @@ const AdminPage = () => {
       )}
 
       <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-black">
-        {!isAuthenticated ? (
-          <button
-            onClick={handleLogin}
-            className="bg-[#214A27] text-white py-2 px-4 rounded hover:bg-green-600 transition duration-300"
-          >
-            Login to Admin
-          </button>
-        ) : (
+        {isAuthenticated && (
           <>
-            <h2 className="my-[25px]">Import your Excel file below:</h2>
-            <DownloadCSVFile />
+            {/* Existing Download and Import Cards */}
+            <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
+              <div className="flex-1 bg-[#214A27] p-6 rounded-lg shadow-lg">
+                <SheetTemplate />
+              </div>
+              <div className="flex-1 bg-[#214A27] p-6 rounded-lg shadow-lg">
+                <DownloadCSVFile
+                  setCsvData={setCsvData}
+                  setGroupedData={setGroupedData}
+                  csvData={csvData}
+                />
+              </div>
+            </div>
+
+            {/* New Full-Width CSV Preview Card */}
+            {csvData.length > 0 && (
+              <div className="mt-6 bg-[#214A27] p-6 rounded-lg shadow-lg max-w-5xl">
+                <CSVPreview csvData={csvData} groupedData={groupedData} />
+              </div>
+            )}
           </>
         )}
       </div>
