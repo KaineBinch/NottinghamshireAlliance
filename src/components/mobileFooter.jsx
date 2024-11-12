@@ -24,17 +24,22 @@ const MobFoot = () => {
         <div className="flex flex-col items-center justify-center pb-3"></div>
       </div>
       <hr className="border-1 border-neutral mt-8" />
-      <p className="flex flex-col py-8 leading-6 text-center text-xs">
-        Copyright © 2024 Nottinghamshire Golf Alliance
-        <a
-          href={"https://kainebinch.dev"}
-          target="_blank"
-          rel="noreferrer"
-          className="pt-4 text-xs"
-        >
-          Web Design by Kaine Binch
-        </a>
-      </p>
+      <div className="flex flex-col py-8 leading-6 text-left mx-5 text-xs">
+        <div className="flex flex-row place-content-between">
+          <p className="">Copyright © 2024 Nottinghamshire Golf Alliance</p>
+          <a href="/#/admin">Admin</a>
+        </div>
+        <div>
+          <a
+            href={"https://kainebinch.dev"}
+            target="_blank"
+            rel="noreferrer"
+            className="pt-4 text-xs "
+          >
+            Web Design by Kaine Binch
+          </a>
+        </div>
+      </div>
     </>
   );
 };

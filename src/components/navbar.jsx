@@ -13,7 +13,6 @@ const Navbar = () => {
     { title: "Contact", to: "/contact" },
     { title: "Rules", to: "/rules" },
     { title: "Gallery", to: "/gallery" },
-    { title: "Admin", to: "/admin" },
   ];
   const loseActiveFocus = () => {
     const elem = document.activeElement;
