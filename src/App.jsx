@@ -12,7 +12,6 @@ import {
   StartTimesPage,
   OrderOfMeritPage,
   FurtherResultsPage,
-  TemplatePage,
   AdminPage,
 } from "./pages";
 import { appRoutes } from "./constants/appRoutes";
@@ -59,8 +58,6 @@ function App() {
             </Auth0Provider>
           }
         />
-
-        <Route exact path={appRoutes.template} element={<TemplatePage />} />
         <Route path="/results/:clubName" element={<FurtherResultsPage />} />
         <Route path={appRoutes.notFound} element={<NotFound />} />
       </Routes>
