@@ -9,7 +9,6 @@ import RulesPage from "./rulesPage"
 import StartTimesPage from "./startTimesPage"
 import OrderOfMeritPage from "./oomPage"
 import FurtherResultsPage from "./furtherResultsPage"
-import TemplatePage from "./templatePage"
 import AdminPage from "./adminPage"
 
-export { HomePage, NotFound, ContactPage, CoursesPage, FixturesPage, GalleryPage, ResultsPage, RulesPage, StartTimesPage, OrderOfMeritPage, FurtherResultsPage, TemplatePage, AdminPage }
+export { HomePage, NotFound, ContactPage, CoursesPage, FixturesPage, GalleryPage, ResultsPage, RulesPage, StartTimesPage, OrderOfMeritPage, FurtherResultsPage, AdminPage }
