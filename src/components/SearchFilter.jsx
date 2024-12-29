@@ -25,7 +25,7 @@ const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
   }, [filteredData, onFilteredDataChange]);
 
   return (
-    <div className="flex flex-col mb-4 p-4 border border-gray-300 rounded">
+    <div className="flex flex-col mb-4 p-4 border border-gray-300">
       {/* Search by Name */}
       <div className="mb-4">
         <input
@@ -33,7 +33,7 @@ const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
           placeholder="Search for a name..."
           value={searchQuery}
           onChange={handleSearchChange}
-          className="p-2 border border-gray-300 w-full placeholder-gray-500 text-base h-12"
+          className="p-2 border border-gray-300 w-full placeholder-gray-500 text-base h-12 rounded-none"
         />
       </div>
 
@@ -42,7 +42,7 @@ const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
         <select
           value={clubQuery}
           onChange={handleClubChange}
-          className="p-2 border border-gray-300 w-full placeholder-gray-500 text-base h-12"
+          className="p-2 border border-gray-300 w-full placeholder-gray-500 text-base h-12 rounded-none"
         >
           <option value="">Select a club...</option>
           {uniqueClubs.map((club, index) => (
