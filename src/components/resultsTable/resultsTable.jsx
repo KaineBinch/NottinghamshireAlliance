@@ -82,8 +82,9 @@ const ResultsTable = ({ limit }) => {
         data={rankedResults}
         onFilteredDataChange={handleFilteredDataChange}
         uniqueClubs={uniqueClubs}
+        className="rounded-none"
       />
-      <div className="bg-white shadow-md w-full max-w-5xl border border-gray-400">
+      <div className="bg-white shadow-md w-full max-w-5xl border border-gray-400 ">
         <TableHeader onCategoryChange={setCategory} category={category} />
         {displayedResults.map((row, rowIndex) => (
           <TableRow
