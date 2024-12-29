@@ -24,6 +24,7 @@ import bulwellLogo from "../assets/courses/logos/bulwellLogo.png"
 export const clubs = [
   {
     name: "Coxmoor Golf Club",
+    clubID: "COX",
     address: "Coxmoor House, Coxmoor Road, Sutton-in-Ashfield, NG17 5LF",
     date: "22/05/2025",
     comp: "Order of Merit",
@@ -34,6 +35,7 @@ export const clubs = [
   },
   {
     name: "Worksop Golf Club",
+    clubID: "WSP",
     address: "51 Windmill Lane, Worksop, S80 2SQ",
     date: "27/03/2025",
     comp: "Order of Merit",
@@ -44,6 +46,7 @@ export const clubs = [
   },
   {
     name: "Newark Golf Club",
+    clubID: "NK",
     address: "Sleaford Road, Coddington, Newark, NG24 2QX",
     date: "16/04/2025",
     comp: "Order of Merit",
@@ -54,6 +57,7 @@ export const clubs = [
   },
   {
     name: "Radcliffe On Trent",
+    clubID: "ROT",
     address: "Dewberry Ln, Radcliffe on Trent, Nottingham NG12 2JH",
     date: "19/09/2024",
     comp: "Order of Merit",
@@ -64,6 +68,7 @@ export const clubs = [
   },
   {
     name: "Bondhay Golf Club",
+    clubID: "BON",
     address: "Bondhay Ln, Whitwell Common, Worksop S80 3EH",
     date: "16/10/2024",
     comp: "Order of Merit",
@@ -74,6 +79,7 @@ export const clubs = [
   },
   {
     name: "Wollaton Park Golf Club",
+    clubID: "WP",
     address: "Lime Tree Ave, Nottingham NG8 1BT",
     date: "03/09/2024",
     comp: "Order of Merit",
@@ -84,6 +90,7 @@ export const clubs = [
   },
   {
     name: "Brierley Forest Golf Club",
+    clubID: "BRI",
     address: "160 Main St, Huthwaite, Sutton-in-Ashfield NG17 2LG",
     date: "02/10/2024",
     comp: "Team Event Pairs",
@@ -94,6 +101,7 @@ export const clubs = [
   },
   {
     name: "Ramsdale Golf Club",
+    clubID: "RM",
     address: "Oxton Rd, Calverton, Nottingham NG14 6NU",
     date: "30/10/2024",
     comp: "Order of Merit",
@@ -104,6 +112,7 @@ export const clubs = [
   },
   {
     name: "Oakmere Park Golf Club",
+    clubID: "OP",
     address: "Oaks Ln, Oxton, Southwell NG25 0RH",
     date: "27/11/2024",
     comp: "Order of Merit",
@@ -114,6 +123,7 @@ export const clubs = [
   },
   {
     name: "Ruddington Golf Club",
+    clubID: "RG",
     address: "Wilford Rd, Ruddington, Nottingham NG11 6NB",
     date: "12/11/2024",
     comp: "Order of Merit",
@@ -124,6 +134,7 @@ export const clubs = [
   },
   {
     name: "Bulwell Forest Golf Club",
+    clubID: "BUL",
     address: "Forest Golf Club, Hucknall Rd, Bulwell, Nottingham NG6 9LQ",
     date: "12/03/2024",
     comp: "Order of Merit",

@@ -67,9 +67,9 @@ const TeeTimesTable = () => {
         {filteredTeeTimesByClub.map((teeTime, index) => (
           <div
             key={index}
-            className="col-span-1 border border-gray-300 bg-[#ffffff] drop-shadow"
+            className="col-span-1 border border-gray-400 bg-[#D9D9D9] drop-shadow"
           >
-            <div className="p-2 border-b border-gray-300 bg-gray-200">
+            <div className="p-2 border-b border-gray-300 text-white bg-[#214A27]">
               <h2 className="text-lg font-semibold">{teeTime.time}</h2>
             </div>
             <div className="p-1">

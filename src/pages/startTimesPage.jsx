@@ -1,7 +1,15 @@
+import { useState } from "react";
 import PageHeader from "../components/pageHeader";
 import TeeTimesTable from "../components/teeTime";
+import ListView from "../components/listView"; // New ListView component
 
 const StartTimesPage = () => {
+  const [isListView, setIsListView] = useState(false); // State to toggle views
+
+  const handleToggleView = () => {
+    setIsListView(!isListView); // Toggle between views
+  };
+
   return (
     <>
       <PageHeader title="Order of Play" />
@@ -23,14 +31,26 @@ const StartTimesPage = () => {
         </div>
         <hr className="border-black" />
       </div>
-      <div className="mt-5">
-        <h2>Coxmoor Golf Club</h2>
-        <h3>07 March 2024</h3>
+      <div className="mt-5 flex flex-col mx-5">
+        <div className="justify-center items-center">
+          <div>
+            <h4 className="text-3xl font-bold">Coxmoor Golf Club</h4>
+            <h4 className="text-xl">07 March 2024</h4>
+          </div>
+        </div>
+        <div className="flex justify-end">
+          <button
+            onClick={handleToggleView}
+            className="text-black font-bold py-5"
+          >
+            {isListView ? "Table View" : "List View"}
+          </button>
+        </div>
       </div>
       <div className="flex justify-center">
         <div className="max-w-5xl w-full">
           <div className="m-5">
-            <TeeTimesTable />
+            {isListView ? <ListView /> : <TeeTimesTable />}
           </div>
         </div>
       </div>
