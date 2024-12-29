@@ -67,6 +67,25 @@ const AdminPage = () => {
             )}
           </>
         )}
+        {!isAuthenticated && (
+          <div>
+            You must be logged in to view this page. <br />
+            Please{" "}
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                loginWithPopup().catch((error) =>
+                  console.error("Login failed", error)
+                );
+              }}
+              className="text-blue-500 hover:underline cursor-pointer"
+            >
+              log in
+            </a>{" "}
+            to continue.
+          </div>
+        )}
       </div>
     </>
   );
