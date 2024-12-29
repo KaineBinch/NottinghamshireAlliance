@@ -38,7 +38,7 @@ const StartTimesPage = () => {
             <h4 className="text-xl">07 March 2024</h4>
           </div>
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-end max-w-5xl mx-auto">
           <button
             onClick={handleToggleView}
             className="text-black font-bold py-5"
