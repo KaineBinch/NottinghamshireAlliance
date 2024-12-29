@@ -37,7 +37,7 @@ const ExpandedRowDetails = ({ result, isClubView }) => {
     const highlightScores = [...sortedScores];
 
     return (
-      <div className="bg-[#D9D9D9] p-2">
+      <div className="bg-[#ffffff] p-2">
         <div className="flex flex-wrap justify-center">
           {result.map((res, index) => {
             const score = parseInt(res.score, 10);

@@ -5,14 +5,14 @@ const TableButtons = ({ onCategoryChange }) => {
 
   const handleButtonClick = (category) => {
     setActiveButton(category);
-    onCategoryChange(category); // Pass the selected category to the parent
+    onCategoryChange(category);
   };
 
   const buttonClasses = (category) =>
-    `w-1/4 border-r text-sm md:text-base ${
+    `w-1/4 border-r border-gray-400 text-sm md:text-base ${
       activeButton === category
-        ? "bg-[#d9d9d9] text-black h-full"
-        : "bg-[#17331B] text-white hover:bg-[#1A4923] active:bg-[#0F2C17] h-full"
+        ? "bg-[#d9d9d9] text-black font-bold h-full border-none"
+        : "bg-[#17331B] text-white hover:bg-[#1A4923] active:bg-[#0F2C17] h-full "
     }`;
 
   return (

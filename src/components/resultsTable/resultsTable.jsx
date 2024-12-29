@@ -83,7 +83,7 @@ const ResultsTable = ({ limit }) => {
         onFilteredDataChange={handleFilteredDataChange}
         uniqueClubs={uniqueClubs}
       />
-      <div className="bg-white shadow-md w-full max-w-5xl">
+      <div className="bg-white shadow-md w-full max-w-5xl border border-gray-400">
         <TableHeader onCategoryChange={setCategory} category={category} />
         {displayedResults.map((row, rowIndex) => (
           <TableRow
