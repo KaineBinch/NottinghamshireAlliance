@@ -1,13 +1,13 @@
 import { useState } from "react";
 import PageHeader from "../components/pageHeader";
 import TeeTimesTable from "../components/teeTime";
-import ListView from "../components/listView"; // New ListView component
+import ListView from "../components/teeTimeListView";
 
 const StartTimesPage = () => {
-  const [isListView, setIsListView] = useState(false); // State to toggle views
+  const [isListView, setIsListView] = useState(false);
 
   const handleToggleView = () => {
-    setIsListView(!isListView); // Toggle between views
+    setIsListView(!isListView);
   };
 
   return (

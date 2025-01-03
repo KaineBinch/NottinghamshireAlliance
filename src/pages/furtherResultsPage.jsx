@@ -9,18 +9,23 @@ const ExpandableText = () => {
 
   const fullText = `If a club has had better greens than Radcliffe's yesterday, I’m not aware of it. Every player commented on how superbly they rolled, and the holes were cut really sharp. Congratulations to the green staff! It’s a shame that we had a reduced field due to a PGA event, with lots of regulars away on various trips. Some super scores were made, and it was nice to see new names picking up prizes. Thanks to Karen and Nicola behind the bar for looking after us all day. Here’s to next year’s visit! Our next event is a Pairs Better Ball at Brierley Forest on Wednesday, October 2nd.`;
 
-  const truncateText = (text, maxLength) => {
-    if (text.length <= maxLength) return text;
-    const truncated = text.slice(0, maxLength);
-    return truncated.slice(0, truncated.lastIndexOf(" ")) + " ";
-  };
-
   return (
-    <div className="px-5 my-[25px] text-start">
-      {isExpanded ? fullText : truncateText(fullText, 250)}
-      <button onClick={toggleExpand} className="font-bold text-[#214A27]">
-        {isExpanded ? "Read Less" : "Read More..."}
-      </button>
+    <div className="px-5 my-[25px] text-start flex flex-col">
+      <div className="relative">
+        <p
+          className={`${
+            isExpanded ? "line-clamp-none" : "line-clamp-4"
+          } overflow-clip`}
+        >
+          {fullText}
+        </p>{" "}
+        <button
+          onClick={toggleExpand}
+          className="font-bold text-[#214A27] mt-1 inline-block"
+        >
+          {isExpanded ? "Read Less" : "Read More"}
+        </button>
+      </div>
     </div>
   );
 };

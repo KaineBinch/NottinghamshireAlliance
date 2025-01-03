@@ -38,7 +38,6 @@ export const transformResults = (results) => {
       row[date] = scoreItem ? parseInt(scoreItem.score) : "-";
     });
 
-    // Use calculateTotalPoints instead of directly summing up scores
     row.total = calculateTotalPoints(player.result);
     return row;
   });

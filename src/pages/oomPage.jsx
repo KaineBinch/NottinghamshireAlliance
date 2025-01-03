@@ -1,7 +1,7 @@
 import PageHeader from "../components/pageHeader";
 import { results } from "../constants/results";
 import { transformResults } from "../utils/transformResults";
-import ResultsTable from "../components/resultsTable/resultsTable";
+import ResultsTable from "../components/results/resultsTable/resultsTable";
 
 const OrderOfMeritPage = () => {
   const { rows, columns } = transformResults(results);

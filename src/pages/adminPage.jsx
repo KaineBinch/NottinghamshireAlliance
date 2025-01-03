@@ -1,9 +1,9 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import PageHeader from "../components/pageHeader";
 import { useNavigate } from "react-router-dom";
-import DownloadCSVFile from "../components/csv/downloadCSV";
-import SheetTemplate from "../components/sheetTemplate";
-import CSVPreview from "../components/csv/csvPreview";
+import DownloadCSVFile from "../components/admin/import/downloadCSV";
+import TemplateCard from "../components/admin/template/TemplateCard";
+import CSVPreview from "../components/admin/import/csvPreview";
 import { useState, useEffect } from "react";
 
 const AdminPage = () => {
@@ -13,7 +13,6 @@ const AdminPage = () => {
   const [groupedData, setGroupedData] = useState({});
 
   useEffect(() => {
-    // Automatically open login popup if the user is not authenticated
     if (!isAuthenticated && !isLoading) {
       loginWithPopup().catch((error) => console.error("Login failed", error));
     }
@@ -45,10 +44,9 @@ const AdminPage = () => {
       <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-black">
         {isAuthenticated && (
           <>
-            {/* Existing Download and Import Cards */}
             <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
               <div className="flex-1 bg-[#214A27] p-6 rounded-lg shadow-lg">
-                <SheetTemplate />
+                <TemplateCard />
               </div>
               <div className="flex-1 bg-[#214A27] p-6 rounded-lg shadow-lg">
                 <DownloadCSVFile
@@ -59,7 +57,6 @@ const AdminPage = () => {
               </div>
             </div>
 
-            {/* New Full-Width CSV Preview Card */}
             {csvData.length > 0 && (
               <div className="mt-6 bg-[#214A27] p-6 rounded-lg shadow-lg max-w-5xl">
                 <CSVPreview csvData={csvData} groupedData={groupedData} />
