@@ -8,14 +8,14 @@ Welcome to the official repository for the Nottinghamshire Golf Alliance website
   - [About the Project](#about-the-project)
     - [Key Objectives](#key-objectives)
   - [Features](#features)
+    - [General Features](#general-features)
+    - [Page-Sepcific Features](#page-sepcific-features)
+    - [Admin Features](#admin-features)
   - [Installation](#installation)
     - [Prerequisites](#prerequisites)
     - [Steps](#steps)
     - [Backend Setup](#backend-setup)
-  - [Usage](#usage)
-    - [Welcome Page](#welcome-page)
-    - [Frontend Features](#frontend-features)
-    - [Admin Features](#admin-features)
+  - [Technology Stack](#technology-stack)
   - [License](#license)
   - [Acknowledgments](#acknowledgments)
 
@@ -35,26 +35,90 @@ The Nottinghamshire Golf Alliance website aims to:
 
 ## Features
 
-- **Event Management:**
-  - Display upcoming events, their dates, and locations.
-  - Allow users to view and download tee times.
-- **Order of Merit Leaderboard:**
-  - Track golfer performance across events and update standings automatically.
-- **Results Pages:**
-  - Provide detailed results for individual competitions.
-- **Golf Course Directory:**
-  - Showcase participating golf clubs with their details, including images, contact information, and URLs.
-- **Calendar Integration:**
-  - Enable users to add events directly to their personal calendars.
-- **User Authentication:**
-  - Secure sections of the site using Auth0 for administrative management.
+### General Features
+- Navigate through upcoming events and view detailed results.
+- Integration with APIs like `OpenWeatherAPI` for real-time data.
+- Access and interact with leaderboard standings.
+- Explore information about participating golf courses.
+- Fully responsive navigation bar for seamless browsing on all devices.
+- An infinite-scroll banner showcasing club logos.
+- Seamless calendar integration for adding events to personal calendars.
+- Secure user authentication using `Auth0` for restriced sections.
+
+### Page-Sepcific Features
+
+**Welcome/Home Page:**
+- Introduction: Explaining the mission and benefits of joining.
+- Quick Links: Easy navigation to events, leaderboard, and golf club directory.
+- Shortened preview sections with snippets of content from other pages.
+
+**Start Times Page:**
+- View tee times in both table and list formats.
+- A search function to easily locate golfers by name.
+- Filter by golf club to view golfers and their assigned tee times.
+
+**Results Page:**
+- Dynamic, clickable links to view "further results" for each event.
+- **Further Results Page:**
+  - A dynamic table displaying the top Amateur, Team, and Professional players.
+  - Expandable and collapsible sections for detailed results.
+
+**Fixtures Page:**
+  - Fixture cards displaying event dates, locations, and competition types.
+
+**Courses Page:**
+  - Comprehensive directory of participating golf clubs.
+    - Club Photos and Logos.
+    - Address and contact details.
+    - Links to official websites.
+
+**Order of Merit Page:**
+  - An expandable results table showing the top 10 player scores, with the ability to view detailed performance across events.
+  - Detailed Performance: Expandable rows to view player scores across events, following the alliance's scoring rules (top 10 scores counted).
+  - A search function to locate specific players and view their score history.
+  
+  **Contact Page:**
+  - Links to social media profiles, presented with `FontAwesome` icons.
+  - `mailto` links for easy email communication via mobile or desktop.
+
+  **Rules Page:**
+  - Accordion-style display for easy navigation of competition rules.
+
+  **Gallery Page:**
+  - A photo gallery powered by `react-image-gallery` to showcase event highlights.
+
+  **Not Found Page:**
+  - A custom 404 error page that redirects users to the homepage with an accessible link.
+
+### Admin Features
+Authenticated administrators can manage the website through secure tools, including:
+
+**Event Management**
+- Add, update, or modify event details, including dates, locations, and competition types.
+- Upload and manage competition results.
+- View and download event-specific tee times.
+
+**Leaderboard Management**
+- Track and update golfer performance across events.
+- Automate leaderboard standings for the Order of Merit.
+
+**Golf Course Management**
+- Maintain a directory of participating golf courses, including images, contact information, and URLs.
+
+**CSV and Excel Tools**
+- Custom Templates: Downloadable Excel templates for event data input.
+- Importer: Convert Excel data to CSV format for processing.
+- Previewer: View and verify CSV data before publishing it to Strapi.
+
+**User Authentication**
+- Integration with the `Auth0` system for secure admin access.
 
 ## Installation
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/)
-- [Yarn](https://yarnpkg.com/) (preferred package manager)
-- [Strapi](https://strapi.io/) for backend content management
+- [Yarn](https://yarnpkg.com/) *(preferred package manager)*
+- [Strapi](https://strapi.io/) *for backend content management*
 
 ### Steps
 1. Clone the repository:
@@ -86,66 +150,34 @@ The Nottinghamshire Golf Alliance website aims to:
 3. Parse CSV data into Strapi using custom scripts.
 4. Configure API endpoints to serve frontend data.
 
-## Usage
+## Technology Stack
+The Nottinghamshire Golf Alliance website utilizes the following technologies and libraries:
 
-### Welcome Page
-The homepage introduces the Nottinghamshire Golf Alliance and provides a warm invitation to golfers of all levels. Key sections include:
-- Introduction: Explaining the mission and benefits of joining.
-- Quick Links: Easy navigation to events, leaderboard, and golf club directory.
+**Front End**
+- **React:** *A JavaScript library for building user interfaces.*
+- **React Router DOM:** *For client-side routing and navigation.*
+- **Emotion:** *For writing CSS-in-JS styles.*
+- **Material-UI (MUI):** *Components and styling for a modern and responsive design.*
+- **Framer Motion:** *For creating smooth animations and transitions.*
+- **React Image Gallery:** *To display photo galleries.*
+- **React Icons & FontAwesome:** *For vector icons and styling.*
 
-### Frontend Features
-- Navigate through upcoming events and view detailed results.
-- Access and interact with leaderboard standings.
-- Explore information about participating golf courses.
-- **Additional Frontend Features**:
-  - Fully responsive navigation bar for seamless browsing on all devices.
-  - Integration with the OpenWeather API to display real-time weather data.
-  - An infinite-scroll banner showcasing club logos.
+**Back End**
+- **Strapi:** *A headless CMS for managing content and APIs.*
+- **Axios:** *For handling API requests.*
 
-**Start Times Page:**
-  - View tee times in both table and list formats.
-  - A search function to easily locate golfers by name.
-  - Filter by golf club to view golfers and their assigned tee times.
+**APIs and Integrations**
+- **OpenWeather API:** *Displays real-time weather data for Nottinghamshire*
+- **Add-to-Calendar:** *Allows users to add an event to their calendar*
 
-**Results Page:**
-  - Dynamic, clickable links to view "further results" for each event.
-  - **Further Results Page:**
-    - A dynamic table displaying the top Amateur, Team, and Professional players.
-    - Expandable and collapsible sections for detailed results.
+**Build Tools**
+- **Vite:** *A fast build tool and development server.*
+- **ESLint:** *For linting and enforcing code style.*
+- **TailwindCSS:** *Utility-first CSS framework for styling.*
 
-**Fixtures Page:**
-  - Fixture cards displaying event dates, locations, and competition types.
+**Authentication**
+- **Auth0**
 
-**Courses Page:**
-  - Detailed information about participating golf courses, including images, logos, contact information, and direct links to their websites.
-
-**Order of Merit Page:**
-  - An expandable results table showing the top 10 player scores, with the ability to view detailed performance across events.
-  - A search function to locate specific players and view their score history.
-  
-  **Contact Page:**
-  - Links to social media profiles, presented with FontAwesome icons.
-  - mailto links for easy email communication via mobile or desktop.
-
-  **Rules Page:**
-  - Accordion-style display for easy navigation of competition rules.
-
-  **Gallery Page:**
-  - A photo gallery powered by react-image-gallery to showcase event highlights.
-
-  **Not Found Page:**
-  - A custom 404 error page that redirects users to the homepage with an accessible link.
-
-### Admin Features
-Authenticated administrators have the ability to:
-- Upload and manage competition results.
-- Add, update, or modify event details.
-- Maintain and update golfer and leaderboard information.
-- **Additional Admin Features**
-  - Integration with the UseAuth0 authentication system for secure access.
-  - Custom Excel event sheet template, available for download.
-  - A bespoke Excel importer that converts event data into CSV format.
-  - A CSV previewer for reviewing data before it is parsed and published to Strapi.
 
 ## License
 

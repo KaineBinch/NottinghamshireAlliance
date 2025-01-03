@@ -15,7 +15,7 @@ import {
   AdminPage,
 } from "./pages";
 import { appRoutes } from "./constants/appRoutes";
-import ScrollToTop from "./components/scrollToTop";
+import ScrollToTop from "./utils/scrollToTop";
 import Navbar from "./components/navbar";
 import MobFoot from "./components/mobileFooter";
 import { Auth0Provider } from "@auth0/auth0-react";
