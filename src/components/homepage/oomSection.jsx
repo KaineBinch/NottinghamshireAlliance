@@ -1,5 +1,5 @@
 import HomePageHeader from "./homepageHeader";
-import ResultsTable from "../resultsTable/resultsTable";
+import ResultsTable from "../results/resultsTable/resultsTable";
 import { results } from "../../constants/results";
 import { transformResults } from "../../utils/transformResults";
 

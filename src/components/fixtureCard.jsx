@@ -123,31 +123,29 @@ END:VCALENDAR
           <h4 className="px-2 -mt-1 font-bold text-3xl md:text-2xl">{name}</h4>
 
           <div className="flex w-full">
-            {/* Column for address */}
             <div className="flex flex-col justify-center pl-4 px-2">
               <h3 className="">{address}</h3>
             </div>
-
-            {/* Calendar icon on the right */}
             <div className="flex-shrink-0 flex items-end justify-end pr-2 lg:hidden">
               <CalendarButton />
             </div>
           </div>
-
-          {/* Competition text */}
           <h3 className="flex items-end justify-center font-semibold">
             {comp} competition
           </h3>
         </div>
 
-        {/* Date display */}
         <div className="absolute right-0 top-0 mt-4 mr-4 bg-[#D9D9D9] h-[115px] w-[115px] flex flex-col items-center justify-center space-y-2">
           <div className="flex flex-col items-center justify-center">
-            <h3 className="font-semibold">{dayName}</h3>
-            <h2 className="font-black py-1">{day}</h2>
-            <h3 className="font-semibold">
+            <h4 className="font-semibold md:text-base text-lg px-1">
+              {dayName}
+            </h4>
+            <h4 className="font-semibold md:text-base text-lg py-[2px] px-1">
+              {day}
+            </h4>
+            <h4 className="font-semibold md:text-base text-lg px-1">
               {monthName} {year}
-            </h3>
+            </h4>
           </div>
         </div>
       </div>

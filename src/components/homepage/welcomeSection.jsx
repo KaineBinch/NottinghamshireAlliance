@@ -1,4 +1,4 @@
-import Weather from "../weather.jsx";
+import Weather from "./weather.jsx";
 import image from "../../assets/background.jpg";
 
 const WelcomeSection = () => {
