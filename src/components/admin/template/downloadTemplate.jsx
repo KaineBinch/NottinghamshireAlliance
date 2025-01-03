@@ -1,6 +1,6 @@
 import ExcelJS from "exceljs";
 
-const DownloadTemplate = ({ eventDate, startTime, endTime }) => {
+const DownloadTemplateButton = ({ eventDate, startTime, endTime }) => {
   const downloadTemplate = async () => {
     if (!eventDate || !startTime || !endTime) {
       alert("Please select an event date, start time, and end time.");
@@ -63,8 +63,23 @@ const DownloadTemplate = ({ eventDate, startTime, endTime }) => {
     }
 
     teeTimes.forEach((time) => {
-      worksheet.addRow([eventDate, time, "", "", "", "", ""]);
+      const [eventYear, eventMonth, eventDay] = eventDate
+        .split("-")
+        .map(Number);
+      const [teeHour, teeMinute] = time.split(":").map(Number);
+      const teeDatetime = new Date(
+        eventYear,
+        eventMonth - 1,
+        eventDay,
+        teeHour,
+        teeMinute
+      );
+
+      worksheet.addRow([eventDate, teeDatetime, "", "", "", "", ""]);
     });
+
+    // Set column formatting for the "Tee time" column
+    worksheet.getColumn(2).numFmt = "hh:mm";
 
     // Alternating row colors
     const color1 = "00B050";
@@ -130,4 +145,4 @@ const DownloadTemplate = ({ eventDate, startTime, endTime }) => {
   );
 };
 
-export default DownloadTemplate;
+export default DownloadTemplateButton;

@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect } from "react";
-import { results } from "../../constants/results";
-import { calculateTotalPoints } from "../../utils/transformResults";
-import TableHeader from "../resultsTable/tableHeader";
-import TableRow from "../resultsTable/tableRow";
-import SearchFilter from "../SearchFilter";
+import { results } from "../../../constants/results";
+import { calculateTotalPoints } from "../../../utils/transformResults";
+import TableHeader from "./tableHeader";
+import TableRow from "./tableRow";
+import SearchFilter from "../../SearchFilter";
 
 const ResultsTable = ({ limit }) => {
   const [expandedRow, setExpandedRow] = useState(null);

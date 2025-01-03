@@ -1,7 +1,7 @@
 import { useState } from "react";
-import DownloadTemplate from "./downloadTemplate";
+import DownloadTemplateButton from "./downloadTemplate";
 
-const SheetTemplate = () => {
+const TemplateCard = () => {
   const [eventDate, setEventDate] = useState("");
   const [startTime, setStartTime] = useState("07:30"); // Default start time
   const [endTime, setEndTime] = useState("14:00"); // Default end time
@@ -42,7 +42,7 @@ const SheetTemplate = () => {
             />
           </div>
         </div>
-        <DownloadTemplate
+        <DownloadTemplateButton
           eventDate={eventDate}
           startTime={startTime}
           endTime={endTime}
@@ -52,4 +52,4 @@ const SheetTemplate = () => {
   );
 };
 
-export default SheetTemplate;
+export default TemplateCard;

@@ -1,11 +1,14 @@
 import { useState } from "react";
 import ExcelJS from "exceljs";
-import FileUpload from "../csv/fileUpload";
-import ActionButtons from "../csv/actionButtons";
-import { uploadToStrapi } from "../csv/strapiUpload";
+import FileUpload from "../import/fileUpload";
+import ActionButtons from "../import/actionButtons";
+import { uploadToStrapi } from "../import/uploadToStrapi";
 
 const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   const [fileName, setFileName] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState("");
+  const [uploadMessage, setUploadMessage] = useState("");
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
@@ -75,6 +78,19 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
     });
   };
 
+  const handleUploadToStrapi = async () => {
+    try {
+      await uploadToStrapi(
+        csvData,
+        setUploadProgress,
+        setUploadStatus,
+        setUploadMessage
+      );
+    } catch (error) {
+      console.error("Error during upload:", error);
+    }
+  };
+
   return (
     <div className="flex flex-col space-y-4 bg-gray-100 h-full p-6 rounded-lg shadow-lg">
       <h2 className="text-lg font-semibold text-center mb-4">
@@ -90,8 +106,17 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
           </p>
           <ActionButtons
             onDownloadCSV={downloadCSV}
-            onUploadToStrapi={() => uploadToStrapi(csvData, fileName)}
+            onUploadToStrapi={handleUploadToStrapi}
           />
+          {uploadStatus && (
+            <div className="mt-4">
+              <p>Status: {uploadStatus}</p>
+              <p>Message: {uploadMessage}</p>
+              {uploadStatus === "uploading" && (
+                <p>Progress: {uploadProgress}%</p>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

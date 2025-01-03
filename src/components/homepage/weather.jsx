@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { getWeatherIcon } from "../constants/weatherIcons";
+import { getWeatherIcon } from "../../constants/weatherIcons";
 
 const Weather = ({ city }) => {
   const [dailyForecast, setDailyForecast] = useState([]);

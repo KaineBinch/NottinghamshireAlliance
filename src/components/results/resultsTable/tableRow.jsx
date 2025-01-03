@@ -1,5 +1,5 @@
-import { calculateTotalPoints as transformResults } from "../../utils/transformResults";
-import ExpandedRowDetails from "../resultsTable/expandedRow";
+import { calculateTotalPoints as transformResults } from "../../../utils/transformResults";
+import ExpandedRowDetails from "./expandedRow";
 
 const TableRow = ({
   row,
