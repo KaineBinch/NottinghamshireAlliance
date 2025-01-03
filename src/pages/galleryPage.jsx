@@ -2,39 +2,35 @@ import { useState, useEffect } from "react";
 import PageHeader from "../components/pageHeader";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
-
-const importAllImages = async (context) => {
-  const images = {};
-  const modules = await Promise.all(
-    Object.entries(context).map(([key, value]) =>
-      value().then((mod) => [key, mod.default])
-    )
-  );
-
-  modules.forEach(([key, value]) => {
-    images[key] = value;
-  });
-
-  return images;
-};
+import { API_URL, BASE_URL } from "../constants/api";
 
 const GalleryPage = () => {
   const [images, setImages] = useState([]);
 
   useEffect(() => {
     const loadImages = async () => {
-      const courseContext = import.meta.glob(
-        "../assets/courses/*.{png,jpg,jpeg,svg}"
-      );
+      try {
+        const response = await fetch(`${API_URL}/upload/files`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
-      const courseImages = await importAllImages(courseContext);
+        const data = await response.json();
+        const courseImageArray = data
+          .filter(
+            (image) =>
+              !image.name.toUpperCase().includes("LOGO") &&
+              !image.url.toUpperCase().includes("LOGO")
+          )
+          .map((image) => ({
+            original: `${BASE_URL}${image.url}`,
+            thumbnail: `${BASE_URL}${image.url}`,
+          }));
 
-      const courseImageArray = Object.keys(courseImages).map((key) => ({
-        original: courseImages[key],
-        thumbnail: courseImages[key],
-      }));
-
-      setImages(courseImageArray);
+        setImages(courseImageArray);
+      } catch (error) {
+        console.error("Error fetching images:", error);
+      }
     };
 
     loadImages();

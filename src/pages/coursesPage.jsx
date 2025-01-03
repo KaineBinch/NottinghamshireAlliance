@@ -1,10 +1,20 @@
 import CourseCard from "../components/courseCard";
 import PageHeader from "../components/pageHeader";
-import { clubs } from "../constants/golfClubs";
-
-const azCompare = (a, b) => +(a > b) * 2 - 0.5;
+import { BASE_URL, MODELS, QUERIES } from "../constants/api";
+import useFetch from "../utils/hooks/useFetch";
+import { queryBuilder } from "../utils/queryBuilder";
 
 const CoursesPage = () => {
+  const query = queryBuilder(MODELS.golfClubs, QUERIES.clubsQuery);
+  const { isLoading, isError, data, error } = useFetch(query);
+
+  if (isLoading) {
+    return <p className="pt-[85px]">Loading...</p>;
+  } else if (isError) {
+    console.error("Error:", error);
+    return <p className="pt-[85px]">Something went wrong...</p>;
+  }
+
   return (
     <>
       <PageHeader title="Courses" />
@@ -27,19 +37,25 @@ const CoursesPage = () => {
       <div className="bg-[#D9D9D9]">
         <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="">
-            {clubs
-              .toSorted((a, b) => azCompare(a.name, b.name))
-              .map((club, i) => (
-                <CourseCard
-                  key={i}
-                  name={club.name}
-                  address={club.address}
-                  contact={club.contact}
-                  link={club.link}
-                  courseImage={club.courseImage}
-                  logo={club.logo}
-                />
-              ))}
+            {data.data.map((club) => (
+              <CourseCard
+                key={club.id}
+                name={`${club.clubName} Golf Club`}
+                address={club.clubAddress}
+                contact={club.clubContactNumber}
+                link={club.clubURL}
+                courseImage={
+                  club.clubImage?.[0]?.url
+                    ? `${BASE_URL}${club.clubImage[0].url}`
+                    : "default-image.jpg"
+                }
+                logo={
+                  club.clubLogo?.[0]?.url
+                    ? `${BASE_URL}${club.clubLogo[0].url}`
+                    : "default-logo.jpg"
+                }
+              />
+            ))}
           </div>
         </div>
       </div>
