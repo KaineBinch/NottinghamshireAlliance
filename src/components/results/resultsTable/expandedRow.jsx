@@ -49,7 +49,7 @@ const ExpandedRowDetails = ({ result, isClubView }) => {
             return (
               <div
                 key={index}
-                className={`flex flex-col w-1/2 sm:w-1/4 md:w-1/6 lg:w-1/12 border border-gray-300 p-1 text-center ${
+                className={`flex flex-col w-1/2 sm:w-1/4 md:w-1/6 lg:w-1/12 border border-gray-400 p-1 text-center ${
                   isTopScore ? "bg-[#214A27] text-white" : "bg-white"
                 }`}
               >

@@ -63,7 +63,7 @@ const TeeTimesTable = () => {
       </div>
 
       {/* Tee Times Table */}
-      <div className="grid md:grid-cols-2 grid-cols-1 gap-4 w-full drop-shadow-sm">
+      <div className="grid l:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4 w-full drop-shadow-sm">
         {filteredTeeTimesByClub.map((teeTime, index) => (
           <div
             key={index}

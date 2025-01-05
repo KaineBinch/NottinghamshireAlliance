@@ -37,7 +37,10 @@ const ListView = () => {
             <div className="p-4">
               <ul>
                 {players.map((player, playerIndex) => (
-                  <li key={playerIndex} className="mb-2 text-gray-700">
+                  <li
+                    key={playerIndex}
+                    className="mb-2 text-gray-700 font-semibold"
+                  >
                     {player.name} -{" "}
                     <span className="font-medium">{player.time}</span>
                   </li>
