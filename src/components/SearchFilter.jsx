@@ -9,20 +9,24 @@ const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
   }, []);
 
   const handleClubChange = useCallback((event) => {
-    setClubQuery(event.target.value.toLowerCase());
+    const selectedValue = event.target.value;
+    setClubQuery(selectedValue === "" ? "" : selectedValue.toLowerCase());
   }, []);
 
   const filteredData = useMemo(() => {
     return data.filter((item) => {
       const matchesName = item.name.toLowerCase().includes(searchQuery);
-      const matchesClub = !clubQuery || item.club.toLowerCase() === clubQuery;
+      const matchesClub =
+        !clubQuery || item.club.toLowerCase().includes(clubQuery);
       return matchesName && matchesClub;
     });
   }, [searchQuery, clubQuery, data]);
 
   useEffect(() => {
-    onFilteredDataChange(filteredData);
-  }, [filteredData, onFilteredDataChange]);
+    if (filteredData !== data) {
+      onFilteredDataChange(filteredData);
+    }
+  }, [filteredData, onFilteredDataChange, data]);
 
   return (
     <div className="flex flex-col mb-4 p-4 border border-gray-300">

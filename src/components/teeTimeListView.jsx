@@ -1,25 +1,62 @@
-import { teeTimes } from "../constants/teeTimes";
+import { useState, useMemo, useEffect } from "react";
+import { queryBuilder } from "../utils/queryBuilder";
+import { MODELS, QUERIES } from "../constants/api";
+import useFetch from "../utils/hooks/useFetch";
 import { clubs } from "../constants/golfClubs";
 
 const ListView = () => {
+  const [teeTimesData, setTeeTimesData] = useState([]);
+
+  const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery);
+  const { isLoading, isError, data, error } = useFetch(query);
+
+  useEffect(() => {
+    if (data?.data) {
+      setTeeTimesData(Array.isArray(data.data) ? data.data : []);
+    }
+  }, [data]);
+
   const clubNameLookup = clubs.reduce((acc, club) => {
     acc[club.clubID] = club.name;
     return acc;
   }, {});
 
-  const groupedByClub = teeTimes.reduce((acc, teeTime) => {
-    teeTime.names.forEach((player) => {
-      if (!acc[player.club]) {
-        acc[player.club] = [];
-      }
-      acc[player.club].push({ name: player.name, time: teeTime.time });
-    });
-    return acc;
-  }, {});
+  const groupedByClub = useMemo(() => {
+    return teeTimesData.reduce((acc, teeTime) => {
+      teeTime.golfers?.forEach((player) => {
+        const club = player?.golf_club?.clubID || "No Club";
+        if (!acc[club]) {
+          acc[club] = [];
+        }
+        acc[club].push({
+          name: player?.golferName || "Unnamed Player",
+          time: teeTime.golferTeeTime,
+        });
+      });
+      return acc;
+    }, {});
+  }, [teeTimesData]);
 
-  Object.keys(groupedByClub).forEach((club) => {
-    groupedByClub[club].sort((a, b) => a.name.localeCompare(b.name));
-  });
+  useEffect(() => {
+    Object.keys(groupedByClub).forEach((club) => {
+      groupedByClub[club].sort((a, b) => a.name.localeCompare(b.name));
+    });
+  }, [groupedByClub]);
+
+  const formatTime = (time) => {
+    if (!time) return null;
+    const [hours, minutes] = time.split(":");
+    return `${hours}:${minutes}`;
+  };
+
+  if (isLoading) {
+    return <p className="pt-[85px]">Loading...</p>;
+  }
+
+  if (isError) {
+    console.error("Error:", error);
+    return <p className="pt-[85px]">Something went wrong...</p>;
+  }
 
   return (
     <div className="w-full flex justify-center">
@@ -42,7 +79,9 @@ const ListView = () => {
                     className="mb-2 text-gray-700 font-semibold"
                   >
                     {player.name} -{" "}
-                    <span className="font-medium">{player.time}</span>
+                    <span className="font-medium">
+                      {formatTime(player.time)}
+                    </span>
                   </li>
                 ))}
               </ul>

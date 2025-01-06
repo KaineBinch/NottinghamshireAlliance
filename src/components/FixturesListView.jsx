@@ -80,7 +80,7 @@ const FixturesListView = () => {
             return (
               <div
                 key={event.id}
-                className="border border-gray-300 p-4 bg-[#ffffff] shadow-md flex flex-col items-start"
+                className="border border-[#214A27] border-2 p-4 bg-[#d9d9d9] shadow-md flex flex-col items-start"
               >
                 <div className="flex justify-between items-center w-full">
                   <div className="flex flex-col text-start">
