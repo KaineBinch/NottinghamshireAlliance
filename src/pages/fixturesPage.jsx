@@ -1,11 +1,15 @@
+import { useState } from "react";
 import PageHeader from "../components/pageHeader";
 import FixtureCard from "../components/fixtureCard";
+import FixturesListView from "../components/FixturesListView"; // Import the new list view
 import { queryBuilder } from "../utils/queryBuilder";
 import { BASE_URL, MODELS, QUERIES } from "../constants/api";
 import useFetch from "../utils/hooks/useFetch";
 import defaultImage from "../assets/background.jpg";
 
 const FixturesPage = () => {
+  const [isListView, setIsListView] = useState(false); // Track toggle state
+
   const query = queryBuilder(MODELS.events, QUERIES.eventsQuery);
   const { isLoading, isError, data, error } = useFetch(query);
 
@@ -45,44 +49,59 @@ const FixturesPage = () => {
         <hr className="border-black" />
       </div>
 
-      <div className="w-full pt-8">
-        <div className="flex flex-col items-center">
-          <div className="w-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5">
-            {sortedData?.map((club) => {
-              const clubName = club.golf_club
-                ? `${club.golf_club.clubName} Golf Club`
-                : "Location To be Confirmed";
-              const clubAddress = club.golf_club
-                ? club.golf_club.clubAddress
-                : "";
-              const clubImage = club.golf_club?.clubImage?.[0]?.url
-                ? `${BASE_URL}${club.golf_club.clubImage[0].url}`
-                : defaultImage;
+      {/* Toggle Button */}
+      <div className="flex justify-center pt-4">
+        <button
+          onClick={() => setIsListView(!isListView)}
+          className="bg-[#214A27] text-white px-6 mt-5 py-2 rounded-lg shadow-md -mb-4"
+        >
+          {isListView ? "Switch to Card View" : "Switch to List View"}
+        </button>
+      </div>
 
-              const eventDate = club.eventDate;
-              const dateText = eventDate ? eventDate : null;
-
-              const competitionText =
-                club.eventType &&
-                club.eventType !== "Competition type to be confirmed"
-                  ? " competition"
+      {/* Conditionally Render List View or Card View */}
+      {isListView ? (
+        <FixturesListView />
+      ) : (
+        <div className="w-full pt-8">
+          <div className="flex flex-col items-center">
+            <div className="w-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5">
+              {sortedData?.map((club) => {
+                const clubName = club.golf_club
+                  ? `${club.golf_club.clubName} Golf Club`
+                  : "Location To be Confirmed";
+                const clubAddress = club.golf_club
+                  ? club.golf_club.clubAddress
                   : "";
+                const clubImage = club.golf_club?.clubImage?.[0]?.url
+                  ? `${BASE_URL}${club.golf_club.clubImage[0].url}`
+                  : defaultImage;
 
-              return (
-                <FixtureCard
-                  key={club.id}
-                  name={clubName}
-                  address={clubAddress}
-                  clubImage={clubImage}
-                  comp={club.eventType}
-                  date={dateText}
-                  competitionText={competitionText}
-                />
-              );
-            })}
+                const eventDate = club.eventDate;
+                const dateText = eventDate ? eventDate : null;
+
+                const competitionText =
+                  club.eventType &&
+                  club.eventType !== "Competition type to be confirmed"
+                    ? " competition"
+                    : "";
+
+                return (
+                  <FixtureCard
+                    key={club.id}
+                    name={clubName}
+                    address={clubAddress}
+                    clubImage={clubImage}
+                    comp={club.eventType}
+                    date={dateText}
+                    competitionText={competitionText}
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </>
   );
 };
