@@ -91,8 +91,6 @@ const FixturesListView = () => {
                       {eventType}
                     </p>
                   </div>
-
-                  {/* Calendar Button */}
                   <div className="ml-4">
                     <CalendarButton
                       date={eventDate}

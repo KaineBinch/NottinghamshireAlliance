@@ -1,14 +1,14 @@
 import { useState } from "react";
 import PageHeader from "../components/pageHeader";
 import FixtureCard from "../components/fixtureCard";
-import FixturesListView from "../components/FixturesListView"; // Import the new list view
+import FixturesListView from "../components/FixturesListView";
 import { queryBuilder } from "../utils/queryBuilder";
 import { BASE_URL, MODELS, QUERIES } from "../constants/api";
 import useFetch from "../utils/hooks/useFetch";
 import defaultImage from "../assets/background.jpg";
 
 const FixturesPage = () => {
-  const [isListView, setIsListView] = useState(false); // Track toggle state
+  const [isListView, setIsListView] = useState(false);
 
   const query = queryBuilder(MODELS.events, QUERIES.eventsQuery);
   const { isLoading, isError, data, error } = useFetch(query);
@@ -49,7 +49,6 @@ const FixturesPage = () => {
         <hr className="border-black" />
       </div>
 
-      {/* Toggle Button */}
       <div className="flex justify-center pt-4">
         <button
           onClick={() => setIsListView(!isListView)}
@@ -59,7 +58,6 @@ const FixturesPage = () => {
         </button>
       </div>
 
-      {/* Conditionally Render List View or Card View */}
       {isListView ? (
         <FixturesListView />
       ) : (
