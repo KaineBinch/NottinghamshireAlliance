@@ -7,6 +7,8 @@ export const MODELS = {
   conditions: "/conditions",
   contact: "/contacts",
   social: "/socials",
+  events: "/events",
+  teeTimes: "/tee-times"
 }
 export const QUERIES = {
   clubsQuery: "?sort[0]=clubName:asc&populate=*",
@@ -14,5 +16,7 @@ export const QUERIES = {
   conditionsQuery: "?sort[0]=conditionTitle:asc",
   contactQuery: "",
   socialQuery: "",
+  eventsQuery: "?sort[0]=eventDate:asc&populate[golf_club][populate]=clubImage",
+  teeTimesQuery: "?populate[0]=event.golf_club&populate[1]=golfers.golf_club&populate[2]=event.golf_club.clubLogo",
   csvImport: "/import-csv"
 }

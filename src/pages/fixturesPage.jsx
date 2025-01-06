@@ -1,8 +1,32 @@
 import PageHeader from "../components/pageHeader";
-import { clubs } from "../constants/golfClubs.js";
 import FixtureCard from "../components/fixtureCard";
+import { queryBuilder } from "../utils/queryBuilder";
+import { BASE_URL, MODELS, QUERIES } from "../constants/api";
+import useFetch from "../utils/hooks/useFetch";
+import defaultImage from "../assets/background.jpg";
 
 const FixturesPage = () => {
+  const query = queryBuilder(MODELS.events, QUERIES.eventsQuery);
+  const { isLoading, isError, data, error } = useFetch(query);
+
+  if (isLoading) {
+    return <p className="pt-[85px]">Loading...</p>;
+  } else if (isError) {
+    console.error("Error:", error);
+    return <p className="pt-[85px]">Something went wrong...</p>;
+  }
+
+  const sortedData = (data?.data || []).sort((a, b) => {
+    const aHasDate = a.eventDate !== null && a.eventDate !== undefined;
+    const bHasDate = b.eventDate !== null && b.eventDate !== undefined;
+
+    if (aHasDate === bHasDate) return 0;
+
+    if (aHasDate) return -1;
+
+    return 1;
+  });
+
   return (
     <>
       <PageHeader title="Fixtures" />
@@ -24,17 +48,38 @@ const FixturesPage = () => {
       <div className="w-full pt-8">
         <div className="flex flex-col items-center">
           <div className="w-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5">
-            {clubs.map((club, i) => (
-              <div key={i}>
+            {sortedData?.map((club) => {
+              const clubName = club.golf_club
+                ? `${club.golf_club.clubName} Golf Club`
+                : "Location To be Confirmed";
+              const clubAddress = club.golf_club
+                ? club.golf_club.clubAddress
+                : "";
+              const clubImage = club.golf_club?.clubImage?.[0]?.url
+                ? `${BASE_URL}${club.golf_club.clubImage[0].url}`
+                : defaultImage;
+
+              const eventDate = club.eventDate;
+              const dateText = eventDate ? eventDate : null;
+
+              const competitionText =
+                club.eventType &&
+                club.eventType !== "Competition type to be confirmed"
+                  ? " competition"
+                  : "";
+
+              return (
                 <FixtureCard
-                  name={club.name}
-                  address={club.address}
-                  courseImage={club.courseImage}
-                  comp={club.comp}
-                  date={club.date}
+                  key={club.id}
+                  name={clubName}
+                  address={clubAddress}
+                  clubImage={clubImage}
+                  comp={club.eventType}
+                  date={dateText}
+                  competitionText={competitionText}
                 />
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
