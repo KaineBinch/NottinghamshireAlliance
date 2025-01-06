@@ -79,7 +79,7 @@ const StartTimesSection = () => {
   }`;
 
   return (
-    <div className="items-center justify-center flex flex-col w-full mx-auto max-w-5xl">
+    <div className="items-center justify-center flex flex-col w-full mx-auto max-w-5xl mb-5">
       <HomePageHeader
         title="Order of Play"
         subtext={subtext}
