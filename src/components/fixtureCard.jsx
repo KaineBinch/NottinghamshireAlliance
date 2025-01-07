@@ -82,7 +82,7 @@ const FixtureCard = ({
             <div className="flex flex-col justify-center w-full pl-4 px-2">
               <h3 className="">{address}</h3>
             </div>
-            <div className="flex-shrink-0 flex items-end justify-end pr-2 lg:hidden">
+            <div className="flex-shrink-0 flex items-end justify-end pr-2 lg:hidden max-w-[60px] min-w-[60px]">
               <CalendarButton
                 date={date}
                 comp={comp}
