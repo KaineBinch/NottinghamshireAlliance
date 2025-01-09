@@ -20,7 +20,7 @@ const getOrdinalSuffix = (day) => {
 const formatDateWithOrdinal = (dateString) => {
   if (!dateString) {
     console.warn("No date string provided for formatting.");
-    return "Invalid Date";
+    return "Date To Be Confirmed";
   }
 
   const date = new Date(dateString);
@@ -69,7 +69,7 @@ const FixturesListView = () => {
           {sortedData?.map((event) => {
             const venue = event.golf_club
               ? `${event.golf_club.clubName} Golf Club`
-              : "Location To be Confirmed";
+              : "Location To Be Confirmed";
             const eventType = event.eventType || "Event type to be confirmed";
             const clubAddress = event.golf_club
               ? event.golf_club.clubAddress

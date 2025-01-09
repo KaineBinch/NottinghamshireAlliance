@@ -3,6 +3,7 @@ import useFetch from "../../utils/hooks/useFetch.js";
 import { queryBuilder } from "../../utils/queryBuilder.js";
 import FixtureCard from "../fixtureCard.jsx";
 import HomePageHeader from "./homepageHeader.jsx";
+import defaultImage from "../../assets/background.jpg";
 
 const FixturesSection = () => {
   const query = queryBuilder(MODELS.events, QUERIES.eventsQuery);
@@ -20,22 +21,33 @@ const FixturesSection = () => {
     const bHasDate = b.eventDate !== null && b.eventDate !== undefined;
 
     if (aHasDate === bHasDate) return 0;
-
     if (aHasDate) return -1;
-
     return 1;
   });
 
   const today = new Date();
-
   const futureFixtures = sortedData.filter((club) => {
     const eventDate = new Date(club.eventDate);
-    const hasGolfClub = club.golf_club;
-    return eventDate > today && hasGolfClub;
+    return eventDate > today;
   });
 
   const nextFixture = futureFixtures?.[0];
   const upcomingFixtures = futureFixtures?.slice(1, 3);
+
+  if (!nextFixture && !upcomingFixtures?.length) {
+    return (
+      <div className="bg-[#d9d9d9] pt-[85px]">
+        <HomePageHeader
+          title="Fixtures"
+          subtext="Stay updated with the latest details on upcoming fixtures. Click here for more information."
+          btnName="Fixtures"
+          btnStyle="text-white bg-[#214A27]"
+          page="fixtures"
+        />
+        <p>No upcoming fixtures available at the moment.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#d9d9d9]">
@@ -50,22 +62,32 @@ const FixturesSection = () => {
         <h2 className="text-2xl font-bold text-black mb-4">Next Fixture</h2>
 
         <div className="w-auto max-w-5xl mb-10">
-          {nextFixture && nextFixture.golf_club && (
+          {nextFixture ? (
             <FixtureCard
               key={nextFixture.id}
-              name={`${nextFixture.golf_club.clubName} Golf Club`}
-              address={nextFixture.golf_club.clubAddress}
-              clubImage={
-                nextFixture.golf_club.clubImage?.[0]?.url
-                  ? `${BASE_URL}${nextFixture.golf_club.clubImage[0].url}`
-                  : "default-image.jpg"
+              name={
+                nextFixture?.golf_club
+                  ? `${nextFixture.golf_club.clubName} Golf Club`
+                  : "Location To Be Confirmed"
               }
-              comp={nextFixture.eventType}
-              date={nextFixture.eventDate || "TBD"}
+              address={nextFixture?.golf_club?.clubAddress}
+              clubImage={
+                nextFixture?.golf_club?.clubImage?.[0]?.url
+                  ? `${BASE_URL}${nextFixture.golf_club.clubImage[0].url}`
+                  : defaultImage
+              }
+              comp={
+                nextFixture?.eventType || "Competition type to be confirmed"
+              }
+              date={nextFixture?.eventDate || "TBD"}
               competitionText={
-                nextFixture.eventType === "Away Trip" ? "" : " competition"
+                nextFixture?.eventType !== "Competition type to be confirmed"
+                  ? ""
+                  : ""
               }
             />
+          ) : (
+            <p>No next fixture available.</p>
           )}
         </div>
 
@@ -74,27 +96,39 @@ const FixturesSection = () => {
         </h3>
 
         <div className="w-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-4">
-          {upcomingFixtures?.map((club) => {
-            if (!club.golf_club) return null;
+          {upcomingFixtures?.length > 0 ? (
+            upcomingFixtures.map((club) => {
+              const clubName = club?.golf_club
+                ? `${club.golf_club.clubName} Golf Club`
+                : "Location To Be Confirmed";
+              const clubAddress = club?.golf_club?.clubAddress;
+              const clubImage = club?.golf_club?.clubImage?.[0]?.url
+                ? `${BASE_URL}${club.golf_club.clubImage[0].url}`
+                : defaultImage;
 
-            return (
-              <FixtureCard
-                key={club.id}
-                name={`${club.golf_club.clubName} Golf Club`}
-                address={club.golf_club.clubAddress}
-                clubImage={
-                  club.golf_club.clubImage?.[0]?.url
-                    ? `${BASE_URL}${club.golf_club.clubImage[0].url}`
-                    : "default-image.jpg"
-                }
-                comp={club.eventType}
-                date={club.eventDate || "TBD"}
-                competitionText={
-                  club.eventType === "Away Trip" ? "" : " competition"
-                }
-              />
-            );
-          })}
+              const eventDate = club?.eventDate;
+              const dateText = eventDate || "TBD";
+
+              const competitionText =
+                club?.eventType !== "Competition type to be confirmed"
+                  ? " competition"
+                  : "";
+
+              return (
+                <FixtureCard
+                  key={club.id}
+                  name={clubName}
+                  address={clubAddress}
+                  clubImage={clubImage}
+                  comp={club?.eventType || "Competition type to be confirmed"}
+                  date={dateText}
+                  competitionText={competitionText}
+                />
+              );
+            })
+          ) : (
+            <p>No upcoming fixtures.</p>
+          )}
         </div>
       </div>
     </div>

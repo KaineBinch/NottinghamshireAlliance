@@ -62,7 +62,7 @@ const FixtureCard = ({
             "0"
           )}`
         ).toLocaleDateString("en-US", { weekday: "short" })
-      : "Date to be confirmed";
+      : "Date To Be Confirmed";
 
   return (
     <div className="p-4 bg-[#214A27] shadow-lg rounded-md">
@@ -93,7 +93,9 @@ const FixtureCard = ({
           </div>
           <h3 className="flex items-end justify-center font-semibold">
             {comp || "Competition type to be confirmed"}
-            {competitionText && ` ${competitionText}`}{" "}
+            {competitionText &&
+              competitionText.trim() !== "" &&
+              ` ${competitionText}`}
           </h3>
         </div>
 
