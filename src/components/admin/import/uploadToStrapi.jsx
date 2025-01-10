@@ -14,7 +14,6 @@ export const uploadToStrapi = async (
 
     const blob = csvData.map((row) => row.join(",")).join("\n");
     const body = { blob };
-    console.log("body", body);
 
     const query = queryBuilder(MODELS.scores, QUERIES.csvImport);
     const response = await axios.post(query, body, {

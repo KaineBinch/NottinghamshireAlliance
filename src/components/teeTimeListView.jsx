@@ -3,6 +3,7 @@ import { queryBuilder } from "../utils/queryBuilder";
 import { MODELS, QUERIES } from "../constants/api";
 import useFetch from "../utils/hooks/useFetch";
 import { clubs } from "../constants/golfClubs";
+import { getNextEventDate } from "../utils/getNextEventDate";
 
 const ListView = () => {
   const [teeTimesData, setTeeTimesData] = useState([]);
@@ -10,11 +11,16 @@ const ListView = () => {
   const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery);
   const { isLoading, isError, data, error } = useFetch(query);
 
+  const nextEventDate = getNextEventDate(data);
+
   useEffect(() => {
     if (data?.data) {
-      setTeeTimesData(Array.isArray(data.data) ? data.data : []);
+      const filtered = data.data.filter(
+        (teeTime) => teeTime.event.eventDate == nextEventDate
+      );
+      setTeeTimesData(Array.isArray(filtered) ? filtered : []);
     }
-  }, [data]);
+  }, [data, nextEventDate]);
 
   const clubNameLookup = clubs.reduce((acc, club) => {
     acc[club.clubID] = club.name;
@@ -22,29 +28,29 @@ const ListView = () => {
   }, {});
 
   const groupedByClub = useMemo(() => {
-    return teeTimesData.reduce((acc, teeTime) => {
+    const grouped = teeTimesData.reduce((acc, teeTime) => {
       teeTime.golfers?.forEach((player) => {
         const club = player?.golf_club?.clubID || "No Club";
-        if (!acc[club]) {
-          acc[club] = [];
-        }
+        if (!acc[club]) acc[club] = [];
         acc[club].push({
           name: player?.golferName || "Unnamed Player",
-          time: teeTime.golferTeeTime,
+          time: teeTime.golferTeeTime || "00:00",
         });
       });
       return acc;
     }, {});
+
+    Object.keys(grouped).forEach((club) => {
+      grouped[club] = grouped[club].sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
+    });
+
+    return grouped;
   }, [teeTimesData]);
 
-  useEffect(() => {
-    Object.keys(groupedByClub).forEach((club) => {
-      groupedByClub[club].sort((a, b) => a.name.localeCompare(b.name));
-    });
-  }, [groupedByClub]);
-
   const formatTime = (time) => {
-    if (!time) return null;
+    if (!time || !time.includes(":")) return "Invalid Time";
     const [hours, minutes] = time.split(":");
     return `${hours}:${minutes}`;
   };

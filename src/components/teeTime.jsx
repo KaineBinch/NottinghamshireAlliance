@@ -3,6 +3,7 @@ import { queryBuilder } from "../utils/queryBuilder";
 import { MODELS, QUERIES } from "../constants/api";
 import useFetch from "../utils/hooks/useFetch";
 import SearchFilter from "./SearchFilter";
+import { getNextEventDate } from "../utils/getNextEventDate";
 
 const TeeTimesTable = () => {
   const [filteredTeeTimes, setFilteredTeeTimes] = useState([]);
@@ -11,11 +12,16 @@ const TeeTimesTable = () => {
   const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery);
   const { isLoading, isError, data, error } = useFetch(query);
 
+  const nextEventDate = getNextEventDate(data);
+
   useEffect(() => {
     if (data?.data) {
-      setTeeTimesData(Array.isArray(data.data) ? data.data : []);
+      const filtered = data.data.filter(
+        (teeTime) => teeTime.event.eventDate == nextEventDate
+      );
+      setTeeTimesData(Array.isArray(filtered) ? filtered : []);
     }
-  }, [data]);
+  }, [data, nextEventDate]);
 
   const uniqueClubs = useMemo(() => {
     return [
@@ -82,7 +88,7 @@ const TeeTimesTable = () => {
       {displayData.length === 0 ? (
         <div>
           <p className="font-bold text-xl">No results found</p>
-          <p className="text-lg">Please check the name and try again.</p>
+          <p className="text-lg">Please check the name and try</p>
         </div>
       ) : (
         <div className="grid l:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4 w-full drop-shadow-sm">

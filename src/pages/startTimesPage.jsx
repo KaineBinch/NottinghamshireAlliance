@@ -55,13 +55,27 @@ const StartTimesPage = () => {
     return <p className="pt-[85px]">Something went wrong...</p>;
   }
 
+  const today = new Date();
+
+  const upcomingEvents = data?.data.filter(
+    (entry) => new Date(entry.event?.eventDate) >= today
+  );
+
+  const sortedEvents = upcomingEvents.sort(
+    (a, b) => new Date(a.event?.eventDate) - new Date(b.event?.eventDate)
+  );
+
+  const nextEvent = sortedEvents[0];
+
+  const eventDate = nextEvent?.event?.eventDate
+    ? formatDateWithOrdinal(nextEvent.event.eventDate)
+    : "Upcoming Event";
+
+  const filteredTeeTimes = nextEvent?.golfers || [];
+
   const handleToggleView = () => {
     setIsListView(!isListView);
   };
-
-  const eventDate = data.data[0]?.event?.eventDate
-    ? formatDateWithOrdinal(data.data[0].event.eventDate)
-    : "Upcoming Event";
 
   return (
     <>
@@ -85,27 +99,37 @@ const StartTimesPage = () => {
         <hr className="border-black" />
       </div>
       <div className="mt-6 flex flex-col mx-5">
-        <div className="justify-center items-center">
-          <div>
-            <h4 className="text-3xl font-bold">
-              {data.data[0]?.event?.golf_club?.clubName}
-            </h4>
-            <h4 className="text-xl mt-2">{eventDate}</h4>
-          </div>
-        </div>
-        <div className="flex justify-end max-w-5xl mx-auto">
-          <button
-            onClick={handleToggleView}
-            className="bg-[#214A27] text-white px-6 mt-5 py-2 rounded-lg shadow-md "
-          >
-            {isListView ? "Tee Time View" : "Club View"}
-          </button>
-        </div>
+        {nextEvent ? (
+          <>
+            <div className="justify-center items-center">
+              <div>
+                <h4 className="text-3xl font-bold">
+                  {nextEvent.event?.golf_club?.clubName}
+                </h4>
+                <h4 className="text-xl mt-2">{eventDate}</h4>
+              </div>
+            </div>
+            <div className="flex justify-end max-w-5xl mx-auto">
+              <button
+                onClick={handleToggleView}
+                className="bg-[#214A27] text-white px-6 mt-5 py-2 rounded-lg shadow-md "
+              >
+                {isListView ? "Tee Time View" : "Club View"}
+              </button>
+            </div>
+          </>
+        ) : (
+          <p className="text-center mt-5 text-xl">No upcoming events found.</p>
+        )}
       </div>
       <div className="flex justify-center">
         <div className="max-w-5xl w-full">
           <div className="mx-5 mb-5 mt-3">
-            {isListView ? <ListView /> : <TeeTimesTable />}
+            {isListView ? (
+              <ListView teeTimes={filteredTeeTimes} />
+            ) : (
+              <TeeTimesTable teeTimes={filteredTeeTimes} />
+            )}
           </div>
         </div>
       </div>
