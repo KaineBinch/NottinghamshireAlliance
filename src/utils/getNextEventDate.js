@@ -1,11 +1,15 @@
 export const getNextEventDate = (teeTimes) => {
+  if (!teeTimes?.data || !Array.isArray(teeTimes.data) || teeTimes.data.length === 0) {
+    console.warn("No valid tee times data provided.");
+    return null;
+  }
   const today = new Date();
 
   const upcomingEvents = teeTimes?.data.filter(
     (entry) => new Date(entry.event?.eventDate) >= today
   );
   let sortedEvents = []
-  if (!upcomingEvents) {
+  if (!upcomingEvents.length) {
     const previousEvents = teeTimes?.data.filter(
       (entry) => new Date(entry.event?.eventDate) <= today
     );

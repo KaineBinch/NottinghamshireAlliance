@@ -5,6 +5,7 @@ import ListView from "../components/teeTimeListView";
 import { queryBuilder } from "../utils/queryBuilder";
 import { MODELS, QUERIES } from "../constants/api";
 import useFetch from "../utils/hooks/useFetch";
+import { getNextEventDate } from "../utils/getNextEventDate";
 
 const getOrdinalSuffix = (day) => {
   if (day > 3 && day < 21) return "th";
@@ -55,17 +56,10 @@ const StartTimesPage = () => {
     return <p className="pt-[85px]">Something went wrong...</p>;
   }
 
-  const today = new Date();
-
-  const upcomingEvents = data?.data.filter(
-    (entry) => new Date(entry.event?.eventDate) >= today
+  const nextEventDate = getNextEventDate(data);
+  const nextEvent = data?.data.find(
+    (entry) => entry.event?.eventDate === nextEventDate
   );
-
-  const sortedEvents = upcomingEvents.sort(
-    (a, b) => new Date(a.event?.eventDate) - new Date(b.event?.eventDate)
-  );
-
-  const nextEvent = sortedEvents[0];
 
   const eventDate = nextEvent?.event?.eventDate
     ? formatDateWithOrdinal(nextEvent.event.eventDate)
