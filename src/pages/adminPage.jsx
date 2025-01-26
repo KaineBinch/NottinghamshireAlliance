@@ -5,12 +5,18 @@ import DownloadCSVFile from "../components/admin/import/downloadCSV";
 import TemplateCard from "../components/admin/template/TemplateCard";
 import CSVPreview from "../components/admin/import/csvPreview";
 import { useState, useEffect } from "react";
+import AddFixture from "../components/admin/addFixture";
+import AddClub from "../components/admin/addClub";
+import { queryBuilder } from "../utils/queryBuilder";
+import { MODELS, QUERIES } from "../constants/api";
+import useFetch from "../utils/hooks/useFetch";
 
 const AdminPage = () => {
   const { isAuthenticated, isLoading, loginWithPopup, logout } = useAuth0();
   const navigate = useNavigate();
   const [csvData, setCsvData] = useState([]);
   const [groupedData, setGroupedData] = useState({});
+  const query = queryBuilder(MODELS.golfClubs, QUERIES.clubsQuery);
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
@@ -23,10 +29,17 @@ const AdminPage = () => {
     navigate("/");
   };
 
+  const { loading, isError, data, error } = useFetch(query);
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
+  if (loading) {
+    return <p className="pt-[85px]">Loading...</p>;
+  } else if (isError) {
+    console.error("Error:", error);
+    return <p className="pt-[85px]">Something went wrong...</p>;
+  }
   return (
     <>
       <PageHeader title="Admin" />
@@ -55,6 +68,10 @@ const AdminPage = () => {
                   csvData={csvData}
                 />
               </div>
+            </div>
+            <div className="flex-1 bg-[#214A27] p-6 my-5 rounded-lg shadow-lg">
+              <AddFixture golfClubsData={data.data} />
+              <AddClub />
             </div>
 
             {csvData.length > 0 && (
