@@ -138,7 +138,7 @@ const DownloadTemplateButton = ({ eventDate, startTime, endTime }) => {
   return (
     <button
       onClick={downloadTemplate}
-      className="bg-[#214A27] text-white p-3 mt-2 rounded-sm hover:bg-[#17331B] transition duration-300"
+      className="bg-[#214A27] text-white p-3 mt-2 rounded-sm hover:bg-green-600 transition duration-300"
     >
       Download Event Template
     </button>
