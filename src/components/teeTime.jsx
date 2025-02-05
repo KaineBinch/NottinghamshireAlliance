@@ -55,6 +55,22 @@ const TeeTimesTable = () => {
     setFilteredTeeTimes(filteredData);
   }, []);
 
+  const sortedTeeTimes = useMemo(() => {
+    const sortByTime = (a, b) => {
+      const [aHours, aMinutes] = a.golferTeeTime.split(":").map(Number);
+      const [bHours, bMinutes] = b.golferTeeTime.split(":").map(Number);
+
+      if (aHours === bHours) {
+        return aMinutes - bMinutes;
+      }
+      return aHours - bHours;
+    };
+
+    return [
+      ...(filteredTeeTimes.length ? filteredTeeTimes : teeTimesData),
+    ].sort(sortByTime);
+  }, [filteredTeeTimes, teeTimesData]);
+
   if (isLoading) {
     return <p className="pt-[85px]">Loading...</p>;
   }
@@ -70,7 +86,7 @@ const TeeTimesTable = () => {
   };
 
   const displayData =
-    filteredTeeTimes.length >= 0 ? filteredTeeTimes : teeTimesData;
+    sortedTeeTimes.length >= 0 ? sortedTeeTimes : teeTimesData;
 
   return (
     <div className="w-full">

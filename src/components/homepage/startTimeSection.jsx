@@ -26,8 +26,8 @@ const StartTimesSection = () => {
   });
 
   const sortedTeeTimes = upcomingTeeTimes.sort((a, b) => {
-    const dateA = new Date(a.event?.eventDate);
-    const dateB = new Date(b.event?.eventDate);
+    const dateA = new Date(`${a.event?.eventDate}T${a.golferTeeTime}`);
+    const dateB = new Date(`${b.event?.eventDate}T${b.golferTeeTime}`);
     return dateA - dateB;
   });
 
@@ -86,7 +86,11 @@ const StartTimesSection = () => {
           {filteredTeeTimes.map((teeTime) => (
             <TeeTimeCard
               key={teeTime.id}
-              clubName={`${teeTime.event.golf_club?.clubName} Golf Club`}
+              clubName={
+                teeTime.event.golf_club?.clubName
+                  ? `${teeTime.event.golf_club.clubName} Golf Club`
+                  : "Location to be confirmed"
+              }
               clubLogo={
                 teeTime.event.golf_club?.clubLogo?.[0]?.url
                   ? `${BASE_URL}${teeTime.event.golf_club.clubLogo[0].url}`

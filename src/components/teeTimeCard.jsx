@@ -57,7 +57,7 @@ const TeeTimeCard = ({
         Tee Time:{" "}
         <span className="font-bold">
           {golferTeeTime
-            ? new Date(`1970-01-01T${golferTeeTime}`).toLocaleTimeString(
+            ? new Date(`${eventDate}T${golferTeeTime}`).toLocaleTimeString(
                 "en-GB",
                 {
                   hour: "2-digit",
@@ -73,7 +73,7 @@ const TeeTimeCard = ({
           golfers.map((golfer) => (
             <div key={golfer.id} className="ml-2 flex items-center">
               <p className={`${golfer.isSenior ? "text-black" : "text-black"}`}>
-                {golfer.golferName} - {golfer.golf_club.clubID}
+                {golfer.golferName} - {golfer?.golf_club?.clubID}
               </p>
               {golfer.isSenior && (
                 <p className="text-sm font-semibold ml-2 text-red-500">

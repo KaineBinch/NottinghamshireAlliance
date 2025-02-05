@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect } from "react";
 import { queryBuilder } from "../utils/queryBuilder";
 import { MODELS, QUERIES } from "../constants/api";
 import useFetch from "../utils/hooks/useFetch";
-import { clubs } from "../constants/golfClubs";
 import { getNextEventDate } from "../utils/getNextEventDate";
 
 const ListView = () => {
@@ -22,10 +21,20 @@ const ListView = () => {
     }
   }, [data, nextEventDate]);
 
-  const clubNameLookup = clubs.reduce((acc, club) => {
-    acc[club.clubID] = club.name;
-    return acc;
-  }, {});
+  const clubNameLookup = useMemo(() => {
+    if (!data?.data) return {};
+
+    return data.data.reduce((acc, item) => {
+      item.golfers.forEach((golfer) => {
+        if (golfer.golf_club) {
+          acc[
+            golfer.golf_club.clubID
+          ] = `${golfer.golf_club.clubName} Golf Club`;
+        }
+      });
+      return acc;
+    }, {});
+  }, [data]);
 
   const groupedByClub = useMemo(() => {
     const grouped = teeTimesData.reduce((acc, teeTime) => {
@@ -40,15 +49,25 @@ const ListView = () => {
       return acc;
     }, {});
 
-    Object.keys(grouped).forEach((club) => {
-      grouped[club] = grouped[club].sort((a, b) =>
+    const sortedGrouped = Object.entries(grouped)
+      .sort(([clubA], [clubB]) => {
+        const nameA = clubNameLookup[clubA]?.toLowerCase() || "";
+        const nameB = clubNameLookup[clubB]?.toLowerCase() || "";
+        return nameA.localeCompare(nameB);
+      })
+      .reduce((acc, [club, players]) => {
+        acc[club] = players;
+        return acc;
+      }, {});
+
+    Object.keys(sortedGrouped).forEach((club) => {
+      sortedGrouped[club] = sortedGrouped[club].sort((a, b) =>
         a.name.localeCompare(b.name)
       );
     });
 
-    return grouped;
-  }, [teeTimesData]);
-
+    return sortedGrouped;
+  }, [teeTimesData, clubNameLookup]);
   const formatTime = (time) => {
     if (!time || !time.includes(":")) return "Invalid Time";
     const [hours, minutes] = time.split(":");
