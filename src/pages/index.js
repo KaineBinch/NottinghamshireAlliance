@@ -1,6 +1,5 @@
 import HomePage from "./homePage"
 import NotFound from "./notFound"
-import ContactPage from "./contactPage"
 import CoursesPage from "./coursesPage"
 import FixturesPage from "./fixturesPage"
 import GalleryPage from "./galleryPage"
@@ -11,4 +10,4 @@ import OrderOfMeritPage from "./oomPage"
 import FurtherResultsPage from "./furtherResultsPage"
 import AdminPage from "./adminPage"
 
-export { HomePage, NotFound, ContactPage, CoursesPage, FixturesPage, GalleryPage, ResultsPage, RulesPage, StartTimesPage, OrderOfMeritPage, FurtherResultsPage, AdminPage }
+export { HomePage, NotFound, CoursesPage, FixturesPage, GalleryPage, ResultsPage, RulesPage, StartTimesPage, OrderOfMeritPage, FurtherResultsPage, AdminPage }

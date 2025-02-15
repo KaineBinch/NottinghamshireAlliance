@@ -1,8 +1,8 @@
-import { Link, useLocation } from "react-router-dom";
-import logo from "../assets/Logo.png";
+import { Link, useLocation } from "react-router-dom"
+import logo from "../assets/Logo.png"
 
 const Navbar = () => {
-  const location = useLocation().pathname;
+  const location = useLocation().pathname
   const links = [
     { title: "Home", to: "/" },
     { title: "Start Times", to: "/starttimes" },
@@ -10,17 +10,15 @@ const Navbar = () => {
     { title: "Fixtures", to: "/fixtures" },
     { title: "Courses", to: "/courses" },
     { title: "Order Of Merit", to: "/oom" },
-    { title: "Contact", to: "/contact" },
-    { title: "Rules", to: "/rules" },
     { title: "Gallery", to: "/gallery" },
-  ];
+  ]
   const loseActiveFocus = () => {
-    const elem = document.activeElement;
-    if (elem) elem.blur();
-  };
+    const elem = document.activeElement
+    if (elem) elem.blur()
+  }
 
   const LinkItem = (title, to, location, my = 1) => {
-    const activeClasses = location === to ? "bg-[#17331B]" : "";
+    const activeClasses = location === to ? "bg-[#17331B]" : ""
     return (
       <li
         key={title}
@@ -29,17 +27,15 @@ const Navbar = () => {
         style={{
           marginTop: my,
           marginBottom: my,
-        }}
-      >
+        }}>
         <Link
           to={to}
-          className="text-center font-normal text-white inline hover:bg-green-600 rounded-none"
-        >
+          className="text-center font-normal text-white inline hover:bg-green-600 rounded-none">
           {title}
         </Link>
       </li>
-    );
-  };
+    )
+  }
 
   return (
     <>
@@ -48,21 +44,18 @@ const Navbar = () => {
           <div className="dropdown visible lg:invisible justify-start items-start lg:w-0 w-auto z-20">
             <label
               tabIndex={0}
-              className="btn btn-ghost btn-square text-white justify-center items-center"
-            >
+              className="btn btn-ghost btn-square text-white justify-center items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="2 2 19 19"
-                className="inline-block w-7 h-7 stroke-current"
-              >
+                className="inline-block w-7 h-7 stroke-current">
                 <path strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
               </svg>
             </label>
             <div className="flex flex-row">
               <ul
                 tabIndex={0}
-                className="menu absolute left-0 dropdown-content bg-[#214A27] w-[175px] items-start rounded-b-[1px] text-lg -ml-5"
-              >
+                className="menu absolute left-0 dropdown-content bg-[#214A27] w-[175px] items-start rounded-b-[1px] text-lg -ml-5">
                 {links.map(({ title, to }) => (
                   <div key={title} className="ml-3">
                     {LinkItem(title, to, location, 5)}
@@ -85,6 +78,6 @@ const Navbar = () => {
         </div>
       </div>
     </>
-  );
-};
-export default Navbar;
+  )
+}
+export default Navbar
