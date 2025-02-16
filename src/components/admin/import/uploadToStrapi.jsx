@@ -8,6 +8,15 @@ export const uploadToStrapi = async (
   setUploadStatus,
   setUploadMessage
 ) => {
+  const userConfirmed = window.confirm(
+    "Are you sure you want to make these changes? Your changes cannot be undone."
+  )
+  if (!userConfirmed) {
+    setUploadStatus("Cancelled")
+    setUploadMessage("Upload cancelled by user. ❌")
+    return
+  }
+
   try {
     setUploadStatus("Uploading")
     setUploadMessage("Uploading...")
