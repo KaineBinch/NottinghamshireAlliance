@@ -76,7 +76,7 @@ const MobFoot = () => {
               <a href="/#/admin">Admin</a>
             </p>
             <p className="text-base py-8">
-              <a href="/#/club-officers">Club Officers</a>
+              <a href="/#/clubofficers">Club Officers</a>
             </p>
             <p className="text-base">
               <a href="/#/rules">Rules</a>

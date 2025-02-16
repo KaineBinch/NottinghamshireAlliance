@@ -11,6 +11,7 @@ export const appRoutes = {
   oom: "/oom",
   template: "/template",
   admin: "/admin",
+  clubofficers: "/clubofficers",
 
   furtherResult: (clubName) => `/results/${clubName}`,
 };

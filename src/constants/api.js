@@ -10,6 +10,7 @@ export const MODELS = {
   events: "/events",
   teeTimes: "/tee-times",
   imports: "/imports",
+  clubOfficers: "/officers"
 }
 export const QUERIES = {
   clubsQuery: "?sort[0]=clubName:asc&populate=*",
@@ -20,5 +21,6 @@ export const QUERIES = {
   eventsQuery: "?sort[0]=eventDate:asc&populate[golf_club][populate]=clubImage",
   teeTimesQuery: "?populate[0]=event.golf_club&populate[1]=golfers.golf_club&populate[2]=event.golf_club.clubLogo",
   oomQuery: "?populate[0]=event&populate[1]=golfer.golf_club",
-  csvImport: "/import-csv"
+  officerQuery: "?populate=*",
+  csvImport: "/import-csv",
 }

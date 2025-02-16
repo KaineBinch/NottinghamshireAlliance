@@ -12,6 +12,7 @@ import {
   OrderOfMeritPage,
   FurtherResultsPage,
   AdminPage,
+  ClubOfficersPage,
 } from "./pages"
 import { appRoutes } from "./constants/appRoutes"
 import ScrollToTop from "./utils/scrollToTop"
@@ -38,6 +39,11 @@ function App() {
         <Route exact path={appRoutes.oom} element={<OrderOfMeritPage />} />
         <Route exact path={appRoutes.results} element={<ResultsPage />} />
         <Route exact path={appRoutes.rules} element={<RulesPage />} />
+        <Route
+          exact
+          path={appRoutes.clubofficers}
+          element={<ClubOfficersPage />}
+        />
         <Route exact path={appRoutes.startTimes} element={<StartTimesPage />} />
 
         {/* Wrapping AdminPage in Auth0Provider */}
