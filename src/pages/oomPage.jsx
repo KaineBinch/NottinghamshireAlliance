@@ -1,10 +1,10 @@
-import PageHeader from "../components/pageHeader";
-import { results } from "../constants/results";
-import { transformResults } from "../utils/transformResults";
-import ResultsTable from "../components/results/resultsTable/resultsTable";
+import PageHeader from "../components/pageHeader"
+import { results } from "../constants/results"
+import { transformResults } from "../utils/transformResults"
+import ResultsTable from "../components/results/resultsTable/resultsTable"
 
 const OrderOfMeritPage = () => {
-  const { rows, columns } = transformResults(results);
+  const { rows, columns } = transformResults(results)
 
   return (
     <>
@@ -28,7 +28,7 @@ const OrderOfMeritPage = () => {
         <ResultsTable columns={columns} rows={rows} />
       </div>
     </>
-  );
-};
+  )
+}
 
-export default OrderOfMeritPage;
+export default OrderOfMeritPage

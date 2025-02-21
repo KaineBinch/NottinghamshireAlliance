@@ -1,9 +1,9 @@
-import OOMSection from "../components/homepage/oomSection.jsx";
-import CoursesSection from "../components/homepage/coursesSection.jsx";
-import FixturesSection from "../components/homepage/fixturesSection.jsx";
-import Scroller from "../components/homepage/Scroller.jsx";
-import WelcomeSection from "../components/homepage/welcomeSection.jsx";
-import StartTimesSection from "../components/homepage/startTimeSection.jsx";
+import OOMSection from "../components/homepage/oomSection.jsx"
+import CoursesSection from "../components/homepage/coursesSection.jsx"
+import FixturesSection from "../components/homepage/fixturesSection.jsx"
+import Scroller from "../components/homepage/Scroller.jsx"
+import WelcomeSection from "../components/homepage/welcomeSection.jsx"
+import StartTimesSection from "../components/homepage/startTimeSection.jsx"
 
 const HomePage = () => {
   return (
@@ -20,7 +20,7 @@ const HomePage = () => {
         <OOMSection />
       </div>
     </>
-  );
-};
+  )
+}
 
-export default HomePage;
+export default HomePage

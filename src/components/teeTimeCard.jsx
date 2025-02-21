@@ -1,4 +1,4 @@
-import defaultImage from "../assets/Logo.png";
+import defaultImage from "../assets/Logo.png"
 
 const TeeTimeCard = ({
   clubName,
@@ -8,24 +8,24 @@ const TeeTimeCard = ({
   golfers,
 }) => {
   const getOrdinalSuffix = (day) => {
-    if (day > 3 && day < 21) return "th";
+    if (day > 3 && day < 21) return "th"
     switch (day % 10) {
       case 1:
-        return "st";
+        return "st"
       case 2:
-        return "nd";
+        return "nd"
       case 3:
-        return "rd";
+        return "rd"
       default:
-        return "th";
+        return "th"
     }
-  };
+  }
 
   const formatDateWithOrdinal = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const ordinal = getOrdinalSuffix(day);
+    if (!dateString) return ""
+    const date = new Date(dateString)
+    const day = date.getDate()
+    const ordinal = getOrdinalSuffix(day)
     return date
       .toLocaleDateString("en-GB", {
         weekday: "long",
@@ -33,8 +33,8 @@ const TeeTimeCard = ({
         month: "long",
         year: "numeric",
       })
-      .replace(`${day}`, `${day}${ordinal}`);
-  };
+      .replace(`${day}`, `${day}${ordinal}`)
+  }
 
   return (
     <div className="bg-[#D9D9D9] border border-[#214A27] border-[6px] shadow-md p-4 rounded-md w-full max-w-md m-1">
@@ -87,7 +87,7 @@ const TeeTimeCard = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default TeeTimeCard;
+export default TeeTimeCard

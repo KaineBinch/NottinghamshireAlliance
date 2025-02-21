@@ -1,13 +1,13 @@
-import ResultsCard from "../components/resultsCard";
-import PageHeader from "../components/pageHeader";
-import { clubs } from "../constants/golfClubs.js";
-import { Link } from "react-router-dom";
+import ResultsCard from "../components/resultsCard"
+import PageHeader from "../components/pageHeader"
+import { clubs } from "../constants/golfClubs.js"
+import { Link } from "react-router-dom"
 
 const isDateInPast = (dateString) => {
-  const [day, month, year] = dateString.split("/").map(Number);
-  const competitionDate = new Date(`${year}-${month}-${day}`);
-  return competitionDate < new Date();
-};
+  const [day, month, year] = dateString.split("/").map(Number)
+  const competitionDate = new Date(`${year}-${month}-${day}`)
+  return competitionDate < new Date()
+}
 
 const ResultsPage = () => {
   return (
@@ -31,8 +31,7 @@ const ResultsPage = () => {
               <Link
                 to={`/results/${club.name}`}
                 key={i}
-                className="hover:opacity-80 transition"
-              >
+                className="hover:opacity-80 transition">
                 <ResultsCard
                   name={club.name}
                   courseImage={club.courseImage}
@@ -44,7 +43,7 @@ const ResultsPage = () => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default ResultsPage;
+export default ResultsPage

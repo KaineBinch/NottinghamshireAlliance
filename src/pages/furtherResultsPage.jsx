@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
-import { Trophy, Users, User } from "lucide-react";
-import { clubs } from "../constants/golfClubs";
+import { useState } from "react"
+import { useParams } from "react-router-dom"
+import { Trophy, Users, User } from "lucide-react"
+import { clubs } from "../constants/golfClubs"
 
 const ExpandableText = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const toggleExpand = () => setIsExpanded(!isExpanded);
+  const [isExpanded, setIsExpanded] = useState(false)
+  const toggleExpand = () => setIsExpanded(!isExpanded)
 
-  const fullText = `If a club has had better greens than Radcliffe's yesterday, I’m not aware of it. Every player commented on how superbly they rolled, and the holes were cut really sharp. Congratulations to the green staff! It’s a shame that we had a reduced field due to a PGA event, with lots of regulars away on various trips. Some super scores were made, and it was nice to see new names picking up prizes. Thanks to Karen and Nicola behind the bar for looking after us all day. Here’s to next year’s visit! Our next event is a Pairs Better Ball at Brierley Forest on Wednesday, October 2nd.`;
+  const fullText = `If a club has had better greens than Radcliffe's yesterday, I’m not aware of it. Every player commented on how superbly they rolled, and the holes were cut really sharp. Congratulations to the green staff! It’s a shame that we had a reduced field due to a PGA event, with lots of regulars away on various trips. Some super scores were made, and it was nice to see new names picking up prizes. Thanks to Karen and Nicola behind the bar for looking after us all day. Here’s to next year’s visit! Our next event is a Pairs Better Ball at Brierley Forest on Wednesday, October 2nd.`
 
   return (
     <div className="px-5 my-[25px] text-start flex flex-col">
@@ -15,20 +15,18 @@ const ExpandableText = () => {
         <p
           className={`${
             isExpanded ? "line-clamp-none" : "line-clamp-4"
-          } overflow-clip`}
-        >
+          } overflow-clip`}>
           {fullText}
         </p>{" "}
         <button
           onClick={toggleExpand}
-          className="font-bold text-[#214A27] mt-1 inline-block"
-        >
+          className="font-bold text-[#214A27] mt-1 inline-block">
           {isExpanded ? "Read Less" : "Read More"}
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
 const TabButton = ({ id, label, icon: Icon, activeTab, onClick }) => (
   <button
@@ -37,12 +35,11 @@ const TabButton = ({ id, label, icon: Icon, activeTab, onClick }) => (
       activeTab === id
         ? "text-[#214A27] border-b-2 border-[#214A27]"
         : "text-gray-700 hover:text-[#214A27]"
-    } flex items-center mx-3`}
-  >
+    } flex items-center mx-3`}>
     <Icon className="mr-2" size={20} />
     {label}
   </button>
-);
+)
 
 const ResultTable = ({ headers, data }) => (
   <div className="overflow-x-auto text-sm md:text-lg">
@@ -60,8 +57,7 @@ const ResultTable = ({ headers, data }) => (
         {data.map((row, rowIndex) => (
           <tr
             key={rowIndex}
-            className={rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"}
-          >
+            className={rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"}>
             {row.map((cell, cellIndex) => (
               <td key={cellIndex} className="border p-2">
                 {cell}
@@ -72,7 +68,7 @@ const ResultTable = ({ headers, data }) => (
       </tbody>
     </table>
   </div>
-);
+)
 
 const WinnersTab = () => (
   <ResultTable
@@ -82,7 +78,7 @@ const WinnersTab = () => (
       ["2nd", "Mike Flanagan", "Wollaton Park", "41"],
     ]}
   />
-);
+)
 
 const TeamsTab = () => (
   <div>
@@ -111,7 +107,7 @@ const TeamsTab = () => (
       ]}
     />
   </div>
-);
+)
 
 const ProfessionalsTab = () => (
   <ResultTable
@@ -125,11 +121,11 @@ const ProfessionalsTab = () => (
       ["5th", "Reece Samson", "Bondhay", "30", "£30"],
     ]}
   />
-);
+)
 
 const FurtherResultsPage = () => {
-  const { clubName } = useParams();
-  const [activeTab, setActiveTab] = useState("winners");
+  const { clubName } = useParams()
+  const [activeTab, setActiveTab] = useState("winners")
 
   const tabs = [
     {
@@ -145,14 +141,14 @@ const FurtherResultsPage = () => {
       icon: User,
       component: ProfessionalsTab,
     },
-  ];
+  ]
 
   const club = clubs.find(
     (c) => c.name.toLowerCase() === clubName.toLowerCase()
-  );
+  )
 
   if (!club) {
-    return <p className="text-center mt-8 text-xl">Club not found</p>;
+    return <p className="text-center mt-8 text-xl">Club not found</p>
   }
 
   return (
@@ -178,7 +174,7 @@ const FurtherResultsPage = () => {
         <main>{tabs.find((tab) => tab.id === activeTab).component()}</main>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default FurtherResultsPage;
+export default FurtherResultsPage

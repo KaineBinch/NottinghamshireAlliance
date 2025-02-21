@@ -1,18 +1,18 @@
-import CourseCard from "../components/courseCard";
-import PageHeader from "../components/pageHeader";
-import { BASE_URL, MODELS, QUERIES } from "../constants/api";
-import useFetch from "../utils/hooks/useFetch";
-import { queryBuilder } from "../utils/queryBuilder";
+import CourseCard from "../components/courseCard"
+import PageHeader from "../components/pageHeader"
+import { BASE_URL, MODELS, QUERIES } from "../constants/api"
+import useFetch from "../utils/hooks/useFetch"
+import { queryBuilder } from "../utils/queryBuilder"
 
 const CoursesPage = () => {
-  const query = queryBuilder(MODELS.golfClubs, QUERIES.clubsQuery);
-  const { isLoading, isError, data, error } = useFetch(query);
+  const query = queryBuilder(MODELS.golfClubs, QUERIES.clubsQuery)
+  const { isLoading, isError, data, error } = useFetch(query)
 
   if (isLoading) {
-    return <p className="pt-[85px]">Loading...</p>;
+    return <p className="pt-[85px]">Loading...</p>
   } else if (isError) {
-    console.error("Error:", error);
-    return <p className="pt-[85px]">Something went wrong...</p>;
+    console.error("Error:", error)
+    return <p className="pt-[85px]">Something went wrong...</p>
   }
 
   return (
@@ -60,6 +60,6 @@ const CoursesPage = () => {
         </div>
       </div>
     </>
-  );
-};
-export default CoursesPage;
+  )
+}
+export default CoursesPage

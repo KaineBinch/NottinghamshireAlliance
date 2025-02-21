@@ -1,21 +1,21 @@
-import { useState, useEffect } from "react";
-import PageHeader from "../components/pageHeader";
-import ImageGallery from "react-image-gallery";
-import "react-image-gallery/styles/css/image-gallery.css";
-import { API_URL, BASE_URL } from "../constants/api";
+import { useState, useEffect } from "react"
+import PageHeader from "../components/pageHeader"
+import ImageGallery from "react-image-gallery"
+import "react-image-gallery/styles/css/image-gallery.css"
+import { API_URL, BASE_URL } from "../constants/api"
 
 const GalleryPage = () => {
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState([])
 
   useEffect(() => {
     const loadImages = async () => {
       try {
-        const response = await fetch(`${API_URL}/upload/files`);
+        const response = await fetch(`${API_URL}/upload/files`)
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}`)
         }
 
-        const data = await response.json();
+        const data = await response.json()
         const courseImageArray = data
           .filter(
             (image) =>
@@ -25,16 +25,16 @@ const GalleryPage = () => {
           .map((image) => ({
             original: `${BASE_URL}${image.url}`,
             thumbnail: `${BASE_URL}${image.url}`,
-          }));
+          }))
 
-        setImages(courseImageArray);
+        setImages(courseImageArray)
       } catch (error) {
-        console.error("Error fetching images:", error);
+        console.error("Error fetching images:", error)
       }
-    };
+    }
 
-    loadImages();
-  }, []);
+    loadImages()
+  }, [])
 
   return (
     <>
@@ -51,7 +51,7 @@ const GalleryPage = () => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default GalleryPage;
+export default GalleryPage

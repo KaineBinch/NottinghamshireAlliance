@@ -1,50 +1,50 @@
-import PageHeader from "../components/pageHeader";
-import { MODELS, QUERIES } from "../constants/api";
-import useFetch from "../utils/hooks/useFetch";
-import { queryBuilder } from "../utils/queryBuilder";
+import PageHeader from "../components/pageHeader"
+import { MODELS, QUERIES } from "../constants/api"
+import useFetch from "../utils/hooks/useFetch"
+import { queryBuilder } from "../utils/queryBuilder"
 
 const RulesPage = () => {
-  const rulesQuery = queryBuilder(MODELS.rules, QUERIES.rulesQuery);
+  const rulesQuery = queryBuilder(MODELS.rules, QUERIES.rulesQuery)
   const {
     isLoading: isLoadingRules,
     isError: isErrorRules,
     data: rulesData,
     error: errorRules,
-  } = useFetch(rulesQuery);
+  } = useFetch(rulesQuery)
 
   const conditionsQuery = queryBuilder(
     MODELS.conditions,
     QUERIES.conditionsQuery
-  );
+  )
   const {
     isLoading: isLoadingConditions,
     isError: isErrorConditions,
     data: conditionsData,
     error: errorConditions,
-  } = useFetch(conditionsQuery);
+  } = useFetch(conditionsQuery)
 
   if (isLoadingRules || isLoadingConditions) {
-    return <p className="pt-[85px]">Loading...</p>;
+    return <p className="pt-[85px]">Loading...</p>
   }
 
   if (isErrorRules || isErrorConditions) {
-    console.error("Error fetching data:", errorRules || errorConditions);
+    console.error("Error fetching data:", errorRules || errorConditions)
     return (
       <div className="pt-[85px]">
         <p>Something went wrong...</p>
         <button onClick={() => window.location.reload()}>Retry</button>
       </div>
-    );
+    )
   }
 
   const renderContent = (contentItem) => {
     if (typeof contentItem === "string") {
-      const isIndented = contentItem.trim().startsWith("-");
+      const isIndented = contentItem.trim().startsWith("-")
       return (
         <p key={contentItem} className={`mb-4 ${isIndented ? "ml-6" : ""}`}>
           {contentItem}
         </p>
-      );
+      )
     }
 
     if (contentItem.subTitle && Array.isArray(contentItem.text)) {
@@ -57,23 +57,23 @@ const RulesPage = () => {
             </p>
           ))}
         </div>
-      );
+      )
     }
 
-    return null;
-  };
+    return null
+  }
 
   const renderSectionContent = (item) => {
     if (Array.isArray(item.ruleContent)) {
-      return item.ruleContent.map((contentItem) => renderContent(contentItem));
+      return item.ruleContent.map((contentItem) => renderContent(contentItem))
     } else if (Array.isArray(item.conditionContent)) {
       return item.conditionContent.map((contentItem) =>
         renderContent(contentItem)
-      );
+      )
     } else {
-      return <p>No content available</p>;
+      return <p>No content available</p>
     }
-  };
+  }
 
   return (
     <>
@@ -93,8 +93,7 @@ const RulesPage = () => {
               rulesData.data.map((item, idx) => (
                 <div
                   key={idx}
-                  className="collapse collapse-arrow bg-[#fff] drop-shadow mb-1"
-                >
+                  className="collapse collapse-arrow bg-[#fff] drop-shadow mb-1">
                   <input type="checkbox" className="peer" />
                   <div className="collapse-title text-xl font-medium">
                     {item.ruleTitle}
@@ -114,8 +113,7 @@ const RulesPage = () => {
               conditionsData.data.map((item, idx) => (
                 <div
                   key={idx}
-                  className="collapse collapse-arrow bg-[#fff] drop-shadow mb-1"
-                >
+                  className="collapse collapse-arrow bg-[#fff] drop-shadow mb-1">
                   <input type="checkbox" className="peer" />
                   <div className="collapse-title text-xl font-medium">
                     {item.conditionTitle || "No Title"}{" "}
@@ -132,7 +130,7 @@ const RulesPage = () => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default RulesPage;
+export default RulesPage

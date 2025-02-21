@@ -17,7 +17,7 @@ const CourseCard = ({ courseImage, name, comp, date }) => {
         <h3 className="text-md">{date}</h3>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default CourseCard;
+export default CourseCard

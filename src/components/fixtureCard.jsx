@@ -1,4 +1,4 @@
-import CalendarButton from "./calendarButton";
+import CalendarButton from "./calendarButton"
 
 const FixtureCard = ({
   clubImage,
@@ -10,23 +10,23 @@ const FixtureCard = ({
 }) => {
   const formatDate = (dateString) => {
     if (!dateString) {
-      console.error("Date string is undefined or null");
-      return { year: "", month: "", monthName: "", day: "" };
+      console.error("Date string is undefined or null")
+      return { year: "", month: "", monthName: "", day: "" }
     }
 
-    const parts = dateString.split("-");
+    const parts = dateString.split("-")
     if (parts.length !== 3) {
       console.error(
         "Date string is not in expected format YYYY-MM-DD:",
         dateString
-      );
-      return { year: "", month: "", monthName: "", day: "" };
+      )
+      return { year: "", month: "", monthName: "", day: "" }
     }
 
-    const [year, month, day] = parts.map(Number);
+    const [year, month, day] = parts.map(Number)
     if (isNaN(day) || isNaN(month) || isNaN(year)) {
-      console.error("Invalid date components:", day, month, year);
-      return { year: "", month: "", monthName: "", day: "" };
+      console.error("Invalid date components:", day, month, year)
+      return { year: "", month: "", monthName: "", day: "" }
     }
 
     const monthNames = [
@@ -42,17 +42,17 @@ const FixtureCard = ({
       "October",
       "November",
       "December",
-    ];
+    ]
 
     return {
       year,
       month,
       monthName: monthNames[month - 1] || "",
       day,
-    };
-  };
+    }
+  }
 
-  const { year, month, monthName, day } = formatDate(date);
+  const { year, month, monthName, day } = formatDate(date)
 
   const dayName =
     day && month && year
@@ -62,7 +62,7 @@ const FixtureCard = ({
             "0"
           )}`
         ).toLocaleDateString("en-US", { weekday: "short" })
-      : "Date To Be Confirmed";
+      : "Date To Be Confirmed"
 
   return (
     <div className="p-4 bg-[#214A27] shadow-lg rounded-md">
@@ -114,7 +114,7 @@ const FixtureCard = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default FixtureCard;
+export default FixtureCard

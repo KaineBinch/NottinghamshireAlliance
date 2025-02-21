@@ -1,4 +1,4 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 const Socials = ({ link, icon }) => {
   return (
@@ -8,8 +8,7 @@ const Socials = ({ link, icon }) => {
           className="flex items-center justify-center"
           href={link}
           target="_blank"
-          rel="noreferrer"
-        >
+          rel="noreferrer">
           <FontAwesomeIcon
             icon={icon}
             className="mr-5 w-[35px] h-[35px] my-2"
@@ -18,6 +17,6 @@ const Socials = ({ link, icon }) => {
         </a>
       </div>
     </>
-  );
-};
-export default Socials;
+  )
+}
+export default Socials

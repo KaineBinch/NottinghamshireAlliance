@@ -1,35 +1,35 @@
-import { useState } from "react";
-import PageHeader from "../components/pageHeader";
-import FixtureCard from "../components/fixtureCard";
-import FixturesListView from "../components/FixturesListView";
-import { queryBuilder } from "../utils/queryBuilder";
-import { BASE_URL, MODELS, QUERIES } from "../constants/api";
-import useFetch from "../utils/hooks/useFetch";
-import defaultImage from "../assets/background.jpg";
+import { useState } from "react"
+import PageHeader from "../components/pageHeader"
+import FixtureCard from "../components/fixtureCard"
+import FixturesListView from "../components/FixturesListView"
+import { queryBuilder } from "../utils/queryBuilder"
+import { BASE_URL, MODELS, QUERIES } from "../constants/api"
+import useFetch from "../utils/hooks/useFetch"
+import defaultImage from "../assets/background.jpg"
 
 const FixturesPage = () => {
-  const [isListView, setIsListView] = useState(false);
+  const [isListView, setIsListView] = useState(false)
 
-  const query = queryBuilder(MODELS.events, QUERIES.eventsQuery);
-  const { isLoading, isError, data, error } = useFetch(query);
+  const query = queryBuilder(MODELS.events, QUERIES.eventsQuery)
+  const { isLoading, isError, data, error } = useFetch(query)
 
   if (isLoading) {
-    return <p className="pt-[85px]">Loading...</p>;
+    return <p className="pt-[85px]">Loading...</p>
   } else if (isError) {
-    console.error("Error:", error);
-    return <p className="pt-[85px]">Something went wrong...</p>;
+    console.error("Error:", error)
+    return <p className="pt-[85px]">Something went wrong...</p>
   }
 
   const sortedData = (data?.data || []).sort((a, b) => {
-    const aHasDate = a.eventDate !== null && a.eventDate !== undefined;
-    const bHasDate = b.eventDate !== null && b.eventDate !== undefined;
+    const aHasDate = a.eventDate !== null && a.eventDate !== undefined
+    const bHasDate = b.eventDate !== null && b.eventDate !== undefined
 
-    if (aHasDate === bHasDate) return 0;
+    if (aHasDate === bHasDate) return 0
 
-    if (aHasDate) return -1;
+    if (aHasDate) return -1
 
-    return 1;
-  });
+    return 1
+  })
 
   return (
     <>
@@ -52,8 +52,7 @@ const FixturesPage = () => {
       <div className="flex justify-center pt-4">
         <button
           onClick={() => setIsListView(!isListView)}
-          className="bg-[#214A27] text-white px-6 mt-5 py-2 rounded-lg shadow-md -mb-4"
-        >
+          className="bg-[#214A27] text-white px-6 mt-5 py-2 rounded-lg shadow-md -mb-4">
           {isListView ? "Switch to Card View" : "Switch to List View"}
         </button>
       </div>
@@ -67,22 +66,22 @@ const FixturesPage = () => {
               {sortedData?.map((club) => {
                 const clubName = club.golf_club
                   ? `${club.golf_club.clubName} Golf Club`
-                  : "Location To be Confirmed";
+                  : "Location To be Confirmed"
                 const clubAddress = club.golf_club
                   ? club.golf_club.clubAddress
-                  : "";
+                  : ""
                 const clubImage = club.golf_club?.clubImage?.[0]?.url
                   ? `${BASE_URL}${club.golf_club.clubImage[0].url}`
-                  : defaultImage;
+                  : defaultImage
 
-                const eventDate = club.eventDate;
-                const dateText = eventDate ? eventDate : null;
+                const eventDate = club.eventDate
+                const dateText = eventDate ? eventDate : null
 
                 const competitionText =
                   club.eventType &&
                   club.eventType !== "Competition type to be confirmed"
                     ? " competition"
-                    : "";
+                    : ""
 
                 return (
                   <FixtureCard
@@ -94,14 +93,14 @@ const FixturesPage = () => {
                     date={dateText}
                     competitionText={competitionText}
                   />
-                );
+                )
               })}
             </div>
           </div>
         </div>
       )}
     </>
-  );
-};
+  )
+}
 
-export default FixturesPage;
+export default FixturesPage

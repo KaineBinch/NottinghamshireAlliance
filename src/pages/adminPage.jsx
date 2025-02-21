@@ -1,30 +1,30 @@
-import { useAuth0 } from "@auth0/auth0-react";
-import PageHeader from "../components/pageHeader";
-import { useNavigate } from "react-router-dom";
-import DownloadCSVFile from "../components/admin/import/downloadCSV";
-import TemplateCard from "../components/admin/template/TemplateCard";
-import CSVPreview from "../components/admin/import/csvPreview";
-import { useState, useEffect } from "react";
+import { useAuth0 } from "@auth0/auth0-react"
+import PageHeader from "../components/pageHeader"
+import { useNavigate } from "react-router-dom"
+import DownloadCSVFile from "../components/admin/import/downloadCSV"
+import TemplateCard from "../components/admin/template/TemplateCard"
+import CSVPreview from "../components/admin/import/csvPreview"
+import { useState, useEffect } from "react"
 
 const AdminPage = () => {
-  const { isAuthenticated, isLoading, loginWithPopup, logout } = useAuth0();
-  const navigate = useNavigate();
-  const [csvData, setCsvData] = useState([]);
-  const [groupedData, setGroupedData] = useState({});
+  const { isAuthenticated, isLoading, loginWithPopup, logout } = useAuth0()
+  const navigate = useNavigate()
+  const [csvData, setCsvData] = useState([])
+  const [groupedData, setGroupedData] = useState({})
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
-      loginWithPopup().catch((error) => console.error("Login failed", error));
+      loginWithPopup().catch((error) => console.error("Login failed", error))
     }
-  }, [isAuthenticated, isLoading, loginWithPopup]);
+  }, [isAuthenticated, isLoading, loginWithPopup])
 
   const handleLogout = () => {
-    logout({ returnTo: window.location.origin });
-    navigate("/");
-  };
+    logout({ returnTo: window.location.origin })
+    navigate("/")
+  }
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>
   }
 
   return (
@@ -34,8 +34,7 @@ const AdminPage = () => {
         <div className="relative">
           <button
             className="absolute -mt-20 top-4 right-10 bg-[#214A27] text-white py-2 px-4 rounded hover:bg-green-600 transition duration-300"
-            onClick={handleLogout}
-          >
+            onClick={handleLogout}>
             Log Out
           </button>
         </div>
@@ -71,13 +70,12 @@ const AdminPage = () => {
             <a
               href="#"
               onClick={(e) => {
-                e.preventDefault();
+                e.preventDefault()
                 loginWithPopup().catch((error) =>
                   console.error("Login failed", error)
-                );
+                )
               }}
-              className="text-blue-500 hover:underline cursor-pointer"
-            >
+              className="text-blue-500 hover:underline cursor-pointer">
               log in
             </a>{" "}
             to continue.
@@ -85,7 +83,7 @@ const AdminPage = () => {
         )}
       </div>
     </>
-  );
-};
+  )
+}
 
-export default AdminPage;
+export default AdminPage

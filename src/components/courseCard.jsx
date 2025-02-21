@@ -1,4 +1,4 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 const CourseCard = ({ name, address, contact, link, courseImage, logo }) => {
   return (
@@ -10,8 +10,7 @@ const CourseCard = ({ name, address, contact, link, courseImage, logo }) => {
             backgroundImage: `url(${courseImage})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
-          }}
-        >
+          }}>
           <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2">
             <img
               src={logo}
@@ -36,8 +35,7 @@ const CourseCard = ({ name, address, contact, link, courseImage, logo }) => {
               className="btn border-black rounded-none md:text-lg"
               href={link}
               target="_blank"
-              rel="noreferrer"
-            >
+              rel="noreferrer">
               Visit
             </a>
           </div>
@@ -46,7 +44,7 @@ const CourseCard = ({ name, address, contact, link, courseImage, logo }) => {
 
       <hr className="my-4 border-[#A0A0A0] ml-auto w-2/4 md:mr-8 mr-2" />
     </>
-  );
-};
+  )
+}
 
-export default CourseCard;
+export default CourseCard

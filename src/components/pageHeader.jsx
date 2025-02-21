@@ -7,6 +7,6 @@ const PageHeader = ({ title }) => {
         </div>
       </div>
     </>
-  );
-};
-export default PageHeader;
+  )
+}
+export default PageHeader
