@@ -1,35 +1,35 @@
-import { useState } from "react";
-import PageHeader from "../components/pageHeader";
-import TeeTimesTable from "../components/teeTime";
-import ListView from "../components/teeTimeListView";
-import { queryBuilder } from "../utils/queryBuilder";
-import { MODELS, QUERIES } from "../constants/api";
-import useFetch from "../utils/hooks/useFetch";
-import { getNextEventDate } from "../utils/getNextEventDate";
+import { useState } from "react"
+import PageHeader from "../components/pageHeader"
+import TeeTimesTable from "../components/teeTime"
+import ListView from "../components/teeTimeListView"
+import { queryBuilder } from "../utils/queryBuilder"
+import { MODELS, QUERIES } from "../constants/api"
+import useFetch from "../utils/hooks/useFetch"
+import { getNextEventDate } from "../utils/getNextEventDate"
 
 const getOrdinalSuffix = (day) => {
-  if (day > 3 && day < 21) return "th";
+  if (day > 3 && day < 21) return "th"
   switch (day % 10) {
     case 1:
-      return "st";
+      return "st"
     case 2:
-      return "nd";
+      return "nd"
     case 3:
-      return "rd";
+      return "rd"
     default:
-      return "th";
+      return "th"
   }
-};
+}
 
 const formatDateWithOrdinal = (dateString) => {
   if (!dateString) {
-    console.warn("No date string provided for formatting.");
-    return "Invalid Date";
+    console.warn("No date string provided for formatting.")
+    return "Invalid Date"
   }
 
-  const date = new Date(dateString);
-  const day = date.getDate();
-  const ordinal = getOrdinalSuffix(day);
+  const date = new Date(dateString)
+  const day = date.getDate()
+  const ordinal = getOrdinalSuffix(day)
 
   const formattedDate = date
     .toLocaleDateString("en-GB", {
@@ -38,38 +38,40 @@ const formatDateWithOrdinal = (dateString) => {
       month: "long",
       year: "numeric",
     })
-    .replace(`${day}`, `${day}${ordinal}`);
+    .replace(`${day}`, `${day}${ordinal}`)
 
-  return formattedDate;
-};
+  return formattedDate
+}
 
 const StartTimesPage = () => {
-  const [isListView, setIsListView] = useState(false);
+  const [isListView, setIsListView] = useState(false)
 
-  const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery);
-  const { isLoading, isError, data, error } = useFetch(query);
+  const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery)
+  const { isLoading, isError, data, error } = useFetch(query)
 
   if (isLoading) {
-    return <p className="pt-[85px]">Loading...</p>;
+    return <p className="pt-[85px]">Loading...</p>
   } else if (isError) {
-    console.error("Error:", error);
-    return <p className="pt-[85px]">Something went wrong...</p>;
+    console.error("Error:", error)
+    return <p className="pt-[85px]">Something went wrong...</p>
   }
 
-  const nextEventDate = getNextEventDate(data);
+  const nextEventDate = getNextEventDate(data)
   const nextEvent = data?.data.find(
     (entry) => entry.event?.eventDate === nextEventDate
-  );
+  )
+  console.log(nextEvent)
 
   const eventDate = nextEvent?.event?.eventDate
     ? formatDateWithOrdinal(nextEvent.event.eventDate)
-    : "Upcoming Event";
+    : "Upcoming Event"
 
-  const filteredTeeTimes = nextEvent?.golfers || [];
+  const filteredTeeTimes = nextEvent?.golfers || []
+  console.log(filteredTeeTimes)
 
   const handleToggleView = () => {
-    setIsListView(!isListView);
-  };
+    setIsListView(!isListView)
+  }
 
   return (
     <>
@@ -106,8 +108,7 @@ const StartTimesPage = () => {
             <div className="flex justify-end max-w-5xl mx-auto">
               <button
                 onClick={handleToggleView}
-                className="bg-[#214A27] text-white px-6 mt-5 py-2 rounded-lg shadow-md "
-              >
+                className="bg-[#214A27] text-white px-6 mt-5 py-2 rounded-lg shadow-md ">
                 {isListView ? "Tee Time View" : "Club View"}
               </button>
             </div>
@@ -119,16 +120,20 @@ const StartTimesPage = () => {
       <div className="flex justify-center">
         <div className="max-w-5xl w-full">
           <div className="mx-5 mb-5 mt-3">
-            {isListView ? (
-              <ListView teeTimes={filteredTeeTimes} />
-            ) : (
-              <TeeTimesTable teeTimes={filteredTeeTimes} />
+            {!!filteredTeeTimes.length && (
+              <>
+                {isListView ? (
+                  <ListView teeTimes={filteredTeeTimes} />
+                ) : (
+                  <TeeTimesTable teeTimes={filteredTeeTimes} />
+                )}
+              </>
             )}
           </div>
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default StartTimesPage;
+export default StartTimesPage

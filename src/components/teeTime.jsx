@@ -1,27 +1,29 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
-import { queryBuilder } from "../utils/queryBuilder";
-import { MODELS, QUERIES } from "../constants/api";
-import useFetch from "../utils/hooks/useFetch";
-import SearchFilter from "./SearchFilter";
-import { getNextEventDate } from "../utils/getNextEventDate";
+import { useState, useMemo, useCallback, useEffect } from "react"
+import { queryBuilder } from "../utils/queryBuilder"
+import { MODELS, QUERIES } from "../constants/api"
+import useFetch from "../utils/hooks/useFetch"
+import SearchFilter from "./SearchFilter"
+import { getNextEventDate } from "../utils/getNextEventDate"
 
 const TeeTimesTable = () => {
-  const [filteredTeeTimes, setFilteredTeeTimes] = useState([]);
-  const [teeTimesData, setTeeTimesData] = useState([]);
+  const [filteredTeeTimes, setFilteredTeeTimes] = useState([])
+  const [teeTimesData, setTeeTimesData] = useState([])
 
-  const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery);
-  const { isLoading, isError, data, error } = useFetch(query);
+  const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery)
+  const { isLoading, isError, data, error } = useFetch(query)
 
-  const nextEventDate = getNextEventDate(data);
+  const nextEventDate = getNextEventDate(data)
+  console.log("ned", nextEventDate)
+  console.log("data", data)
 
   useEffect(() => {
     if (data?.data) {
       const filtered = data.data.filter(
-        (teeTime) => teeTime.event.eventDate == nextEventDate
-      );
-      setTeeTimesData(Array.isArray(filtered) ? filtered : []);
+        (teeTime) => teeTime?.event?.eventDate == nextEventDate
+      )
+      setTeeTimesData(Array.isArray(filtered) ? filtered : [])
     }
-  }, [data, nextEventDate]);
+  }, [data, nextEventDate])
 
   const uniqueClubs = useMemo(() => {
     return [
@@ -34,8 +36,8 @@ const TeeTimesTable = () => {
           )
           .filter(Boolean)
       ),
-    ].sort();
-  }, [teeTimesData]);
+    ].sort()
+  }, [teeTimesData])
 
   const searchFilterData = useMemo(
     () =>
@@ -49,44 +51,43 @@ const TeeTimesTable = () => {
           .join(", "),
       })),
     [teeTimesData]
-  );
+  )
 
   const handleFilteredDataChange = useCallback((filteredData) => {
-    setFilteredTeeTimes(filteredData);
-  }, []);
+    setFilteredTeeTimes(filteredData)
+  }, [])
 
   const sortedTeeTimes = useMemo(() => {
     const sortByTime = (a, b) => {
-      const [aHours, aMinutes] = a.golferTeeTime.split(":").map(Number);
-      const [bHours, bMinutes] = b.golferTeeTime.split(":").map(Number);
+      const [aHours, aMinutes] = a.golferTeeTime.split(":").map(Number)
+      const [bHours, bMinutes] = b.golferTeeTime.split(":").map(Number)
 
       if (aHours === bHours) {
-        return aMinutes - bMinutes;
+        return aMinutes - bMinutes
       }
-      return aHours - bHours;
-    };
+      return aHours - bHours
+    }
 
     return [
       ...(filteredTeeTimes.length ? filteredTeeTimes : teeTimesData),
-    ].sort(sortByTime);
-  }, [filteredTeeTimes, teeTimesData]);
+    ].sort(sortByTime)
+  }, [filteredTeeTimes, teeTimesData])
 
   if (isLoading) {
-    return <p className="pt-[85px]">Loading...</p>;
+    return <p className="pt-[85px]">Loading...</p>
   }
   if (isError) {
-    console.error("Error:", error);
-    return <p className="pt-[85px]">Something went wrong...</p>;
+    console.error("Error:", error)
+    return <p className="pt-[85px]">Something went wrong...</p>
   }
 
   const formatTime = (time) => {
-    if (!time) return null;
-    const [hours, minutes] = time.split(":");
-    return `${hours}:${minutes}`;
-  };
+    if (!time) return null
+    const [hours, minutes] = time.split(":")
+    return `${hours}:${minutes}`
+  }
 
-  const displayData =
-    sortedTeeTimes.length >= 0 ? sortedTeeTimes : teeTimesData;
+  const displayData = sortedTeeTimes.length >= 0 ? sortedTeeTimes : teeTimesData
 
   return (
     <div className="w-full">
@@ -111,8 +112,7 @@ const TeeTimesTable = () => {
           {displayData.map((teeTime, index) => (
             <div
               key={index}
-              className="col-span-1 border border-gray-400 bg-[#D9D9D9] drop-shadow"
-            >
+              className="col-span-1 border border-gray-400 bg-[#D9D9D9] drop-shadow">
               <div className="p-2 border-b border-gray-300 text-white bg-[#214A27]">
                 <h2 className="text-lg font-semibold">
                   {formatTime(teeTime.golferTeeTime) || "No Time Available"}
@@ -140,7 +140,7 @@ const TeeTimesTable = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default TeeTimesTable;
+export default TeeTimesTable

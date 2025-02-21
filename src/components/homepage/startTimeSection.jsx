@@ -1,54 +1,54 @@
-import { useState } from "react";
-import { BASE_URL, MODELS, QUERIES } from "../../constants/api.js";
-import useFetch from "../../utils/hooks/useFetch.js";
-import { queryBuilder } from "../../utils/queryBuilder.js";
-import HomePageHeader from "./homepageHeader.jsx";
-import TeeTimeCard from "../teeTimeCard.jsx";
+import { useState } from "react"
+import { BASE_URL, MODELS, QUERIES } from "../../constants/api.js"
+import useFetch from "../../utils/hooks/useFetch.js"
+import { queryBuilder } from "../../utils/queryBuilder.js"
+import HomePageHeader from "./homepageHeader.jsx"
+import TeeTimeCard from "../teeTimeCard.jsx"
 
 const StartTimesSection = () => {
-  const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery);
-  const { isLoading, isError, data, error } = useFetch(query);
-  const [searchQuery, setSearchQuery] = useState("");
+  const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery)
+  const { isLoading, isError, data, error } = useFetch(query)
+  const [searchQuery, setSearchQuery] = useState("")
 
   if (isLoading) {
-    return <p className="pt-[85px]">Loading...</p>;
+    return <p className="pt-[85px]">Loading...</p>
   } else if (isError) {
-    console.error("Error:", error);
-    return <p className="pt-[85px]">Something went wrong...</p>;
+    console.error("Error:", error)
+    return <p className="pt-[85px]">Something went wrong...</p>
   }
 
-  const today = new Date();
-  const teeTimes = data?.data || [];
+  const today = new Date()
+  const teeTimes = data?.data || []
 
   const upcomingTeeTimes = teeTimes.filter((entry) => {
-    const eventDate = new Date(entry.event?.eventDate);
-    return eventDate >= today;
-  });
+    const eventDate = new Date(entry.event?.eventDate)
+    return eventDate >= today
+  })
 
   const sortedTeeTimes = upcomingTeeTimes.sort((a, b) => {
-    const dateA = new Date(`${a.event?.eventDate}T${a.golferTeeTime}`);
-    const dateB = new Date(`${b.event?.eventDate}T${b.golferTeeTime}`);
-    return dateA - dateB;
-  });
+    const dateA = new Date(`${a.event?.eventDate}T${a.golferTeeTime}`)
+    const dateB = new Date(`${b.event?.eventDate}T${b.golferTeeTime}`)
+    return dateA - dateB
+  })
 
-  const nextEventDate = sortedTeeTimes[0]?.event?.eventDate;
+  const nextEventDate = sortedTeeTimes[0]?.event?.eventDate
   const teeTimesForNextEvent = sortedTeeTimes.filter(
     (entry) => entry.event?.eventDate === nextEventDate
-  );
+  )
 
   const golfersToDisplay = (teeTime) => {
     return Array.isArray(teeTime?.golfers)
       ? teeTime.golfers.filter((golfer) =>
           golfer.golferName.toLowerCase().includes(searchQuery.toLowerCase())
         )
-      : [];
-  };
+      : []
+  }
 
   const filteredTeeTimes = searchQuery
     ? teeTimesForNextEvent.filter(
         (teeTime) => golfersToDisplay(teeTime).length > 0
       )
-    : teeTimesForNextEvent.slice(0, 1);
+    : teeTimesForNextEvent.slice(0, 1)
 
   return (
     <div className="items-center justify-center flex flex-col w-full mx-auto max-w-5xl mb-5">
@@ -104,7 +104,7 @@ const StartTimesSection = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default StartTimesSection;
+export default StartTimesSection
