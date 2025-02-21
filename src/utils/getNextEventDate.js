@@ -21,5 +21,6 @@ export const getNextEventDate = (teeTimes) => {
       (a, b) => new Date(a.event?.eventDate) - new Date(b.event?.eventDate)
     );
   }
+  if (!sortedEvents.length) return
   return sortedEvents[0].event.eventDate;
 }

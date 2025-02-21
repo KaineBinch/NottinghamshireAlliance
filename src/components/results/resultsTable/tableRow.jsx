@@ -1,5 +1,4 @@
-import { calculateTotalPoints as transformResults } from "../../../utils/transformResults";
-import ExpandedRowDetails from "./expandedRow";
+import ExpandedRowDetails from "./expandedRow"
 
 const TableRow = ({
   row,
@@ -8,37 +7,41 @@ const TableRow = ({
   expandedRow,
   isClubView,
 }) => {
-  const widthClass = isClubView ? "w-1/3" : "w-1/4";
+  const isExpanded = expandedRow === row
 
   return (
     <>
-      <div
-        className="flex flex-row place-content-evenly items-center h-full cursor-pointer hover:bg-gray-100 min-h-[25px]"
-        onClick={() => handleRowClick(rowIndex)}
-      >
-        <div className={`${widthClass} p-2 text-center`}>{rowIndex + 1}</div>
-        <div
-          className={`${widthClass} p-2 ${
-            isClubView ? "text-center" : "text-left overflow-x-hidden px-1 pr-5"
-          }`}
-        >
-          {row.name}
-        </div>
-        <div
-          className={`${widthClass} p-2 text-center ${isClubView && "hidden"}`}
-        >
-          {row.club}
-        </div>
-        <div className={`${widthClass} p-2 text-center`}>
-          {isClubView ? row.totalPoints : transformResults(row.result)}
-        </div>
-      </div>
+      <tr
+        className={`border-b border-gray-400 ${
+          isExpanded ? "bg-gray-50" : "hover:bg-gray-50"
+        }`}
+        onClick={() => handleRowClick(row)}>
+        <td className="p-2">{rowIndex + 1}</td>
+        <td className="p-2">{row.name}</td>
+        {!isClubView && <td className="p-2">{row.club}</td>}
+        <td className="p-2">{isClubView ? row.totalPoints : row.result}</td>
+      </tr>
 
-      {expandedRow === rowIndex && (
-        <ExpandedRowDetails result={row.result} isClubView={isClubView} />
+      {isExpanded && (
+        <tr>
+          <td
+            colSpan={isClubView ? 3 : 4}
+            className="p-0 border-b border-gray-400">
+            <ExpandedRowDetails
+              result={
+                isClubView
+                  ? row.players
+                  : Array.isArray(row.result)
+                  ? row.result
+                  : [{ date: row.eventDate, score: row.result }]
+              }
+              isClubView={isClubView}
+            />
+          </td>
+        </tr>
       )}
     </>
-  );
-};
+  )
+}
 
-export default TableRow;
+export default TableRow

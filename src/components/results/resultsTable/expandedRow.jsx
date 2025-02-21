@@ -1,67 +1,82 @@
 const ExpandedRowDetails = ({ result, isClubView }) => {
   if (isClubView) {
-    // Club view logic
-    const dateScores = result.reduce((acc, { date, score }) => {
-      const scoreValue = parseInt(score, 10);
-      if (!acc[date]) {
-        acc[date] = 0;
-      }
-      acc[date] += scoreValue;
-      return acc;
-    }, {});
-
-    const sortedDates = Object.keys(dateScores).sort();
-
+    // Club view logic - display top 4 players in the club
     return (
-      <div className="bg-[#D9D9D9] p-2">
-        <div className="flex flex-wrap justify-center">
-          {sortedDates.map((date, index) => (
-            <div
-              key={index}
-              className="flex flex-col w-1/2 sm:w-1/4 md:w-1/6 lg:w-1/12 border border-gray-300 p-1 text-center bg-white"
-            >
-              <div className="font-semibold">{date}</div>
-              <div>{dateScores[date]}</div>
-            </div>
-          ))}
-        </div>
+      <div className="p-4 bg-gray-50">
+        <h3 className="font-bold mb-2">Top 4 Contributors</h3>
+        <table className="w-full">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="p-2 text-left">Player</th>
+              <th className="p-2 text-right">Score</th>
+              <th className="p-2 text-left">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {result.slice(0, 4).map((player, index) => (
+              <tr
+                key={index}
+                className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                <td className="p-2 text-left">{player.name}</td>
+                <td className="p-2 text-right">{player.score}</td>
+                <td className="p-2 text-left">{player.date}</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr className="font-bold border-t border-gray-300">
+              <td className="p-2 text-left">Total (Top 4)</td>
+              <td className="p-2 text-right">
+                {result
+                  .slice(0, 4)
+                  .reduce((sum, player) => sum + parseInt(player.score, 10), 0)}
+              </td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
-    );
+    )
   } else {
-    // Player view logic
+    // Keep your existing individual player view code
     const sortedScores = result
       .map((item) => parseInt(item.score, 10))
       .sort((a, b) => b - a)
-      .slice(0, 10);
+      .slice(0, 10)
 
-    const highlightScores = [...sortedScores];
+    const highlightScores = [...sortedScores]
 
     return (
-      <div className="bg-[#ffffff] p-2">
-        <div className="flex flex-wrap justify-center">
-          {result.map((res, index) => {
-            const score = parseInt(res.score, 10);
-            const isTopScore = highlightScores.includes(score);
-            if (isTopScore) {
-              highlightScores.splice(highlightScores.indexOf(score), 1);
-            }
-
-            return (
-              <div
-                key={index}
-                className={`flex flex-col w-1/2 sm:w-1/4 md:w-1/6 lg:w-1/12 border border-gray-400 p-1 text-center ${
-                  isTopScore ? "bg-[#214A27] text-white" : "bg-white"
-                }`}
-              >
-                <div className="font-semibold">{res.date}</div>
-                <div>{res.score}</div>
-              </div>
-            );
-          })}
-        </div>
+      <div className="p-4 bg-gray-50">
+        <h3 className="font-bold mb-2">Individual Scores</h3>
+        <table className="w-full">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="p-2 text-left">Date</th>
+              <th className="p-2 text-right">Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {result.map((res, index) => {
+              const score = parseInt(res.score, 10)
+              const isTopScore = highlightScores.includes(score)
+              if (isTopScore) {
+                highlightScores.splice(highlightScores.indexOf(score), 1)
+              }
+              return (
+                <tr
+                  key={index}
+                  className={isTopScore ? "font-bold bg-gray-100" : ""}>
+                  <td className="p-2 text-left">{res.date}</td>
+                  <td className="p-2 text-right">{res.score}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
-    );
+    )
   }
-};
+}
 
-export default ExpandedRowDetails;
+export default ExpandedRowDetails

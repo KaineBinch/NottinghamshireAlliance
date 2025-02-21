@@ -1,5 +1,10 @@
 
 export const calculateTotalPoints = (result) => {
+  if (!Array.isArray(result)) {
+    console.error("Expected 'result' to be an array, but got:", result);
+    return 0; // Return 0 if result is not an array
+  }
+
   const sortedScores = result
     .map((item) => parseInt(item.score, 10))
     .sort((a, b) => b - a);
