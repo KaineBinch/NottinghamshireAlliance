@@ -1,10 +1,10 @@
-import HomePageHeader from "./homepageHeader";
-import ResultsTable from "../results/resultsTable/resultsTable";
-import { results } from "../../constants/results";
-import { transformResults } from "../../utils/transformResults";
+import HomePageHeader from "./homepageHeader"
+import ResultsTable from "../results/resultsTable/resultsTable"
+import { results } from "../../constants/results"
+import { transformResults } from "../../utils/transformResults"
 
 const OOMSection = () => {
-  const { rows, columns } = transformResults(results);
+  const { rows, columns } = transformResults(results)
 
   return (
     <>
@@ -21,7 +21,7 @@ const OOMSection = () => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default OOMSection;
+export default OOMSection

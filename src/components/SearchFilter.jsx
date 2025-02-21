@@ -1,32 +1,33 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react"
 
 const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [clubQuery, setClubQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("")
+  const [clubQuery, setClubQuery] = useState("")
 
   const handleSearchChange = useCallback((event) => {
-    setSearchQuery(event.target.value.toLowerCase());
-  }, []);
+    setSearchQuery(event.target.value.toLowerCase())
+  }, [])
 
   const handleClubChange = useCallback((event) => {
-    const selectedValue = event.target.value;
-    setClubQuery(selectedValue === "" ? "" : selectedValue.toLowerCase());
-  }, []);
+    const selectedValue = event.target.value
+    setClubQuery(selectedValue === "" ? "" : selectedValue.toLowerCase())
+  }, [])
 
   const filteredData = useMemo(() => {
     return data.filter((item) => {
-      const matchesName = item.name.toLowerCase().includes(searchQuery);
+      const matchesName =
+        item.name?.toLowerCase().includes(searchQuery) ?? false
       const matchesClub =
-        !clubQuery || item.club.toLowerCase().includes(clubQuery);
-      return matchesName && matchesClub;
-    });
-  }, [searchQuery, clubQuery, data]);
+        (!clubQuery || item.club?.toLowerCase().includes(clubQuery)) ?? false
+      return matchesName && matchesClub
+    })
+  }, [searchQuery, clubQuery, data])
 
   useEffect(() => {
     if (filteredData !== data) {
-      onFilteredDataChange(filteredData);
+      onFilteredDataChange(filteredData)
     }
-  }, [filteredData, onFilteredDataChange, data]);
+  }, [filteredData, onFilteredDataChange, data])
 
   return (
     <div className="flex flex-col mb-4 p-4 border border-gray-300">
@@ -46,8 +47,7 @@ const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
         <select
           value={clubQuery}
           onChange={handleClubChange}
-          className="p-2 border border-gray-300 w-full placeholder-gray-500 text-base h-12 rounded-none"
-        >
+          className="p-2 border border-gray-300 w-full placeholder-gray-500 text-base h-12 rounded-none">
           <option value="">Select a club...</option>
           {uniqueClubs.map((club, index) => (
             <option key={index} value={club.toLowerCase()}>
@@ -57,7 +57,7 @@ const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
         </select>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SearchFilter;
+export default SearchFilter

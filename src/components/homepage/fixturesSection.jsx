@@ -1,38 +1,38 @@
-import { BASE_URL, MODELS, QUERIES } from "../../constants/api.js";
-import useFetch from "../../utils/hooks/useFetch.js";
-import { queryBuilder } from "../../utils/queryBuilder.js";
-import FixtureCard from "../fixtureCard.jsx";
-import HomePageHeader from "./homepageHeader.jsx";
-import defaultImage from "../../assets/background.jpg";
+import { BASE_URL, MODELS, QUERIES } from "../../constants/api.js"
+import useFetch from "../../utils/hooks/useFetch.js"
+import { queryBuilder } from "../../utils/queryBuilder.js"
+import FixtureCard from "../fixtureCard.jsx"
+import HomePageHeader from "./homepageHeader.jsx"
+import defaultImage from "../../assets/background.jpg"
 
 const FixturesSection = () => {
-  const query = queryBuilder(MODELS.events, QUERIES.eventsQuery);
-  const { isLoading, isError, data, error } = useFetch(query);
+  const query = queryBuilder(MODELS.events, QUERIES.eventsQuery)
+  const { isLoading, isError, data, error } = useFetch(query)
 
   if (isLoading) {
-    return <p className="pt-[85px]">Loading...</p>;
+    return <p className="pt-[85px]">Loading...</p>
   } else if (isError) {
-    console.error("Error:", error);
-    return <p className="pt-[85px]">Something went wrong...</p>;
+    console.error("Error:", error)
+    return <p className="pt-[85px]">Something went wrong...</p>
   }
 
   const sortedData = (data?.data || []).sort((a, b) => {
-    const aHasDate = a.eventDate !== null && a.eventDate !== undefined;
-    const bHasDate = b.eventDate !== null && b.eventDate !== undefined;
+    const aHasDate = a.eventDate !== null && a.eventDate !== undefined
+    const bHasDate = b.eventDate !== null && b.eventDate !== undefined
 
-    if (aHasDate === bHasDate) return 0;
-    if (aHasDate) return -1;
-    return 1;
-  });
+    if (aHasDate === bHasDate) return 0
+    if (aHasDate) return -1
+    return 1
+  })
 
-  const today = new Date();
+  const today = new Date()
   const futureFixtures = sortedData.filter((club) => {
-    const eventDate = new Date(club.eventDate);
-    return eventDate > today;
-  });
+    const eventDate = new Date(club.eventDate)
+    return eventDate > today
+  })
 
-  const nextFixture = futureFixtures?.[0];
-  const upcomingFixtures = futureFixtures?.slice(1, 3);
+  const nextFixture = futureFixtures?.[0]
+  const upcomingFixtures = futureFixtures?.slice(1, 3)
 
   if (!nextFixture && !upcomingFixtures?.length) {
     return (
@@ -46,7 +46,7 @@ const FixturesSection = () => {
         />
         <p>No upcoming fixtures available at the moment.</p>
       </div>
-    );
+    )
   }
 
   return (
@@ -100,19 +100,19 @@ const FixturesSection = () => {
             upcomingFixtures.map((club) => {
               const clubName = club?.golf_club
                 ? `${club.golf_club.clubName} Golf Club`
-                : "Location To Be Confirmed";
-              const clubAddress = club?.golf_club?.clubAddress;
+                : "Location To Be Confirmed"
+              const clubAddress = club?.golf_club?.clubAddress
               const clubImage = club?.golf_club?.clubImage?.[0]?.url
                 ? `${BASE_URL}${club.golf_club.clubImage[0].url}`
-                : defaultImage;
+                : defaultImage
 
-              const eventDate = club?.eventDate;
-              const dateText = eventDate || "TBD";
+              const eventDate = club?.eventDate
+              const dateText = eventDate || "TBD"
 
               const competitionText =
                 club?.eventType !== "Competition type to be confirmed"
                   ? " competition"
-                  : "";
+                  : ""
 
               return (
                 <FixtureCard
@@ -124,7 +124,7 @@ const FixturesSection = () => {
                   date={dateText}
                   competitionText={competitionText}
                 />
-              );
+              )
             })
           ) : (
             <p>No upcoming fixtures.</p>
@@ -132,7 +132,7 @@ const FixturesSection = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default FixturesSection;
+export default FixturesSection

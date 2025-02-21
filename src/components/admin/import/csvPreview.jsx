@@ -1,7 +1,7 @@
-import React from "react";
+import React from "react"
 
 const CSVPreview = ({ csvData, groupedData }) => {
-  const times = Object.keys(groupedData);
+  const times = Object.keys(groupedData)
 
   return (
     <div>
@@ -20,8 +20,7 @@ const CSVPreview = ({ csvData, groupedData }) => {
                 {csvData[0].slice(2).map((header, index) => (
                   <th
                     key={index}
-                    className="border border-gray-300 bg-gray-200 p-2 text-center"
-                  >
+                    className="border border-gray-300 bg-gray-200 p-2 text-center">
                     {header}
                   </th>
                 ))}
@@ -40,13 +39,11 @@ const CSVPreview = ({ csvData, groupedData }) => {
                       key={j}
                       className={
                         j % 2 === 0 ? "bg-white w-full" : "bg-gray-100 w-full"
-                      }
-                    >
+                      }>
                       {row.map((cell, cellIndex) => (
                         <td
                           key={cellIndex}
-                          className="border border-gray-300 p-2"
-                        >
+                          className="border border-gray-300 p-2">
                           {cell}
                         </td>
                       ))}
@@ -59,7 +56,7 @@ const CSVPreview = ({ csvData, groupedData }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default CSVPreview;
+export default CSVPreview

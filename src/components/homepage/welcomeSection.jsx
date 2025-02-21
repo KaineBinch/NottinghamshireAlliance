@@ -1,5 +1,5 @@
-import Weather from "./weather.jsx";
-import image from "../../assets/background.jpg";
+import Weather from "./weather.jsx"
+import image from "../../assets/background.jpg"
 
 const WelcomeSection = () => {
   return (
@@ -11,8 +11,7 @@ const WelcomeSection = () => {
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           backgroundPosition: "center",
-        }}
-      >
+        }}>
         <Weather city="Nottingham" />
       </div>
       <div className="bg-[#D9D9D9] flex place-content-center">
@@ -28,20 +27,18 @@ const WelcomeSection = () => {
           </p>
           <a
             className="btn rounded-none mr-8 w-[125px] border-black"
-            href="/#/starttimes"
-          >
+            href="/#/starttimes">
             Start Times
           </a>
           <a
             className="btn rounded-none ml-8 w-[125px] border-black text-white bg-[#214A27]"
-            href="/#/results"
-          >
+            href="/#/results">
             Results
           </a>
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default WelcomeSection;
+export default WelcomeSection

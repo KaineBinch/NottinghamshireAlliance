@@ -1,41 +1,41 @@
-import { useState } from "react";
-import { FiUpload } from "react-icons/fi";
+import { useState } from "react"
+import { FiUpload } from "react-icons/fi"
 
 const FileUpload = ({ onFileUpload }) => {
-  const [fileName, setFileName] = useState(null);
-  const [isDragActive, setIsDragActive] = useState(false);
+  const [fileName, setFileName] = useState(null)
+  const [isDragActive, setIsDragActive] = useState(false)
 
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
+    const file = event.target.files[0]
     if (file) {
-      setFileName(file.name);
-      onFileUpload(event);
+      setFileName(file.name)
+      onFileUpload(event)
     }
-  };
+  }
 
   const handleDragEnter = (event) => {
-    event.preventDefault();
-    setIsDragActive(true);
-  };
+    event.preventDefault()
+    setIsDragActive(true)
+  }
 
   const handleDragLeave = (event) => {
-    event.preventDefault();
-    setIsDragActive(false);
-  };
+    event.preventDefault()
+    setIsDragActive(false)
+  }
 
   const handleDrop = (event) => {
-    event.preventDefault();
-    setIsDragActive(false);
-    const file = event.dataTransfer.files[0];
+    event.preventDefault()
+    setIsDragActive(false)
+    const file = event.dataTransfer.files[0]
     if (file) {
-      setFileName(file.name);
-      onFileUpload({ target: { files: [file] } });
+      setFileName(file.name)
+      onFileUpload({ target: { files: [file] } })
     }
-  };
+  }
 
   const handleDragOver = (event) => {
-    event.preventDefault();
-  };
+    event.preventDefault()
+  }
 
   return (
     <div className="flex flex-col items-center">
@@ -47,8 +47,7 @@ const FileUpload = ({ onFileUpload }) => {
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
-        onDrop={handleDrop}
-      >
+        onDrop={handleDrop}>
         <FiUpload size={40} className="text-gray-600 mb-2" />
         <span className="text-gray-700 font-medium">
           {fileName
@@ -67,7 +66,7 @@ const FileUpload = ({ onFileUpload }) => {
         Supports .xlsx and .xls files
       </p>
     </div>
-  );
-};
+  )
+}
 
-export default FileUpload;
+export default FileUpload

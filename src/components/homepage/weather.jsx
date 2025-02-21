@@ -1,33 +1,33 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { getWeatherIcon } from "../../constants/weatherIcons";
+import { useState, useEffect } from "react"
+import axios from "axios"
+import { getWeatherIcon } from "../../constants/weatherIcons"
 
 const Weather = ({ city }) => {
-  const [dailyForecast, setDailyForecast] = useState([]);
+  const [dailyForecast, setDailyForecast] = useState([])
 
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
+        const apiKey = import.meta.env.VITE_WEATHER_API_KEY
         const response = await axios.get(
           `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`
-        );
+        )
 
-        const weatherData = response.data.list;
-        const dailyData = {};
+        const weatherData = response.data.list
+        const dailyData = {}
 
         weatherData.forEach((entry) => {
-          const date = entry.dt_txt.split(" ")[0];
+          const date = entry.dt_txt.split(" ")[0]
           if (!dailyData[date]) {
             dailyData[date] = {
               temp: 0,
               count: 0,
               icon: entry.weather[0].icon,
-            };
+            }
           }
-          dailyData[date].temp += entry.main.temp;
-          dailyData[date].count++;
-        });
+          dailyData[date].temp += entry.main.temp
+          dailyData[date].count++
+        })
 
         const forecast = Object.keys(dailyData).map((date) => ({
           date,
@@ -35,22 +35,22 @@ const Weather = ({ city }) => {
             (dailyData[date].temp / dailyData[date].count).toFixed(1)
           ),
           icon: dailyData[date].icon,
-        }));
+        }))
 
-        setDailyForecast(forecast.slice(0, 3));
+        setDailyForecast(forecast.slice(0, 3))
       } catch (error) {
-        console.error("Error fetching the weather data:", error);
+        console.error("Error fetching the weather data:", error)
       }
-    };
+    }
 
-    fetchWeather();
-  }, [city]);
+    fetchWeather()
+  }, [city])
 
   const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    const options = { weekday: "short", day: "numeric" };
-    return date.toLocaleDateString(undefined, options);
-  };
+    const date = new Date(dateStr)
+    const options = { weekday: "short", day: "numeric" }
+    return date.toLocaleDateString(undefined, options)
+  }
 
   return (
     <div className="flex place-content-center h-[50px] w-auto z-10 drop-shadow-2xl">
@@ -72,7 +72,7 @@ const Weather = ({ city }) => {
           : "Loading..."}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Weather;
+export default Weather

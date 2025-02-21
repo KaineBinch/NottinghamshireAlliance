@@ -1,5 +1,5 @@
-import { clubLogos } from "../../constants/clubLogos";
-import ScrollingImages from "./scrollingImages";
+import { clubLogos } from "../../constants/clubLogos"
+import ScrollingImages from "./scrollingImages"
 
 const LogoScroller = () => {
   return (
@@ -10,7 +10,7 @@ const LogoScroller = () => {
       </div>
       <hr className="border-black w-full" />
     </div>
-  );
-};
+  )
+}
 
-export default LogoScroller;
+export default LogoScroller

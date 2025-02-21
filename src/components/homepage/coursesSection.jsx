@@ -1,4 +1,4 @@
-import HomePageHeader from "./homepageHeader";
+import HomePageHeader from "./homepageHeader"
 
 const CoursesSection = () => {
   return (
@@ -11,7 +11,7 @@ const CoursesSection = () => {
         page="courses"
       />
     </>
-  );
-};
+  )
+}
 
-export default CoursesSection;
+export default CoursesSection
