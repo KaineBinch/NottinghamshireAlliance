@@ -57,8 +57,7 @@ const TemplateCard = () => {
             {eventOptions.length > 0 ? (
               eventOptions.map((event) => (
                 <option key={event.id} value={event.date}>
-                  <strong>{event.label.split(" - ")[0]}</strong> -{" "}
-                  {event.label.split(" - ")[1]}
+                  {event.label.split(" - ")[0]} - {event.label.split(" - ")[1]}
                 </option>
               ))
             ) : (
