@@ -18,17 +18,37 @@ const ResultsTable = ({ limit }) => {
 
   const results = useMemo(() => {
     if (data?.data) {
-      return data.data.map((item) => ({
-        name: item.golfer.golferName,
-        club: item.golfer.golf_club.clubName,
-        golferClubID: item.golfer.golf_club.clubID,
-        isPro: item.golfer.isPro,
-        isSenior: item.golfer.isSenior,
-        eventDate: item.event.eventDate,
-        eventType: item.event.eventType,
-        result: item.golferEventScore,
-        totalPoints: item.golferEventScore,
-      }))
+      const playerScores = data.data.reduce((acc, item) => {
+        const playerName = item.golfer.golferName
+        const playerScore = item.golferEventScore
+        const clubName = item.golfer.golf_club?.clubName
+        const clubID = item.golfer.golf_club?.clubID
+        const isPro = item.golfer.isPro
+        const isSenior = item.golfer.isSenior
+        const eventDate = item.event.eventDate
+
+        if (!acc[playerName]) {
+          acc[playerName] = {
+            name: playerName,
+            club: clubName,
+            golferClubID: clubID,
+            isPro: isPro,
+            isSenior: isSenior,
+            totalPoints: 0,
+            scores: [],
+          }
+        }
+
+        acc[playerName].totalPoints += playerScore
+        acc[playerName].scores.push({
+          date: eventDate,
+          score: playerScore,
+        })
+
+        return acc
+      }, {})
+
+      return Object.values(playerScores)
     }
     return []
   }, [data?.data])
@@ -39,7 +59,7 @@ const ResultsTable = ({ limit }) => {
   )
 
   const categorizeData = useCallback(() => {
-    let categorizedData = []
+    let categorizedData = results
 
     if (category === "Professional") {
       categorizedData = results.filter((row) => row.isPro)
@@ -49,51 +69,56 @@ const ResultsTable = ({ limit }) => {
       categorizedData = results.filter((row) => !row.isPro)
     } else if (category === "Club") {
       const clubMap = results.reduce((acc, row) => {
-        const totalPoints = parseInt(row.totalPoints || 0, 10)
-
-        if (acc[row.club]) {
-          // Add this player to the club's players array
-          acc[row.club].players.push({
-            name: row.name,
-            score: totalPoints,
-            date: row.eventDate,
-            result: row.result,
-          })
-
-          // Sort players by score in descending order
-          acc[row.club].players.sort((a, b) => b.score - a.score)
-
-          // Take top 4 scores for the club total
-          const top4Scores = acc[row.club].players.slice(0, 4)
-          acc[row.club].totalPoints = top4Scores.reduce(
-            (sum, player) => sum + player.score,
-            0
-          )
-        } else {
+        if (row.club && !acc[row.club]) {
           acc[row.club] = {
             club: row.club,
-            totalPoints: totalPoints,
-            players: [
-              {
-                name: row.name,
-                score: totalPoints,
-                date: row.eventDate,
-                result: row.result,
-              },
-            ],
+            totalPoints: 0,
+            players: [],
           }
+        }
+        if (row.club) {
+          acc[row.club].players.push({
+            name: row.name,
+            score: row.totalPoints,
+            scores: row.scores,
+          })
         }
         return acc
       }, {})
 
-      categorizedData = Object.values(clubMap).map(
-        ({ club, totalPoints, players }) => ({
+      categorizedData = Object.values(clubMap).map(({ club, players }) => {
+        const dateScores = players.reduce((dateAcc, player) => {
+          player.scores.forEach(({ date, score }) => {
+            if (!dateAcc[date]) {
+              dateAcc[date] = []
+            }
+            dateAcc[date].push(score)
+          })
+          return dateAcc
+        }, {})
+
+        const top4DateScores = {}
+        for (const date in dateScores) {
+          dateScores[date].sort((a, b) => b - a)
+          const top4Scores = dateScores[date].slice(0, 4)
+          top4DateScores[date] = top4Scores.reduce(
+            (sum, score) => sum + score,
+            0
+          )
+        }
+
+        const clubTotalPoints = Object.values(top4DateScores).reduce(
+          (sum, score) => sum + score,
+          0
+        )
+
+        return {
           name: club,
-          totalPoints,
-          players, // This will contain all players from the club
-          topPlayers: players.slice(0, 4), // Take top 4 players by score
-        })
-      )
+          totalPoints: clubTotalPoints,
+          players,
+          topPlayers: players.slice(0, 4),
+        }
+      })
     }
 
     return categorizedData

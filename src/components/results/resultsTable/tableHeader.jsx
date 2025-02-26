@@ -15,9 +15,9 @@ const TableHeader = ({ onCategoryChange, category }) => {
           <TableButtons onCategoryChange={onCategoryChange} />
         </th>
       </tr>
-      <tr className="bg-gray-200 border-b border-gray-400">
+      <tr className="bg-[#D9D9D9] border-b border-gray-400">
         {currentHeaders.map((header, index) => (
-          <th key={index} className="py-2 px-4 text-left font-medium">
+          <th key={index} className="py-2 px-4 text-center font-medium">
             {header}
           </th>
         ))}
