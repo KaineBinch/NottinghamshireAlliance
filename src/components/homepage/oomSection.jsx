@@ -8,7 +8,7 @@ const OOMSection = () => {
 
   return (
     <>
-      <div className="bg-[#D9D9D9]">
+      <div className="">
         <HomePageHeader
           title="Order Of Merit Standings"
           subtext="See the top 12 rankings at a glance, or click here for the complete standings."

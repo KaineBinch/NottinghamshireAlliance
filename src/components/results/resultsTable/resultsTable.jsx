@@ -19,13 +19,13 @@ const ResultsTable = ({ limit }) => {
   const results = useMemo(() => {
     if (data?.data) {
       const playerScores = data.data.reduce((acc, item) => {
-        const playerName = item.golfer.golferName
-        const playerScore = item.golferEventScore
-        const clubName = item.golfer.golf_club?.clubName
-        const clubID = item.golfer.golf_club?.clubID
-        const isPro = item.golfer.isPro
-        const isSenior = item.golfer.isSenior
-        const eventDate = item.event.eventDate
+        const playerName = item?.golfer?.golferName || "Unknown Player"
+        const playerScore = item?.golferEventScore || 0
+        const clubName = item?.golfer?.golf_club?.clubName || "No Club"
+        const clubID = item?.golfer?.golf_club?.clubID || null
+        const isPro = item?.golfer?.isPro || false
+        const isSenior = item?.golfer?.isSenior || false
+        const eventDate = item?.event?.eventDate || "Unknown Date"
 
         if (!acc[playerName]) {
           acc[playerName] = {
@@ -169,7 +169,7 @@ const ResultsTable = ({ limit }) => {
   }
 
   return (
-    <div className="flex flex-col justify-center my-8">
+    <div className="flex flex-col justify-center my-8 mb-16">
       <SearchFilter
         data={rankedResults}
         onFilteredDataChange={handleFilteredDataChange}

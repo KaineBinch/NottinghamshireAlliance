@@ -38,7 +38,7 @@ const MobFoot = () => {
   return (
     <>
       <hr className="border-black mt-10" />
-      <div className="bg-[#D9D9D9] text-black px-5">
+      <div className="bg-[#D9D9D9] text-black px-5 pb-5">
         {/* Logo */}
         <div className="flex flex-col items-center justify-center py-6 mx-auto max-w-5xl">
           <img className="h-[150px]" src={logo} alt="Logo" />
@@ -103,8 +103,8 @@ const MobFoot = () => {
         {/* Footer Copyright */}
         <div className="flex flex-col items-center justify-center pb-3"></div>
       </div>
-      <hr className="border-1 border-neutral mt-8" />
-      <div className="max-w-5xl mx-auto flex flex-col p-5 leading-6 text-center items-center text-xs">
+      <hr className="border-1 border-neutral" />
+      <div className="max-w-5xl mx-auto flex flex-col p-8 leading-6 text-center items-center text-xs">
         <div className="flex flex-row place-content-between">
           <p className="">Copyright © 2024 Nottinghamshire Golf Alliance</p>
         </div>

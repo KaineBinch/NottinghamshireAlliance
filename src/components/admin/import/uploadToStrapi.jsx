@@ -19,7 +19,12 @@ export const uploadToStrapi = async (
 
   try {
     setUploadStatus("Uploading")
-    setUploadMessage("Uploading...")
+    setUploadMessage(
+      <div className="flex items-center justify-center w-full">
+        Processing...
+        <div className="ml-2 w-4 h-4 border-2 border-t-2 border-blue-500 rounded-full animate-spin"></div>
+      </div>
+    )
 
     const blob = csvData.map((row) => row.join(",")).join("\n")
     const body = { blob }
@@ -32,7 +37,11 @@ export const uploadToStrapi = async (
           (progressEvent.loaded * 100) / progressEvent.total
         )
         setUploadProgress(progress)
-        setUploadMessage(`Uploading ${progress}%`)
+        setUploadMessage(
+          <div className="flex items-center justify-center w-full">
+            Processing... <div className="spinner"></div>
+          </div>
+        )
       },
     })
 
