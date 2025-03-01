@@ -52,7 +52,7 @@ The Nottinghamshire Golf Alliance website aims to:
 - Quick Links: Easy navigation to events, leaderboard, and golf club directory.
 - Shortened preview sections with snippets of content from other pages.
 
-**Start Times Page:**
+**Tee Times Page:**
 - View tee times in both table and list formats.
 - A search function to easily locate golfers by name.
 - Filter by golf club to view golfers and their assigned tee times.

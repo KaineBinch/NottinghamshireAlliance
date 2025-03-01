@@ -43,7 +43,7 @@ const formatDateWithOrdinal = (dateString) => {
   return formattedDate
 }
 
-const StartTimesPage = () => {
+const TeeTimesPage = () => {
   const [isListView, setIsListView] = useState(false)
 
   const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery)
@@ -85,7 +85,7 @@ const StartTimesPage = () => {
           </p>
           <p className="py-5">
             Please collect your scorecard at least 10 minutes before your
-            scheduled start time.
+            scheduled tee time.
           </p>
           <p>
             The entry fee will be payable if you fail to arrive without prior
@@ -136,4 +136,4 @@ const StartTimesPage = () => {
   )
 }
 
-export default StartTimesPage
+export default TeeTimesPage

@@ -5,7 +5,7 @@ import { queryBuilder } from "../../utils/queryBuilder.js"
 import HomePageHeader from "./homepageHeader.jsx"
 import TeeTimeCard from "../teeTimeCard.jsx"
 
-const StartTimesSection = () => {
+const TeeTimesSection = () => {
   const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery)
   const { isLoading, isError, data, error } = useFetch(query)
   const [searchQuery, setSearchQuery] = useState("")
@@ -58,9 +58,9 @@ const StartTimesSection = () => {
           teeTimesForNextEvent[0]?.event?.golf_club?.clubName ||
           "the next event"
         }`}
-        btnName="Start Times"
+        btnName="Tee Times"
         btnStyle="text-black bg-white"
-        page="starttimes"
+        page="teetimes"
       />
       <div className="flex justify-center w-full -mt-5 p-5">
         <input
@@ -107,4 +107,4 @@ const StartTimesSection = () => {
   )
 }
 
-export default StartTimesSection
+export default TeeTimesSection

@@ -7,7 +7,7 @@ export const appRoutes = {
   gallery: "/gallery",
   results: "/results",
   rules: "/rules",
-  startTimes: "/starttimes",
+  teeTimes: "/teetimes",
   oom: "/oom",
   template: "/template",
   admin: "/admin",

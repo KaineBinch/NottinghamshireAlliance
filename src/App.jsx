@@ -8,7 +8,7 @@ import {
   GalleryPage,
   ResultsPage,
   RulesPage,
-  StartTimesPage,
+  TeeTimesPage,
   OrderOfMeritPage,
   FurtherResultsPage,
   AdminPage,
@@ -44,7 +44,7 @@ function App() {
           path={appRoutes.clubofficers}
           element={<ClubOfficersPage />}
         />
-        <Route exact path={appRoutes.startTimes} element={<StartTimesPage />} />
+        <Route exact path={appRoutes.teeTimes} element={<TeeTimesPage />} />
 
         {/* Wrapping AdminPage in Auth0Provider */}
         <Route

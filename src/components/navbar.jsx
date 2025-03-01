@@ -5,7 +5,7 @@ const Navbar = () => {
   const location = useLocation().pathname
   const links = [
     { title: "Home", to: "/" },
-    { title: "Start Times", to: "/starttimes" },
+    { title: "Tee Times", to: "/teetimes" },
     { title: "Results", to: "/results" },
     { title: "Fixtures", to: "/fixtures" },
     { title: "Courses", to: "/courses" },
