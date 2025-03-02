@@ -23,7 +23,15 @@ const AdminPage = () => {
   }, [isAuthenticated, isLoading, loginWithPopup, loginAttempted])
 
   const handleLogout = () => {
-    logout({ returnTo: window.location.origin })
+    const productionOrigin = window.location.hostname.includes("localhost")
+      ? window.location.origin
+      : "https://nottsalliance.com"
+
+    logout({
+      logoutParams: {
+        returnTo: productionOrigin,
+      },
+    })
     navigate("/")
   }
 
