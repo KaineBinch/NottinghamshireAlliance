@@ -6,7 +6,8 @@ export const uploadToStrapi = async (
   csvData,
   setUploadProgress,
   setUploadStatus,
-  setUploadMessage
+  setUploadMessage,
+  getToken // Pass the getToken function from your Auth0 hook
 ) => {
   const userConfirmed = window.confirm(
     "Are you sure you want to make these changes? Your changes cannot be undone."
@@ -26,12 +27,18 @@ export const uploadToStrapi = async (
       </div>
     )
 
+    // Get the Auth0 token
+    const token = await getToken()
+
     const blob = csvData.map((row) => row.join(",")).join("\n")
     const body = { blob }
 
     const query = queryBuilder(MODELS.imports, QUERIES.csvImport)
     const response = await axios.post(query, body, {
-      headers: { "Content-Type": "application/JSON" },
+      headers: {
+        "Content-Type": "application/JSON",
+        Authorization: `Bearer ${token}`, // Add token to authorization header
+      },
       onUploadProgress: (progressEvent) => {
         const progress = Math.round(
           (progressEvent.loaded * 100) / progressEvent.total

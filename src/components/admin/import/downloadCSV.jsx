@@ -3,8 +3,10 @@ import ExcelJS from "exceljs"
 import FileUpload from "../import/fileUpload"
 import ActionButtons from "../import/actionButtons"
 import { uploadToStrapi } from "../import/uploadToStrapi"
+import { useAuth0 } from "@auth0/auth0-react"
 
 const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
+  const { getAccessTokenSilently } = useAuth0()
   const [fileName, setFileName] = useState("")
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadStatus, setUploadStatus] = useState("")
@@ -84,7 +86,8 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
         csvData,
         setUploadProgress,
         setUploadStatus,
-        setUploadMessage
+        setUploadMessage,
+        getAccessTokenSilently
       )
     } catch (error) {
       console.error("Error during upload:", error)
