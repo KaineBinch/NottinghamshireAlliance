@@ -10,7 +10,7 @@ import {
   faSquareInstagram,
 } from "@fortawesome/free-brands-svg-icons"
 import { faPhone, faEnvelope } from "@fortawesome/free-solid-svg-icons"
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from "@vercel/speed-insights/react"
 
 library.add(fab, faPhone, faEnvelope, faSquareFacebook, faSquareInstagram)
 
