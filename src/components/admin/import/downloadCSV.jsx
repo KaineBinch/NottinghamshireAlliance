@@ -82,15 +82,28 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
 
   const handleUploadToStrapi = async () => {
     try {
+      const token = await getAccessTokenSilently({
+        audience: "https://alliance-admin.uk.auth0.com/api/v2/", //API identifier
+        scope: "openid profile email",
+      })
+
+      console.log(
+        "Got token with specified audience:",
+        token.substring(0, 20) + "..."
+      )
+      console.log("Token parts:", token.split(".").length)
+
       await uploadToStrapi(
         csvData,
         setUploadProgress,
         setUploadStatus,
         setUploadMessage,
-        getAccessTokenSilently
+        token // Pass the token directly instead of the function
       )
     } catch (error) {
-      console.error("Error during upload:", error)
+      console.error("Auth error:", error)
+      setUploadStatus("❌ Auth Error")
+      setUploadMessage("Authentication failed: " + error.message)
     }
   }
 
