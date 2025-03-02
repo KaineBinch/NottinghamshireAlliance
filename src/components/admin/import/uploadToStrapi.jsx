@@ -29,6 +29,10 @@ export const uploadToStrapi = async (
 
     // Get the Auth0 token
     const token = await getToken()
+    console.log("Token first 20 chars:", token.substring(0, 20) + "...")
+    if (!token.includes(".") || token.split(".").length !== 3) {
+      console.error("Token is not in valid JWT format")
+    }
 
     const blob = csvData.map((row) => row.join(",")).join("\n")
     const body = { blob }
