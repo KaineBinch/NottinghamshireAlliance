@@ -8,15 +8,19 @@ import { useState, useEffect } from "react"
 
 const AdminPage = () => {
   const { isAuthenticated, isLoading, loginWithPopup, logout } = useAuth0()
+  const [loginAttempted, setLoginAttempted] = useState(false)
   const navigate = useNavigate()
   const [csvData, setCsvData] = useState([])
   const [groupedData, setGroupedData] = useState({})
 
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
-      loginWithPopup().catch((error) => console.error("Login failed", error))
+    if (!isAuthenticated && !isLoading && !loginAttempted) {
+      setLoginAttempted(true)
+      loginWithPopup().catch((error) => {
+        console.error("Login failed", error)
+      })
     }
-  }, [isAuthenticated, isLoading, loginWithPopup])
+  }, [isAuthenticated, isLoading, loginWithPopup, loginAttempted])
 
   const handleLogout = () => {
     logout({ returnTo: window.location.origin })
