@@ -6,7 +6,8 @@ import { uploadToStrapi } from "../import/uploadToStrapi"
 import { useAuth0 } from "@auth0/auth0-react"
 
 const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
-  const { getAccessTokenSilently } = useAuth0()
+  const { getAccessTokenSilently, isAuthenticated, loginWithRedirect } =
+    useAuth0()
   const [fileName, setFileName] = useState("")
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadStatus, setUploadStatus] = useState("")
@@ -82,6 +83,18 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
 
   const handleUploadToStrapi = async () => {
     try {
+      // Check if the user is authenticated
+
+      if (!isAuthenticated) {
+        setUploadStatus("❌ Auth Error")
+        setUploadMessage("You need to log in first")
+
+        // Optionally redirect to login
+        await loginWithRedirect()
+        return
+      }
+
+      // Continue with getting token and uploading
       const token = await getAccessTokenSilently({
         authorizationParams: {
           audience: "https://alliance-admin.uk.auth0.com/api/v2/",
@@ -103,7 +116,7 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
         token
       )
     } catch (error) {
-      console.error("Auth error:", error)
+      console.error("Auth error details:", error)
       setUploadStatus("❌ Auth Error")
       setUploadMessage("Authentication failed: " + error.message)
     }

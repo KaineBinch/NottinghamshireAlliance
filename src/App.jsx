@@ -56,6 +56,8 @@ function App() {
               clientId={clientId}
               authorizationParams={{
                 redirect_uri: window.location.origin,
+                audience: "https://alliance-admin.uk.auth0.com/api/v2/",
+                scope: "openid profile email",
               }}>
               <AdminPage />
             </Auth0Provider>
