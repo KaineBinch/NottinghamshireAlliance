@@ -9,7 +9,6 @@ const ExpandableText = ({ text }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const toggleExpand = () => setIsExpanded(!isExpanded)
 
-  // Use provided text or fallback to default
   const fullText = text || "No event review available."
 
   return (
@@ -83,12 +82,10 @@ const formatDate = (dateString) => {
 
 const FurtherResultsPage = () => {
   const [activeTab, setActiveTab] = useState("winners")
-  const { eventId } = useParams() // Get eventId from URL if using React Router
-
+  const { eventId } = useParams()
   const query = queryBuilder(MODELS.events, QUERIES.resultsQuery)
   const { isLoading, isError, data, error } = useFetch(query)
 
-  // Helper function to get ordinal suffix
   const getOrdinal = (n) => {
     const s = ["th", "st", "nd", "rd"]
     const v = n % 100
@@ -104,26 +101,21 @@ const FurtherResultsPage = () => {
     )
   }
 
-  // Handle the array of events - either use a specific one based on ID or use the first one
   const events = data.data || []
   const event = eventId
     ? events.find((e) => e.id.toString() === eventId)
-    : events[1] || events[0] // Default to second event in array or first if only one exists
+    : events[1] || events[0]
 
-  console.log("event", event)
   if (!event) {
     return <p className="text-center pt-[85px] text-xl">Event not found</p>
   }
 
-  // Sort scores by golferEventScore in descending order if scores exist
   const sortedScores = event.scores
     ? [...event.scores].sort((a, b) => b.golferEventScore - a.golferEventScore)
     : []
 
-  // Group scores by club for team results
   const scoresByClub = {}
   event.scores?.forEach((score) => {
-    // Handle null checks for nested properties
     const clubName =
       score.golfer?.golf_club?.clubName ||
       (score.golfer && score.golfer.club_name) ||
@@ -135,10 +127,8 @@ const FurtherResultsPage = () => {
     scoresByClub[clubName].push(score)
   })
 
-  // Calculate team totals
   const teamResults = Object.entries(scoresByClub)
     .map(([clubName, scores]) => {
-      // Take top 4 scores for each club
       const topScores = scores
         .sort((a, b) => b.golferEventScore - a.golferEventScore)
         .slice(0, 4)
@@ -150,7 +140,6 @@ const FurtherResultsPage = () => {
     })
     .sort((a, b) => b.totalPoints - a.totalPoints)
 
-  // Filter professional scores
   const professionalScores =
     event.scores?.filter((score) => score.golfer?.isPro === true) || []
   const sortedProfessionalScores = [...professionalScores].sort(

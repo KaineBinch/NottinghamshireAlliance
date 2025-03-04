@@ -7,7 +7,7 @@ export const uploadToStrapi = async (
   setUploadProgress,
   setUploadStatus,
   setUploadMessage,
-  token // Changed from getToken to token - now expects the actual token string
+  token
 ) => {
   const userConfirmed = window.confirm(
     "Are you sure you want to make these changes? Your changes cannot be undone."
@@ -27,10 +27,6 @@ export const uploadToStrapi = async (
       </div>
     )
 
-    // Remove this line - token is now passed directly
-    // const token = await getToken()
-
-    console.log("Token first 20 chars:", token.substring(0, 20) + "...")
     if (!token.includes(".") || token.split(".").length !== 3) {
       console.error("Token is not in valid JWT format")
     }

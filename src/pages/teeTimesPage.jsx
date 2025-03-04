@@ -60,14 +60,12 @@ const TeeTimesPage = () => {
   const nextEvent = data?.data.find(
     (entry) => entry.event?.eventDate === nextEventDate
   )
-  console.log(nextEvent)
 
   const eventDate = nextEvent?.event?.eventDate
     ? formatDateWithOrdinal(nextEvent.event.eventDate)
     : "Upcoming Event"
 
   const filteredTeeTimes = nextEvent?.golfers || []
-  console.log(filteredTeeTimes)
 
   const handleToggleView = () => {
     setIsListView(!isListView)

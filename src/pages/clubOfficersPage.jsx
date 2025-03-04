@@ -6,21 +6,14 @@ import { queryBuilder } from "../utils/queryBuilder"
 const ClubOfficersPage = () => {
   const query = queryBuilder(MODELS.clubOfficers, QUERIES.officerQuery)
 
-  // Log the query to ensure it's correctly generated
-  console.log("Generated query:", query)
-
   const { isLoading, isError, data, error } = useFetch(query)
 
-  // Log loading and error states
-  console.log("isLoading:", isLoading)
-  console.log("isError:", isError)
-  if (isError) {
-    console.error("Error:", error) // Log the error details
+  if (isLoading) {
+    return <p className="pt-[85px]">Loading...</p>
+  } else if (isError) {
+    console.error("Error:", error)
     return <p className="pt-[85px]">Something went wrong...</p>
   }
-
-  // Log the data if it's available
-  console.log("Fetched data:", data)
 
   // Group officers by their position
   const president =

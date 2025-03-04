@@ -83,29 +83,19 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
 
   const handleUploadToStrapi = async () => {
     try {
-      // Check if the user is authenticated
-
       if (!isAuthenticated) {
         setUploadStatus("❌ Auth Error")
         setUploadMessage("You need to log in first")
 
-        // Optionally redirect to login
         await loginWithRedirect()
         return
       }
 
-      // Continue with getting token and uploading
       const token = await getAccessTokenSilently({
         authorizationParams: {
           audience: "https://alliance-admin.uk.auth0.com/api/v2/",
           scope: "openid profile email",
         },
-      })
-
-      console.log("Token format check:", {
-        length: token.length,
-        parts: token.split(".").length,
-        isValidJWT: token.split(".").length === 3,
       })
 
       await uploadToStrapi(

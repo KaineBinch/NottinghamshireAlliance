@@ -13,8 +13,6 @@ const TeeTimesTable = () => {
   const { isLoading, isError, data, error } = useFetch(query)
 
   const nextEventDate = getNextEventDate(data)
-  console.log("ned", nextEventDate)
-  console.log("data", data)
 
   useEffect(() => {
     if (data?.data) {
