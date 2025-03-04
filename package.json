@@ -9,7 +9,7 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "pre": "yarn run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "yarn build; rm -rf /var/www/frontend; cp -r dist /var/www/frontend"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
