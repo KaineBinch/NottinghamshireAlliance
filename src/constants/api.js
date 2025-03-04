@@ -19,7 +19,7 @@ export const QUERIES = {
   contactQuery: "",
   socialQuery: "",
   resultsQuery: "?sort[0]=eventDate:asc&populate=scores.golfer.golf_club&populate=golf_club&populate=golf_club.clubImage",
-  eventsQuery: "?sort[0]=eventDate:asc&populate[1]=golf_club",
+  eventsQuery: "?sort[0]=eventDate:asc&populate[1]=golf_club&populate=golf_club.clubImage",
   teeTimesQuery: "?populate[0]=event.golf_club&populate[1]=golfers.golf_club&populate[2]=event.golf_club.clubLogo",
   oomQuery: "?populate[0]=event&populate[1]=golfer.golf_club",
   officerQuery: "?populate=*",
