@@ -1,5 +1,5 @@
 import { useState } from "react"
-import CalendarButton from "../calendarButton"
+import CalendarButton from "./calendarButton"
 
 const FixtureCard = ({
   clubImage,
