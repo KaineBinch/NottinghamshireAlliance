@@ -1,4 +1,4 @@
-import defaultImage from "../../assets/background.jpg"
+import defaultImage from "../../assets/Logo.png"
 
 const TeeTimeCard = ({
   clubName,

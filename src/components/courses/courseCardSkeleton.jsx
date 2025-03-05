@@ -6,13 +6,6 @@ const CourseCardSkeleton = () => {
         <div className="relative flex w-2/5 h-50 md:h-60 bg-gray-300 overflow-hidden">
           {/* The wave effect overlay */}
           <div className="absolute inset-0 skeleton-wave"></div>
-
-          {/* Logo placeholder */}
-          <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 z-10">
-            <div className="md:w-[100px] md:h-[100px] w-[75px] h-[75px] rounded-full overflow-hidden">
-              <div className="absolute inset-0 skeleton-wave"></div>
-            </div>
-          </div>
         </div>
 
         {/* Right side - Content skeletons */}
