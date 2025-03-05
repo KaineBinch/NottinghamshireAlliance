@@ -20,7 +20,6 @@ import Navbar from "./components/navbar"
 import MobFoot from "./components/mobileFooter"
 import { Auth0Provider } from "@auth0/auth0-react"
 
-// Auth0 Configuration
 const domain = "alliance-admin.uk.auth0.com"
 const clientId = "yIwh6Lg7VkPxKsmDXcc4H84Or3oZaIHA"
 
