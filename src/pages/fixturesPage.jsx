@@ -1,7 +1,8 @@
 import { useState } from "react"
 import PageHeader from "../components/pageHeader"
-import FixtureCard from "../components/fixtureCard"
-import FixturesListView from "../components/FixturesListView"
+import FixtureCard from "../components/fixtures/fixtureCard"
+import FixtureCardSkeleton from "../components/fixtures/fixtureCardSkeleton"
+import FixturesListView from "../components/fixtures/FixturesListView"
 import { queryBuilder } from "../utils/queryBuilder"
 import { BASE_URL, MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
@@ -13,9 +14,10 @@ const FixturesPage = () => {
   const query = queryBuilder(MODELS.events, QUERIES.eventsQuery)
   const { isLoading, isError, data, error } = useFetch(query)
 
-  if (isLoading) {
-    return <p className="pt-[85px]">Loading...</p>
-  } else if (isError) {
+  // Number of skeleton cards to show - adjust based on your typical data size
+  const skeletonCards = Array(6).fill(0)
+
+  if (isError) {
     console.error("Error:", error)
     return <p className="pt-[85px]">Something went wrong...</p>
   }
@@ -25,9 +27,7 @@ const FixturesPage = () => {
     const bHasDate = b.eventDate !== null && b.eventDate !== undefined
 
     if (aHasDate === bHasDate) return 0
-
     if (aHasDate) return -1
-
     return 1
   })
 
@@ -63,38 +63,44 @@ const FixturesPage = () => {
         <div className="w-full pt-8">
           <div className="flex flex-col items-center">
             <div className="w-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5">
-              {sortedData?.map((club) => {
-                const clubName = club.golf_club
-                  ? `${club.golf_club.clubName} Golf Club`
-                  : "Location To be Confirmed"
-                const clubAddress = club.golf_club
-                  ? club.golf_club.clubAddress
-                  : ""
-                const clubImage = club.golf_club?.clubImage?.[0]?.url
-                  ? `${BASE_URL}${club.golf_club.clubImage[0].url}`
-                  : defaultImage
+              {isLoading
+                ? // Show skeleton cards while loading
+                  skeletonCards.map((_, index) => (
+                    <FixtureCardSkeleton key={index} />
+                  ))
+                : // Show actual data when loaded
+                  sortedData?.map((club) => {
+                    const clubName = club.golf_club
+                      ? `${club.golf_club.clubName} Golf Club`
+                      : "Location To be Confirmed"
+                    const clubAddress = club.golf_club
+                      ? club.golf_club.clubAddress
+                      : ""
+                    const clubImage = club.golf_club?.clubImage?.[0]?.url
+                      ? `${BASE_URL}${club.golf_club.clubImage[0].url}`
+                      : defaultImage
 
-                const eventDate = club.eventDate
-                const dateText = eventDate ? eventDate : null
+                    const eventDate = club.eventDate
+                    const dateText = eventDate ? eventDate : null
 
-                const competitionText =
-                  club.eventType &&
-                  club.eventType !== "Competition type to be confirmed"
-                    ? " competition"
-                    : ""
+                    const competitionText =
+                      club.eventType &&
+                      club.eventType !== "Competition type to be confirmed"
+                        ? " competition"
+                        : ""
 
-                return (
-                  <FixtureCard
-                    key={club.id}
-                    name={clubName}
-                    address={clubAddress}
-                    clubImage={clubImage}
-                    comp={club.eventType}
-                    date={dateText}
-                    competitionText={competitionText}
-                  />
-                )
-              })}
+                    return (
+                      <FixtureCard
+                        key={club.id}
+                        name={clubName}
+                        address={clubAddress}
+                        clubImage={clubImage}
+                        comp={club.eventType}
+                        date={dateText}
+                        competitionText={competitionText}
+                      />
+                    )
+                  })}
             </div>
           </div>
         </div>

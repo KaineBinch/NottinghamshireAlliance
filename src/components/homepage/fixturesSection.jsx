@@ -1,7 +1,7 @@
 import { BASE_URL, MODELS, QUERIES } from "../../constants/api.js"
 import useFetch from "../../utils/hooks/useFetch.js"
 import { queryBuilder } from "../../utils/queryBuilder.js"
-import FixtureCard from "../fixtureCard.jsx"
+import FixtureCard from "../fixtures/fixtureCard.jsx"
 import HomePageHeader from "./homepageHeader.jsx"
 import defaultImage from "../../assets/background.jpg"
 
