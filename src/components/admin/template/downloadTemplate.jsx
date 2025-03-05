@@ -46,7 +46,6 @@ const DownloadTemplateButton = ({
     const [startHour, startMinute] = startTime.split(":").map(Number)
     const [endHour, endMinute] = endTime.split(":").map(Number)
 
-    // Generate tee times based on user-selected interval
     let currentHour = startHour
     let currentMinute = startMinute
 
@@ -58,12 +57,10 @@ const DownloadTemplateButton = ({
         .toString()
         .padStart(2, "0")}`
 
-      // Add 4 slots per tee time
       for (let i = 0; i < 4; i++) {
         teeTimes.push(time)
       }
 
-      // Increment by user-selected minutes
       currentMinute += minuteIncrement
       if (currentMinute >= 60) {
         currentMinute -= 60
@@ -81,10 +78,8 @@ const DownloadTemplateButton = ({
       worksheet.addRow([eventDate, teeDatetime, "", "", "", "", ""])
     })
 
-    // Set column formatting for the "Tee time" column
     worksheet.getColumn(2).numFmt = "hh:mm"
 
-    // Alternating row colors
     const color1 = "00B050"
     const color2 = "B5E6A2"
 
@@ -96,14 +91,12 @@ const DownloadTemplateButton = ({
       for (let colIndex = 1; colIndex <= 7; colIndex++) {
         const cell = worksheet.getCell(rowIndex, colIndex)
 
-        // Set background color
         cell.fill = {
           type: "pattern",
           pattern: "solid",
           fgColor: { argb: bgColor },
         }
 
-        // Set alignment and font based on column
         if (colIndex <= 2) {
           cell.alignment = { horizontal: "center", vertical: "middle" }
           cell.font = {
@@ -115,14 +108,12 @@ const DownloadTemplateButton = ({
           cell.font = { name: "Aptos Narrow", size: 12 }
         }
 
-        // Set bottom border
         cell.border = {
-          bottom: { style: "thin", color: { argb: "000000" } }, // Thin black bottom border
+          bottom: { style: "thin", color: { argb: "000000" } }, //
         }
       }
     })
 
-    // Download logic
     await workbook.xlsx.writeBuffer().then((buffer) => {
       const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

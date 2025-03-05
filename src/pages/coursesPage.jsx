@@ -39,12 +39,10 @@ const CoursesPage = () => {
         <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="">
             {isLoading
-              ? // Show skeleton cards while loading
-                skeletonCards.map((_, index) => (
+              ? skeletonCards.map((_, index) => (
                   <CourseCardSkeleton key={index} />
                 ))
-              : // Show actual data when loaded
-                data.data.map((club) => (
+              : data.data.map((club) => (
                   <CourseCard
                     key={club.id}
                     name={`${club.clubName} Golf Club`}

@@ -15,7 +15,6 @@ const ClubOfficersPage = () => {
     return <p className="pt-[85px]">Something went wrong...</p>
   }
 
-  // Group officers by their position
   const president =
     data?.data?.filter((officer) => officer.Positions === "President") || []
   const secretary =

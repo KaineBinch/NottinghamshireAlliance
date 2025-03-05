@@ -1,4 +1,3 @@
-// components/FixtureCardSkeleton.jsx
 const FixtureCardSkeleton = () => {
   return (
     <div className="p-4 bg-[#214A27] shadow-lg rounded-md">

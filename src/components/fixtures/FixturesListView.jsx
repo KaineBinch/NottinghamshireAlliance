@@ -1,4 +1,4 @@
-import CalendarButton from "../calendarButton"
+import CalendarButton from "./calendarButton"
 import useFetch from "../../utils/hooks/useFetch"
 import { queryBuilder } from "../../utils/queryBuilder"
 import { MODELS, QUERIES } from "../../constants/api"
