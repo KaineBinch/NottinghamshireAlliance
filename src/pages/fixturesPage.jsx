@@ -1,8 +1,9 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import PageHeader from "../components/pageHeader"
 import FixtureCard from "../components/fixtures/fixtureCard"
 import FixtureCardSkeleton from "../components/fixtures/fixtureCardSkeleton"
-import FixturesListView from "../components/fixtures/FixturesListView"
+import FixturesListView from "../components/fixtures/fixturesListView"
+import FixturesListViewSkeleton from "../components/fixtures/fixturesListViewSkeleton"
 import { queryBuilder } from "../utils/queryBuilder"
 import { BASE_URL, MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
@@ -14,8 +15,17 @@ const FixturesPage = () => {
   const query = queryBuilder(MODELS.events, QUERIES.eventsQuery)
   const { isLoading, isError, data, error } = useFetch(query)
 
-  // Number of skeleton cards to show - adjust based on your typical data size
   const skeletonCards = Array(6).fill(0)
+
+  useEffect(() => {
+    const checkIfMobile = () => {
+      if (window.innerWidth < 768) {
+        setIsListView(true)
+      }
+    }
+
+    checkIfMobile()
+  }, [])
 
   if (isError) {
     console.error("Error:", error)
@@ -58,18 +68,20 @@ const FixturesPage = () => {
       </div>
 
       {isListView ? (
-        <FixturesListView />
+        isLoading ? (
+          <FixturesListViewSkeleton />
+        ) : (
+          <FixturesListView />
+        )
       ) : (
         <div className="w-full pt-8">
           <div className="flex flex-col items-center">
             <div className="w-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5">
               {isLoading
-                ? // Show skeleton cards while loading
-                  skeletonCards.map((_, index) => (
+                ? skeletonCards.map((_, index) => (
                     <FixtureCardSkeleton key={index} />
                   ))
-                : // Show actual data when loaded
-                  sortedData?.map((club) => {
+                : sortedData?.map((club) => {
                     const clubName = club.golf_club
                       ? `${club.golf_club.clubName} Golf Club`
                       : "Location To be Confirmed"
