@@ -1,9 +1,9 @@
 import { useState, useMemo, useCallback, useEffect } from "react"
-import { queryBuilder } from "../utils/queryBuilder"
-import { MODELS, QUERIES } from "../constants/api"
-import useFetch from "../utils/hooks/useFetch"
-import SearchFilter from "./SearchFilter"
-import { getNextEventDate } from "../utils/getNextEventDate"
+import { queryBuilder } from "../../utils/queryBuilder"
+import { MODELS, QUERIES } from "../../constants/api"
+import useFetch from "../../utils/hooks/useFetch"
+import SearchFilter from "../SearchFilter"
+import { getNextEventDate } from "../../utils/getNextEventDate"
 
 const TeeTimesTable = () => {
   const [filteredTeeTimes, setFilteredTeeTimes] = useState([])

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import CalendarButton from "./calendarButton"
 import useFetch from "../../utils/hooks/useFetch"
 import { queryBuilder } from "../../utils/queryBuilder"
@@ -41,8 +42,18 @@ const formatDateWithOrdinal = (dateString) => {
 }
 
 const FixturesListView = () => {
+  const [contentVisible, setContentVisible] = useState(false)
   const query = queryBuilder(MODELS.events, QUERIES.eventsQuery)
   const { isLoading, isError, data, error } = useFetch(query)
+
+  // Add a transition effect when content loads
+  useEffect(() => {
+    if (!isLoading && data) {
+      // Small delay to ensure smooth transition
+      const timer = setTimeout(() => setContentVisible(true), 50)
+      return () => clearTimeout(timer)
+    }
+  }, [isLoading, data])
 
   if (isError) {
     console.error("Error:", error)
@@ -68,7 +79,10 @@ const FixturesListView = () => {
         <div className="bg-white shadow-md rounded-lg overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-[#214A27] font-semibold text-white text-center text-xs sm:text-sm">
-              <tr className="[&>th]:px-2 [&>th]:sm:px-4 [&>th]:md:px-6 [&>th]:py-2 [&>th]:md:py-3 [&>th]:tracking-wider">
+              <tr
+                className={`transition-opacity duration-300 ${
+                  contentVisible ? "opacity-100" : "opacity-0"
+                } [&>th]:px-2 [&>th]:sm:px-4 [&>th]:md:px-6 [&>th]:py-2 [&>th]:md:py-3 [&>th]:tracking-wider`}>
                 <th>Date</th>
                 <th>Venue</th>
                 <th>Competition</th>
@@ -93,19 +107,40 @@ const FixturesListView = () => {
                     key={event.id}
                     className="hover:bg-gray-200 [&>td]:px-2 [&>td]:sm:px-4 [&>td]:md:px-6 [&>td]:py-2 [&>td]:md:py-4">
                     <td>
-                      <div className="font-medium">{formattedDate}</div>
+                      <div
+                        className={`font-medium transition-opacity duration-300 ${
+                          contentVisible ? "opacity-100" : "opacity-0"
+                        }`}>
+                        {formattedDate}
+                      </div>
                     </td>
                     <td>
-                      <div className="font-medium">{venue}</div>
-                      <div className="text-gray-600 hidden sm:block">
+                      <div
+                        className={`font-medium transition-opacity duration-300 ${
+                          contentVisible ? "opacity-100" : "opacity-0"
+                        }`}>
+                        {venue}
+                      </div>
+                      <div
+                        className={`text-gray-600 hidden sm:block transition-opacity duration-300 ${
+                          contentVisible ? "opacity-100" : "opacity-0"
+                        }`}>
                         {clubAddress}
                       </div>
                     </td>
                     <td>
-                      <div>{eventType}</div>
+                      <div
+                        className={`transition-opacity duration-300 ${
+                          contentVisible ? "opacity-100" : "opacity-0"
+                        }`}>
+                        {eventType}
+                      </div>
                     </td>
                     <td className="whitespace-nowrap">
-                      <div className="flex pl-2 justify-center">
+                      <div
+                        className={`transition-opacity duration-300 flex pl-2 justify-center ${
+                          contentVisible ? "opacity-100" : "opacity-0"
+                        }`}>
                         <CalendarButton
                           date={eventDate}
                           comp={eventType}

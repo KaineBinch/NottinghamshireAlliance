@@ -17,7 +17,7 @@ import {
 import { appRoutes } from "./constants/appRoutes"
 import ScrollToTop from "./utils/scrollToTop"
 import Navbar from "./components/navbar"
-import MobFoot from "./components/mobileFooter"
+import MobFoot from "./components/footer/mobileFooter"
 import { Auth0Provider } from "@auth0/auth0-react"
 
 const domain = "alliance-admin.uk.auth0.com"

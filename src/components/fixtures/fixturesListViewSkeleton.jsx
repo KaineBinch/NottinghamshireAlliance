@@ -6,12 +6,12 @@ const FixturesListViewSkeleton = () => {
       <div className="max-w-5xl mx-auto">
         <div className="bg-white shadow-md rounded-lg overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-[#214A27] font-semibold text-white text-center text-xs sm:text-sm">
+            <thead className="bg-[#214A27] h-[64px] w-auto font-semibold text-white text-center text-xs sm:text-sm">
               <tr className="[&>th]:px-2 [&>th]:sm:px-4 [&>th]:md:px-6 [&>th]:py-2 [&>th]:md:py-3 [&>th]:tracking-wider">
-                <th>Date</th>
-                <th>Venue</th>
-                <th>Competition</th>
-                <th>Add to Calendar</th>
+                <th className="skeleton-wave"></th>
+                <th></th>
+                <th></th>
+                <th></th>
               </tr>
             </thead>
             <tbody className="bg-[#D9D9D9] divide-y divide-gray-300">

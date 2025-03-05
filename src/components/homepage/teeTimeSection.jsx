@@ -3,7 +3,7 @@ import { BASE_URL, MODELS, QUERIES } from "../../constants/api.js"
 import useFetch from "../../utils/hooks/useFetch.js"
 import { queryBuilder } from "../../utils/queryBuilder.js"
 import HomePageHeader from "./homepageHeader.jsx"
-import TeeTimeCard from "../teeTimeCard.jsx"
+import TeeTimeCard from "../teeTimes/teeTimeCard.jsx"
 
 const TeeTimesSection = () => {
   const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery)

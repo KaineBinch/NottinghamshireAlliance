@@ -1,4 +1,4 @@
-import ResultsCard from "../components/resultsCard"
+import ResultsCard from "../components/results/resultsCard"
 import PageHeader from "../components/pageHeader"
 import { Link } from "react-router-dom"
 import { BASE_URL, MODELS, QUERIES } from "../constants/api"

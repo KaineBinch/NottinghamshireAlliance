@@ -10,13 +10,25 @@ import useFetch from "../utils/hooks/useFetch"
 import defaultImage from "../assets/background.jpg"
 
 const FixturesPage = () => {
-  const [isListView, setIsListView] = useState(false)
+  // Get saved view preference from localStorage, default to false if none found
+  const getSavedViewPreference = () => {
+    try {
+      const savedPreference = localStorage.getItem("fixturesListView")
+      return savedPreference === "true"
+    } catch (error) {
+      // In case localStorage is not available (e.g., incognito mode)
+      return false
+    }
+  }
+
+  const [isListView, setIsListView] = useState(getSavedViewPreference)
 
   const query = queryBuilder(MODELS.events, QUERIES.eventsQuery)
   const { isLoading, isError, data, error } = useFetch(query)
 
   const skeletonCards = Array(6).fill(0)
 
+  // Check for mobile device on mount
   useEffect(() => {
     const checkIfMobile = () => {
       if (window.innerWidth < 768) {
@@ -26,6 +38,16 @@ const FixturesPage = () => {
 
     checkIfMobile()
   }, [])
+
+  // Save view preference to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem("fixturesListView", isListView.toString())
+    } catch (error) {
+      // Handle potential localStorage errors
+      console.warn("Could not save view preference")
+    }
+  }, [isListView])
 
   if (isError) {
     console.error("Error:", error)

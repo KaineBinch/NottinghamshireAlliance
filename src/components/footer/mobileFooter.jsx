@@ -1,8 +1,8 @@
-import logo from "../assets/Logo.png"
-import Socials from "../components/socials"
-import { MODELS, QUERIES } from "../constants/api"
-import useFetch from "../utils/hooks/useFetch"
-import { queryBuilder } from "../utils/queryBuilder"
+import logo from "../../assets/Logo.png"
+import Socials from "./socials"
+import { MODELS, QUERIES } from "../../constants/api"
+import useFetch from "../../utils/hooks/useFetch"
+import { queryBuilder } from "../../utils/queryBuilder"
 
 const MobFoot = () => {
   const contactQuery = queryBuilder(MODELS.contact, QUERIES.contactQuery)
