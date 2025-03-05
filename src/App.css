@@ -98,6 +98,10 @@
   transform: translateX(-100%);
 }
 
+.content-container {
+  transition: opacity 0.3s ease-in-out, height 0.3s ease-in-out;
+}
+
 @keyframes wave {
   0% {
     transform: translateX(-100%);

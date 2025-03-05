@@ -1,3 +1,4 @@
+import { useState } from "react"
 import CalendarButton from "../calendarButton"
 
 const FixtureCard = ({
@@ -8,6 +9,8 @@ const FixtureCard = ({
   date,
   competitionText,
 }) => {
+  const [imageLoaded, setImageLoaded] = useState(false)
+
   const formatDate = (dateString) => {
     if (!dateString) {
       console.error("Date string is undefined or null")
@@ -68,10 +71,14 @@ const FixtureCard = ({
     <div className="p-4 bg-[#214A27] shadow-lg rounded-md">
       <div className="flex flex-col bg-[#D9D9D9] text-black border border-black relative max-w-[300px] min-h-[300px]">
         <div className="relative">
+          <div className="w-full h-[250px] bg-gray-300 absolute top-0 left-0" />
           <img
             src={clubImage}
-            className="w-full h-[250px] object-cover"
+            className={`w-full h-[250px] object-cover relative transition-opacity duration-300 ${
+              imageLoaded ? "opacity-100" : "opacity-0"
+            }`}
             alt={`${name} course`}
+            onLoad={() => setImageLoaded(true)}
           />
         </div>
 
