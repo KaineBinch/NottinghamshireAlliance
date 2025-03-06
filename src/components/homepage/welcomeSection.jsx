@@ -16,7 +16,7 @@ const WelcomeSection = () => {
       </div>
       <div className="bg-[#D9D9D9] flex place-content-center">
         <div className="text-center text-black px-5 py-[50px] max-w-5xl">
-          <h1>Welcome to the Nottinghamshire Golf Alliance</h1>
+          <h1>TEST</h1>
           <p className="py-[25px]">
             Experience the best golf courses in Nottinghamshire and compete with
             amateurs and professionals in our exciting competitions. The
