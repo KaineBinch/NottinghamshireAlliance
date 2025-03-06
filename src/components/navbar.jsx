@@ -39,7 +39,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="fixed w-full flex bg-[#214A27] justify-center h-[60px] z-10">
+      <div className="fixed w-full flex bg-[#214A27] justify-center h-[60px] z-100">
         <div className="flex max-w-5xl w-full items-center justify-between h-full px-4">
           <div className="dropdown visible lg:invisible justify-start items-start lg:w-0 w-auto z-20">
             <label
