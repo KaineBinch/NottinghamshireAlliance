@@ -10,20 +10,21 @@ import {
   faSquareInstagram,
 } from "@fortawesome/free-brands-svg-icons"
 import { faPhone, faEnvelope } from "@fortawesome/free-solid-svg-icons"
+import posthog from "posthog-js"
 import { PostHogProvider } from "posthog-js/react"
 
 library.add(fab, faPhone, faEnvelope, faSquareFacebook, faSquareInstagram)
 
-const options = {
-  api_host: import.meta.env.VITE_REACT_APP_PUBLIC_POSTHOG_HOST,
-}
+posthog.init(import.meta.env.VITE_REACT_APP_PUBLIC_POSTHOG_KEY, {
+  api_host: import.meta.env.VITE_REACT_APP_POSTHOG_HOST,
+  ui_host: "https://us.posthog.com",
+  capture_pageview: false,
+})
 const queryClient = new QueryClient()
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <PostHogProvider
-      apiKey={import.meta.env.VITE_REACT_APP_PUBLIC_POSTHOG_KEY}
-      options={options}>
+    <PostHogProvider client={posthog}>
       <HashRouter>
         <QueryClientProvider client={queryClient}>
           <App />
