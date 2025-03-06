@@ -17,7 +17,7 @@ library.add(fab, faPhone, faEnvelope, faSquareFacebook, faSquareInstagram)
 
 posthog.init(import.meta.env.VITE_REACT_APP_PUBLIC_POSTHOG_KEY, {
   api_host: import.meta.env.VITE_REACT_APP_POSTHOG_HOST,
-  ui_host: "https://us.posthog.com",
+  ui_host: "https://eu.i.posthog.com",
   capture_pageview: false,
 })
 const queryClient = new QueryClient()

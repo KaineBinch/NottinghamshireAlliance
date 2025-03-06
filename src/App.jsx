@@ -18,6 +18,7 @@ import { appRoutes } from "./constants/appRoutes"
 import ScrollToTop from "./utils/scrollToTop"
 import Navbar from "./components/navbar"
 import MobFoot from "./components/footer/mobileFooter"
+import { PosthogPageViewTracker } from "./components/posthogPageViewTracker"
 import { Auth0Provider } from "@auth0/auth0-react"
 
 const domain = "alliance-admin.uk.auth0.com"
@@ -28,6 +29,7 @@ function App() {
 
   return (
     <>
+      <PosthogPageViewTracker />
       <ScrollToTop />
       <Navbar />
       <Routes location={location} key={location.pathname}>
