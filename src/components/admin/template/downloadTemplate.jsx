@@ -22,14 +22,20 @@ const DownloadTemplateButton = ({
       "Senior?",
       "Pro?",
       "Club",
-      "Score",
+      "Front 9",
+      "Back 9",
+      "Overall Score",
     ]
 
     const header = worksheet.addRow(headerRow)
-    header.height = 26.25
+    header.height = 34.5
     header.eachCell((cell) => {
       cell.font = { bold: true, size: 12, color: { argb: "FFFFFFFF" } }
-      cell.alignment = { horizontal: "center", vertical: "middle" }
+      cell.alignment = {
+        horizontal: "center",
+        vertical: "middle",
+        wrapText: true, // Add text wrapping for header cells
+      }
       cell.fill = {
         type: "pattern",
         pattern: "solid",
@@ -37,7 +43,7 @@ const DownloadTemplateButton = ({
       }
     })
 
-    const columnWidths = [15, 15, 20, 10, 10, 15, 10]
+    const columnWidths = [15, 15, 20, 10, 10, 10, 10, 10, 10]
     columnWidths.forEach((width, index) => {
       worksheet.getColumn(index + 1).width = width
     })
@@ -88,7 +94,7 @@ const DownloadTemplateButton = ({
       const minute = parseInt(time.split(":")[1], 10)
       const bgColor = minute % (2 * minuteIncrement) === 0 ? color1 : color2
 
-      for (let colIndex = 1; colIndex <= 7; colIndex++) {
+      for (let colIndex = 1; colIndex <= 9; colIndex++) {
         const cell = worksheet.getCell(rowIndex, colIndex)
 
         cell.fill = {
@@ -108,11 +114,22 @@ const DownloadTemplateButton = ({
           cell.font = { name: "Aptos Narrow", size: 12 }
         }
 
+        // Add bottom border to all cells
         cell.border = {
-          bottom: { style: "thin", color: { argb: "000000" } }, //
+          bottom: { style: "thin", color: { argb: "000000" } },
+        }
+
+        // Add right border to the last column
+        if (colIndex === 9) {
+          cell.border.right = { style: "thin", color: { argb: "000000" } }
         }
       }
     })
+
+    // Add right border to the header of the last column
+    worksheet.getCell(1, 9).border = {
+      right: { style: "thin", color: { argb: "000000" } },
+    }
 
     await workbook.xlsx.writeBuffer().then((buffer) => {
       const blob = new Blob([buffer], {

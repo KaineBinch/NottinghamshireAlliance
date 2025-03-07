@@ -21,10 +21,10 @@ export const uploadToStrapi = async (
   try {
     setUploadStatus("Uploading")
     setUploadMessage(
-      <div className="flex items-center justify-center w-full">
+      <span className="flex items-center justify-center w-full">
         Processing...
-        <div className="ml-2 w-4 h-4 border-2 border-t-2 border-blue-500 rounded-full animate-spin"></div>
-      </div>
+        <span className="ml-2 w-4 h-4 border-2 border-t-2 border-blue-500 rounded-full animate-spin"></span>
+      </span>
     )
 
     if (!token.includes(".") || token.split(".").length !== 3) {

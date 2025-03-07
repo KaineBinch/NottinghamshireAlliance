@@ -26,14 +26,16 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
         const worksheet = workbook.getWorksheet(1)
         const jsonData = []
 
+        // Extract data from Excel
         worksheet.eachRow((row) => {
           const rowValues = row.values.slice(1)
           jsonData.push(rowValues)
         })
 
+        // Format dates in the data
         const formattedData = jsonData.map((row, rowIndex) => {
-          if (rowIndex === 0) return row.slice(0, 7)
-          return row.slice(0, 7).map((cell, cellIndex) => {
+          if (rowIndex === 0) return row
+          return row.map((cell, cellIndex) => {
             if (cellIndex === 0) {
               return cell ? new Date(cell).toLocaleDateString("en-GB") : ""
             }
@@ -44,15 +46,36 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
           })
         })
 
+        // Set the CSV data
         setCsvData(formattedData)
 
-        const dataGroups = formattedData.slice(1).reduce((groups, row) => {
+        // Create data groups
+        const dataGroups = {}
+        for (let i = 1; i < formattedData.length; i++) {
+          const row = formattedData[i]
+          if (!row || row.length < 3) continue
+
           const time = row[1]
-          if (!groups[time]) groups[time] = []
-          if (row[2]) groups[time].push([...row.slice(2)])
-          return groups
-        }, {})
+          if (!time) continue
+
+          if (!dataGroups[time]) {
+            dataGroups[time] = []
+          }
+
+          // Include ALL columns after the time column
+          const rowData = []
+          for (let j = 2; j < row.length; j++) {
+            rowData.push(row[j])
+          }
+
+          dataGroups[time].push(rowData)
+        }
+
         setGroupedData(dataGroups)
+
+        console.log("Headers:", formattedData[0])
+        console.log("Sample Data:", formattedData[1])
+        console.log("Grouped Data Sample:", Object.values(dataGroups)[0])
       }
 
       reader.readAsArrayBuffer(file)
@@ -134,8 +157,8 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
       )}
       {uploadStatus && (
         <div className="mt-4">
-          <p>Status: {uploadStatus}</p>
-          <p>Message: {uploadMessage}</p>
+          <div>Status: {uploadStatus}</div>
+          <div>Message: {uploadMessage}</div>
           {uploadStatus === "uploading" && <p>Progress: {uploadProgress}%</p>}
         </div>
       )}

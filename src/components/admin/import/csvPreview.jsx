@@ -12,25 +12,32 @@ const CSVPreview = ({ csvData, groupedData }) => {
           You can use this as a final check to ensure that everything is entered
           correctly.
         </p>
-        <h2 className="text-lg font-semibold">{`${csvData[1][0]}`}</h2>
+        <h2 className="text-lg font-semibold">
+          {csvData && csvData.length > 1 && csvData[1] ? csvData[1][0] : ""}
+        </h2>
         <div className="overflow-auto">
           <table className="min-w-full border-collapse border border-gray-300 mt-2">
             <thead>
               <tr>
-                {csvData[0].slice(2).map((header, index) => (
-                  <th
-                    key={index}
-                    className="border border-gray-300 bg-gray-200 p-2 text-center">
-                    {header}
-                  </th>
-                ))}
+                {csvData &&
+                  csvData.length > 0 &&
+                  csvData[0] &&
+                  csvData[0].slice(2).map((header, index) => (
+                    <th
+                      key={index}
+                      className="border border-gray-300 bg-gray-200 p-2 text-center">
+                      {header}
+                    </th>
+                  ))}
               </tr>
             </thead>
             <tbody>
               {times.map((time) => (
                 <React.Fragment key={time}>
                   <tr>
-                    <td className="pt-3 font-semibold" colSpan="5">
+                    <td
+                      className="pt-3 font-semibold"
+                      colSpan={csvData[0].slice(2).length}>
                       {time.slice(0, -3)}
                     </td>
                   </tr>

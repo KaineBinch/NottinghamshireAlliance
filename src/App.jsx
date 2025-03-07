@@ -21,8 +21,8 @@ import MobFoot from "./components/footer/mobileFooter"
 import { PosthogPageViewTracker } from "./components/posthogPageViewTracker"
 import { Auth0Provider } from "@auth0/auth0-react"
 
-const domain = "alliance-admin.uk.auth0.com"
-const clientId = "yIwh6Lg7VkPxKsmDXcc4H84Or3oZaIHA"
+const domain = import.meta.env.VITE_AUTH0_DOMAIN
+const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID
 
 function App() {
   const location = useLocation()
@@ -57,7 +57,7 @@ function App() {
               clientId={clientId}
               authorizationParams={{
                 redirect_uri: window.location.origin,
-                audience: "https://alliance-admin.uk.auth0.com/api/v2/",
+                audience: import.meta.env.VITE_AUTH0_AUDIENCE,
                 scope: "openid profile email",
               }}>
               <AdminPage />
