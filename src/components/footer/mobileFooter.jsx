@@ -22,7 +22,7 @@ const MobFoot = () => {
   } = useFetch(socialQuery)
 
   if (isLoadingContacts || isLoadingSocials) {
-    return <p className="pt-[85px]">Loading...</p>
+    return <p className="pt-[85px]"></p>
   }
 
   if (isErrorContacts || isErrorSocials) {

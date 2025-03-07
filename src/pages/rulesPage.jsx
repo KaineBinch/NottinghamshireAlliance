@@ -24,7 +24,7 @@ const RulesPage = () => {
   } = useFetch(conditionsQuery)
 
   if (isLoadingRules || isLoadingConditions) {
-    return <p className="pt-[85px]">Loading...</p>
+    return <p className="pt-[85px]"></p>
   }
 
   if (isErrorRules || isErrorConditions) {

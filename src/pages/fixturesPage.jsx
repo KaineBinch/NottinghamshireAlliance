@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import PageHeader from "../components/pageHeader"
 import FixtureCard from "../components/fixtures/fixtureCard"
-import FixtureCardSkeleton from "../components/fixtures/fixtureCardSkeleton"
 import FixturesListView from "../components/fixtures/FixturesListView"
 import FixturesListViewSkeleton from "../components/fixtures/fixturesListViewSkeleton"
 import { queryBuilder } from "../utils/queryBuilder"
@@ -22,11 +21,10 @@ const FixturesPage = () => {
   }
 
   const [isListView, setIsListView] = useState(getSavedViewPreference)
+  const [showContent, setShowContent] = useState(false)
 
   const query = queryBuilder(MODELS.events, QUERIES.eventsQuery)
   const { isLoading, isError, data, error } = useFetch(query)
-
-  const skeletonCards = Array(6).fill(0)
 
   // Check for mobile device on mount
   useEffect(() => {
@@ -38,6 +36,18 @@ const FixturesPage = () => {
 
     checkIfMobile()
   }, [])
+
+  // Once data is loaded, allow a small delay before showing content
+  useEffect(() => {
+    if (!isLoading && data) {
+      // Short delay to ensure all card images start loading
+      const timer = setTimeout(() => {
+        setShowContent(true)
+      }, 100)
+
+      return () => clearTimeout(timer)
+    }
+  }, [isLoading, data])
 
   // Save view preference to localStorage whenever it changes
   useEffect(() => {
@@ -98,44 +108,45 @@ const FixturesPage = () => {
       ) : (
         <div className="w-full pt-8">
           <div className="flex flex-col items-center">
-            <div className="w-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5">
-              {isLoading
-                ? skeletonCards.map((_, index) => (
-                    <FixtureCardSkeleton key={index} />
-                  ))
-                : sortedData?.map((club) => {
-                    const clubName = club.golf_club
-                      ? `${club.golf_club.clubName} Golf Club`
-                      : "Location To be Confirmed"
-                    const clubAddress = club.golf_club
-                      ? club.golf_club.clubAddress
+            {showContent && !isLoading ? (
+              <div className="w-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5">
+                {sortedData?.map((club) => {
+                  const clubName = club.golf_club
+                    ? `${club.golf_club.clubName} Golf Club`
+                    : "Location To be Confirmed"
+                  const clubAddress = club.golf_club
+                    ? club.golf_club.clubAddress
+                    : ""
+                  const clubImage = club.golf_club?.clubImage?.[0]?.url
+                    ? `${BASE_URL}${club.golf_club.clubImage[0].url}`
+                    : defaultImage
+
+                  const eventDate = club.eventDate
+                  const dateText = eventDate ? eventDate : null
+
+                  const competitionText =
+                    club.eventType &&
+                    club.eventType !== "Competition type to be confirmed"
+                      ? " competition"
                       : ""
-                    const clubImage = club.golf_club?.clubImage?.[0]?.url
-                      ? `${BASE_URL}${club.golf_club.clubImage[0].url}`
-                      : defaultImage
 
-                    const eventDate = club.eventDate
-                    const dateText = eventDate ? eventDate : null
-
-                    const competitionText =
-                      club.eventType &&
-                      club.eventType !== "Competition type to be confirmed"
-                        ? " competition"
-                        : ""
-
-                    return (
-                      <FixtureCard
-                        key={club.id}
-                        name={clubName}
-                        address={clubAddress}
-                        clubImage={clubImage}
-                        comp={club.eventType}
-                        date={dateText}
-                        competitionText={competitionText}
-                      />
-                    )
-                  })}
-            </div>
+                  return (
+                    <FixtureCard
+                      key={club.id}
+                      name={clubName}
+                      address={clubAddress}
+                      clubImage={clubImage}
+                      comp={club.eventType}
+                      date={dateText}
+                      competitionText={competitionText}
+                    />
+                  )
+                })}
+              </div>
+            ) : (
+              // Empty space while loading
+              <div className="min-h-[500px] w-full max-w-5xl px-5"></div>
+            )}
           </div>
         </div>
       )}

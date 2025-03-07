@@ -36,7 +36,7 @@ const AdminPage = () => {
   }
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <div></div>
   }
 
   return (

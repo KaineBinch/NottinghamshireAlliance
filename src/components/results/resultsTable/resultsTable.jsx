@@ -156,7 +156,7 @@ const ResultsTable = ({ limit }) => {
     : filteredResults
 
   if (isLoading) {
-    return <p className="pt-[85px]">Loading...</p>
+    return <p className="pt-[85px]"></p>
   }
 
   if (isError) {

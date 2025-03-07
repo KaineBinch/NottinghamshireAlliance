@@ -77,7 +77,7 @@ const FixturesListView = () => {
     <div className="w-full pt-8 px-2 sm:px-4">
       <div className="max-w-5xl mx-auto">
         <div className="bg-white shadow-md rounded-lg overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="min-w-full divide-y divide-gray-400">
             <thead className="bg-[#214A27] font-semibold text-white text-center text-xs sm:text-sm">
               <tr
                 className={`transition-opacity duration-300 ${
@@ -89,7 +89,7 @@ const FixturesListView = () => {
                 <th>Add to Calendar</th>
               </tr>
             </thead>
-            <tbody className="bg-[#D9D9D9] divide-y divide-gray-300 text-xs sm:text-sm text-gray-900 text-center">
+            <tbody className="bg-[#D9D9D9] divide-y divide-gray-400 text-xs sm:text-sm text-gray-900 text-center">
               {sortedData.map((event) => {
                 const venue = event.golf_club
                   ? `${event.golf_club.clubName} Golf Club`
@@ -105,7 +105,7 @@ const FixturesListView = () => {
                 return (
                   <tr
                     key={event.id}
-                    className="hover:bg-gray-200 [&>td]:px-2 [&>td]:sm:px-4 [&>td]:md:px-6 [&>td]:py-2 [&>td]:md:py-4">
+                    className="hover:bg-gray-200 [&>td]:px-2 [&>td]:sm:px-4 [&>td]:md:px-6 [&>td]:py-2 [&>td]:md:py-4 border-b border-gray-400">
                     <td>
                       <div
                         className={`font-medium transition-opacity duration-300 ${

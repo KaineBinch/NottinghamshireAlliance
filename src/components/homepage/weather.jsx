@@ -69,7 +69,7 @@ const Weather = ({ city }) => {
                 </div>
               </div>
             ))
-          : "Loading..."}
+          : ""}
       </div>
     </div>
   )
