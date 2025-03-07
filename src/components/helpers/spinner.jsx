@@ -1,4 +1,4 @@
-const Spinner = ({ size = "md", color = "#3498db" }) => {
+const Spinner = ({ size = "md", color = "#214A27" }) => {
   // Size mapping
   const sizeMap = {
     sm: "w-4 h-4",

@@ -67,6 +67,19 @@
   animation: "spin 1s linear infinite";
 }
 
+@keyframes fadeInEase {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.gallery-ease-in {
+  animation: fadeInEase 1s cubic-bezier(0.4, 0, 1, 1);
+}
+
 .containerStyles {
   display: "flex";
   align-items: "center";
