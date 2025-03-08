@@ -32,7 +32,7 @@
     "framer-motion": "^11.3.31",
     "lucide-react": "^0.446.0",
     "postcss-cli": "^11.0.0",
-    "posthog-js": "^1.229.1",
+    "posthog-js": "^1.229.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-drag-drop-files": "^2.4.0",

@@ -1,3 +1,8 @@
+export const API_BASE_URLS = {
+  local: 'http://localhost:1337',
+  production: import.meta.env.VITE_API_URL || 'http://localhost:1337'
+};
+
 export const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:1337'
 export const API_URL = BASE_URL + "/api"
 export const MODELS = {
