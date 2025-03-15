@@ -73,13 +73,13 @@ const MobFoot = () => {
           {/* Link Section */}
           <div className="md:w-1/2 flex flex-col items-center justify-center font-bold">
             <p className="text-base">
-              <a href="/#/admin">Admin</a>
+              <a href="/admin">Admin</a>
             </p>
             <p className="text-base py-8">
-              <a href="/#/clubofficers">Club Officers</a>
+              <a href="/clubofficers">Club Officers</a>
             </p>
             <p className="text-base">
-              <a href="/#/rules">Rules</a>
+              <a href="/rules">Rules</a>
             </p>
           </div>
         </div>

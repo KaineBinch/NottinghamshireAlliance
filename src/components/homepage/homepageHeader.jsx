@@ -10,7 +10,7 @@ const HomePageHeader = ({ title, subtext, btnName, btnStyle, page }) => {
           <div className="flex flex-col justify-end">
             <a
               className={`btn rounded-none w-[125px] border-black ${btnStyle}`}
-              href={`/#/${page}`}>
+              href={`/${page}`}>
               {btnName}
             </a>
           </div>

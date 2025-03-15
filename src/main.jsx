@@ -1,10 +1,7 @@
-// main.jsx - Using PostHog's official initialization approach
-
 import React from "react"
 import { QueryClient, QueryClientProvider } from "react-query"
 import ReactDOM from "react-dom/client"
 import App from "./App.jsx"
-import { HashRouter } from "react-router-dom"
 import { library } from "@fortawesome/fontawesome-svg-core"
 import {
   fab,
@@ -39,18 +36,14 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     {/* Only use PostHogProvider if posthog is available */}
     {posthog ? (
       <PostHogProvider client={posthog}>
-        <HashRouter>
-          <QueryClientProvider client={queryClient}>
-            <App />
-          </QueryClientProvider>
-        </HashRouter>
-      </PostHogProvider>
-    ) : (
-      <HashRouter>
         <QueryClientProvider client={queryClient}>
           <App />
         </QueryClientProvider>
-      </HashRouter>
+      </PostHogProvider>
+    ) : (
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
     )}
   </React.StrictMode>
 )
