@@ -14,6 +14,46 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   const [showLogs, setShowLogs] = useState(false)
   const [view, setView] = useState("upload") // "upload", "processing", "results"
 
+  const formatLogSummary = (originalSummary) => {
+    if (!originalSummary) return originalSummary
+
+    let lines = originalSummary.split("\n")
+
+    let totalGolfersProcessed = "0"
+    for (const line of lines) {
+      if (
+        line.includes("For a total of") &&
+        line.includes("golfers processed")
+      ) {
+        const match = line.match(/For a total of (\d+) golfers processed/)
+        if (match && match[1]) {
+          totalGolfersProcessed = match[1]
+        }
+        break
+      }
+    }
+
+    const modifiedLines = lines.map((line) => {
+      if (line.includes("new golfer records")) {
+        return `- ${totalGolfersProcessed} golfers updated`
+      } else if (line.includes("Date(s):")) {
+        const dateMatch = line.match(/Date\(s\):\s*(\d{4}-\d{2}-\d{2})/)
+        if (dateMatch && dateMatch[1]) {
+          const isoDate = dateMatch[1]
+          const [year, month, day] = isoDate.split("-")
+          const formattedDate = `${day}/${month}/${year}`
+          return line.replace(isoDate, formattedDate)
+        }
+      } else if (line.includes("Records Created:")) {
+        return line.replace("Records Created:", "Records Processed:")
+      }
+      return line
+    })
+    return modifiedLines
+      .filter((line) => !line.includes("For a total of"))
+      .join("\n")
+  }
+
   const handleFileUpload = async (event) => {
     const file = event.target.files[0]
     if (file) {
@@ -33,15 +73,24 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
         })
 
         const formattedData = jsonData.map((row, rowIndex) => {
-          if (rowIndex === 0) return row
+          if (rowIndex === 0)
+            return row.map((cell) => safelyExtractCellValue(cell))
           return row.map((cell, cellIndex) => {
+            // Extract the cell value safely first
+            const cellValue = safelyExtractCellValue(cell)
+
+            // Then format dates if needed
             if (cellIndex === 0) {
-              return cell ? new Date(cell).toLocaleDateString("en-GB") : ""
+              return cellValue && !isNaN(new Date(cellValue))
+                ? new Date(cellValue).toLocaleDateString("en-GB")
+                : cellValue || ""
             }
             if (cellIndex === 1) {
-              return cell ? new Date(cell).toLocaleTimeString("en-GB") : ""
+              return cellValue && !isNaN(new Date(cellValue))
+                ? new Date(cellValue).toLocaleTimeString("en-GB")
+                : cellValue || ""
             }
-            return cell
+            return cellValue
           })
         })
 
@@ -71,6 +120,52 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
       }
 
       reader.readAsArrayBuffer(file)
+    }
+  }
+
+  // Helper function to safely extract the value from Excel cells
+  const safelyExtractCellValue = (cell) => {
+    if (cell === null || cell === undefined) {
+      return ""
+    }
+
+    // If cell is already a primitive value
+    if (
+      typeof cell === "string" ||
+      typeof cell === "number" ||
+      typeof cell === "boolean"
+    ) {
+      return cell
+    }
+
+    // If cell is a complex ExcelJS Cell object
+    if (typeof cell === "object") {
+      // Handle cells with formulas
+      if (cell.formula || cell.sharedFormula) {
+        return cell.result !== undefined ? cell.result : ""
+      }
+
+      // Handle cells with rich text
+      if (cell.richText) {
+        return cell.richText.map((rt) => rt.text).join("")
+      }
+
+      // Handle cells with a value property
+      if (cell.value !== undefined) {
+        return safelyExtractCellValue(cell.value)
+      }
+
+      // Handle Excel date serial numbers
+      if (cell.text && typeof cell.text === "string") {
+        return cell.text
+      }
+    }
+
+    // Convert the cell to a string as a fallback
+    try {
+      return String(cell)
+    } catch (e) {
+      return ""
     }
   }
 
@@ -203,44 +298,62 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   }
 
   const renderResultsView = () => {
+    let summaryFromLogs = ""
+
+    if (progressLogs.length > 0) {
+      for (const log of progressLogs) {
+        if (
+          log.message &&
+          log.message.includes("==== IMPORT PROCESS SUMMARY ====")
+        ) {
+          summaryFromLogs = formatLogSummary(log.message)
+          break
+        }
+      }
+    }
+
+    const displaySummary = summaryFromLogs || summaryMessage
+
     return (
       <div className="py-4">
         <div className="text-center">
           <div className="font-semibold text-xl mb-4">{uploadStatus}</div>
 
-          {/* Show success/error message */}
-          <div className="mb-6">
-            {uploadMessage.split("||").map((line, index) => (
-              <div key={index}>{line}</div>
-            ))}
-          </div>
+          {/* Success message removed - only show error messages */}
+          {!uploadStatus.includes("Success") && (
+            <div className="mb-6">
+              {uploadMessage.split("||").map((line, index) => (
+                <div key={index}>{line}</div>
+              ))}
+            </div>
+          )}
 
-          {/* Summary message box */}
-          {summaryMessage && (
+          {/* Summary message box - using displaySummary instead of summaryMessage */}
+          {displaySummary && (
             <div className="mt-4 bg-[#214A27] p-4 rounded-md font-mono text-sm overflow-x-auto border border-gray-300 shadow-sm max-w-2xl mx-auto">
-              {formatSummaryText(summaryMessage).map((line, index) => {
+              {formatSummaryText(displaySummary).map((line, index) => {
                 const isHeaderOrFooter = line.includes("====")
                 const isLabelValue = line.includes(":")
 
                 if (isHeaderOrFooter) {
                   return (
-                    <div key={index} className="text-white font-bold">
+                    <div
+                      key={index}
+                      className="text-white font-bold text-center">
                       {line}
                     </div>
                   )
                 } else if (isLabelValue) {
                   const [label, value] = line.split(":").map((s) => s.trim())
                   return (
-                    <div key={index} className="flex justify-between">
+                    <div key={index} className="flex justify-between text-left">
                       <span className="text-white font-medium">{label}:</span>
-                      <span className="text-[#D9D9D9] font-semibold">
-                        {value}
-                      </span>
+                      <span className="text-white font-semibold">{value}</span>
                     </div>
                   )
                 } else {
                   return (
-                    <div key={index} className="text-gray-800">
+                    <div key={index} className="text-white text-left">
                       {line}
                     </div>
                   )
@@ -263,17 +376,29 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
           {/* Display logs if enabled */}
           {showLogs && progressLogs.length > 0 && (
             <div className="mt-4 bg-[#D9D9D9] p-4 rounded-md overflow-y-auto max-h-80 max-w-4xl mx-auto">
-              {progressLogs.map((log, index) => (
-                <div key={index} className="text-sm border-b pb-1 mb-1 flex">
-                  <span className="mr-2 w-6">{log.status}</span>
-                  <div>
-                    <span className="font-medium">{log.message}</span>
-                    {log.detail && (
-                      <span className="text-[#214A27] ml-2">{log.detail}</span>
-                    )}
+              {progressLogs.map((log, index) => {
+                const isSectionHeader = log.message?.includes("===")
+
+                return (
+                  <div
+                    key={index}
+                    className={`text-sm border-b border-[#396847] pb-1 mb-1 flex text-gray-800 ${
+                      isSectionHeader ? "font-semibold" : ""
+                    }`}>
+                    {/* Remove the status/icon display */}
+                    <div className="flex-1">
+                      <span className={isSectionHeader ? "font-semibold" : ""}>
+                        {log.message}
+                      </span>
+                      {log.detail && (
+                        <span className="ml-2 text-[#214A27] text-xs">
+                          {log.detail}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
 

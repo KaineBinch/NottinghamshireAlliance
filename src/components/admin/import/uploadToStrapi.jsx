@@ -3,6 +3,44 @@ import axios from "axios"
 import { queryBuilder } from "../../../utils/queryBuilder"
 import { MODELS, QUERIES } from "../../../constants/api"
 
+const formatLogSummary = (originalSummary) => {
+  if (!originalSummary) return originalSummary
+
+  let lines = originalSummary.split("\n")
+  let totalGolfersProcessed = "0"
+
+  for (const line of lines) {
+    if (line.includes("For a total of") && line.includes("golfers processed")) {
+      const match = line.match(/For a total of (\d+) golfers processed/)
+      if (match && match[1]) {
+        totalGolfersProcessed = match[1]
+      }
+      break
+    }
+  }
+
+  const modifiedLines = lines.map((line) => {
+    if (line.includes("new golfer records")) {
+      return `- ${totalGolfersProcessed} golfers updated`
+    } else if (line.includes("Date(s):")) {
+      const dateMatch = line.match(/Date\(s\):\s*(\d{4}-\d{2}-\d{2})/)
+      if (dateMatch && dateMatch[1]) {
+        const isoDate = dateMatch[1]
+        const [year, month, day] = isoDate.split("-")
+        const formattedDate = `${day}/${month}/${year}`
+        return line.replace(isoDate, formattedDate)
+      }
+    } else if (line.includes("Records Created:")) {
+      return line.replace("Records Created:", "Records Processed:")
+    }
+    return line
+  })
+
+  return modifiedLines
+    .filter((line) => !line.includes("For a total of"))
+    .join("\n")
+}
+
 export const uploadToStrapi = async (
   csvData,
   setUploadProgress,
@@ -47,21 +85,73 @@ export const uploadToStrapi = async (
       console.log("Upload successful ✅")
       setUploadStatus("Success! ✅")
 
-      if (response.data.progressLogs && setProgressLogs) {
-        setProgressLogs(response.data.progressLogs)
-      } else if (response.data.logs) {
-        setProgressLogs(response.data.logs)
+      if (response.data.logs && setProgressLogs) {
+        const logTypeIcons = {
+          info: "ℹ️",
+          success: "✅",
+          warning: "⚠️",
+          error: "❌",
+          timing: "⏱️",
+        }
+
+        const formattedLogs = response.data.logs.map((log) => {
+          const newLog = { ...log }
+
+          if (
+            newLog.message &&
+            newLog.message.includes("==== IMPORT PROCESS SUMMARY ====")
+          ) {
+            newLog.message = formatLogSummary(newLog.message)
+          }
+
+          return {
+            status: logTypeIcons[newLog.type] || "•",
+            message: newLog.message,
+            detail: newLog.detail,
+            type: newLog.type,
+            timestamp: newLog.timestamp,
+          }
+        })
+
+        setProgressLogs(formattedLogs)
+
+        if (setSummaryMessage) {
+          const summaryLog = formattedLogs.find(
+            (log) =>
+              log.message &&
+              log.message.includes("==== IMPORT PROCESS SUMMARY ====")
+          )
+
+          if (summaryLog) {
+            setSummaryMessage(summaryLog.message)
+          }
+        }
       }
 
-      const executionTime =
-        response.data.executionTimeSeconds ||
-        response.data.executionTime ||
-        "N/A"
+      const created = response.data.created || {}
+      const totalCreated =
+        typeof created === "object"
+          ? (created.golfers || 0) +
+            (created.teeTimes || 0) +
+            (created.scores || 0)
+          : created || 0
+
       const messageLines = [
         `Upload Successful!`,
-        `Processed ${response.data.attempted} rows in ${executionTime} seconds.`,
-        `Created ${response.data.created} entries.`,
+        `Processed ${response.data.attempted || 0} rows in ${
+          response.data.executionTimeSeconds || "N/A"
+        } seconds.`,
       ]
+
+      if (typeof created === "object") {
+        messageLines.push(
+          `Created ${created.golfers || 0} golfers, ${
+            created.teeTimes || 0
+          } tee times, and ${created.scores || 0} scores.`
+        )
+      } else {
+        messageLines.push(`Created ${totalCreated} entries.`)
+      }
 
       if (response.data.updated) {
         messageLines.push(`Updated ${response.data.updated} entries.`)
@@ -78,20 +168,68 @@ export const uploadToStrapi = async (
       setUploadMessage(messageLines.join("||"))
 
       if (setSummaryMessage) {
-        const summaryText =
-          response.data.summaryText ||
-          `==== Import Process Summary ====
-Total time: ${executionTime} seconds
-Total rows processed: ${response.data.attempted || 0}
-Entries created: ${response.data.created || 0}
-Entries updated: ${response.data.updated || 0}
-Failed entries: ${response.data.failed || 0}
+        const summaryLogFound =
+          response.data.logs &&
+          response.data.logs.some(
+            (log) =>
+              log.message &&
+              log.message.includes("==== IMPORT PROCESS SUMMARY ====")
+          )
+
+        if (!summaryLogFound && !response.data.summaryText) {
+          const eventDates = response.data.eventDates || "Not specified"
+          const processedTimeSlots = response.data.processedTimeSlots || 0
+          const processedGolfers = response.data.processedGolfers || 0
+
+          let formattedEventDates = eventDates
+          if (
+            typeof eventDates === "string" &&
+            eventDates.match(/^\d{4}-\d{2}-\d{2}$/)
+          ) {
+            const [year, month, day] = eventDates.split("-")
+            formattedEventDates = `${day}/${month}/${year}`
+          } else if (Array.isArray(eventDates)) {
+            formattedEventDates = eventDates
+              .map((date) => {
+                if (
+                  typeof date === "string" &&
+                  date.match(/^\d{4}-\d{2}-\d{2}$/)
+                ) {
+                  const [year, month, day] = date.split("-")
+                  return `${day}/${month}/${year}`
+                }
+                return date
+              })
+              .join(", ")
+          }
+
+          const summaryText = `==== IMPORT PROCESS SUMMARY ====
+Import completed in ${response.data.executionTimeSeconds || "N/A"} seconds
+
+Event Information:
+- Date(s): ${formattedEventDates}
+- Total tee time slots: ${processedTimeSlots}
+
+Records Processed:
+- ${processedGolfers} golfers updated
+- ${
+            typeof created === "object" ? created.teeTimes || 0 : 0
+          } tee time assignments
+- ${typeof created === "object" ? created.scores || 0 : 0} score entries
 ===============================`
 
-        setSummaryMessage(summaryText)
+          setSummaryMessage(summaryText)
+        } else if (!summaryLogFound && response.data.summaryText) {
+          setSummaryMessage(formatLogSummary(response.data.summaryText))
+        }
       }
 
-      return response.data
+      return {
+        ...response.data,
+        created: totalCreated,
+        executionTimeSeconds: response.data.executionTimeSeconds,
+        attempted: response.data.attempted,
+      }
     } else {
       setUploadStatus("❌ Error")
       setUploadMessage(`🚩 Upload failed with status: ${response.status}`)
@@ -101,10 +239,35 @@ Failed entries: ${response.data.failed || 0}
     console.error("🚩 Error uploading CSV to Strapi:", error)
     setUploadStatus("❌ Error")
 
-    if (error.response?.data?.progressLogs && setProgressLogs) {
-      setProgressLogs(error.response.data.progressLogs)
-    } else if (error.response?.data?.logs) {
-      setProgressLogs(error.response.data.logs)
+    if (error.response?.data?.logs && setProgressLogs) {
+      const logTypeIcons = {
+        info: "ℹ️",
+        success: "✅",
+        warning: "⚠️",
+        error: "❌",
+        timing: "⏱️",
+      }
+
+      const formattedLogs = error.response.data.logs.map((log) => {
+        const newLog = { ...log }
+
+        if (
+          newLog.message &&
+          newLog.message.includes("==== IMPORT PROCESS SUMMARY ====")
+        ) {
+          newLog.message = formatLogSummary(newLog.message)
+        }
+
+        return {
+          status: logTypeIcons[newLog.type] || "•",
+          message: newLog.message,
+          detail: newLog.detail,
+          type: newLog.type,
+          timestamp: newLog.timestamp,
+        }
+      })
+
+      setProgressLogs(formattedLogs)
     }
 
     setUploadMessage(
@@ -123,7 +286,6 @@ export const CSVUploader = ({ initialData = [] }) => {
   const [progressLogs, setProgressLogs] = useState([])
   const [summaryMessage, setSummaryMessage] = useState("")
   const [showLogs, setShowLogs] = useState(false)
-  const [importStats, setImportStats] = useState(null)
 
   const handleUpload = async () => {
     if (csvData.length === 0) {
@@ -132,10 +294,9 @@ export const CSVUploader = ({ initialData = [] }) => {
     }
 
     setShowLogs(false)
-    setImportStats(null)
     setSummaryMessage("")
 
-    const response = await uploadToStrapi(
+    await uploadToStrapi(
       csvData,
       setUploadProgress,
       setUploadStatus,
@@ -143,15 +304,6 @@ export const CSVUploader = ({ initialData = [] }) => {
       setProgressLogs,
       setSummaryMessage
     )
-
-    if (response) {
-      setImportStats({
-        executionTime:
-          response.executionTimeSeconds || response.executionTime || "N/A",
-        rowsProcessed: response.attempted || 0,
-        entriesCreated: response.created || 0,
-      })
-    }
   }
 
   const renderProcessingState = () => {
@@ -227,45 +379,17 @@ export const CSVUploader = ({ initialData = [] }) => {
                   return (
                     <div key={index} className="flex justify-between">
                       <span className="text-white font-medium">{label}:</span>
-                      <span className="text-[#D9D9D9] font-semibold">
-                        {value}
-                      </span>
+                      <span className="text-white font-semibold">{value}</span>
                     </div>
                   )
                 } else {
                   return (
-                    <div key={index} className="text-gray-800">
+                    <div key={index} className="text-white">
                       {line}
                     </div>
                   )
                 }
               })}
-            </div>
-          )}
-
-          {importStats && (
-            <div className="mt-4 bg-[#f0f4f0] p-3 rounded-md border border-[#d2e0d2]">
-              <h3 className="font-medium text-[#214A27]">Import Statistics</h3>
-              <div className="grid grid-cols-3 gap-4 mt-2">
-                <div className="text-center p-2 bg-white rounded shadow-sm border border-gray-200">
-                  <div className="text-lg font-bold text-[#214A27]">
-                    {importStats.executionTime}s
-                  </div>
-                  <div className="text-sm text-gray-600">Total Time</div>
-                </div>
-                <div className="text-center p-2 bg-white rounded shadow-sm border border-gray-200">
-                  <div className="text-lg font-bold text-[#214A27]">
-                    {importStats.rowsProcessed}
-                  </div>
-                  <div className="text-sm text-gray-600">Rows Processed</div>
-                </div>
-                <div className="text-center p-2 bg-white rounded shadow-sm border border-gray-200">
-                  <div className="text-lg font-bold text-[#214A27]">
-                    {importStats.entriesCreated}
-                  </div>
-                  <div className="text-sm text-gray-600">Entries Created</div>
-                </div>
-              </div>
             </div>
           )}
 
