@@ -101,14 +101,40 @@ const FurtherResultsPage = () => {
     )
   }
 
-  const events = data.data || []
+  const events = data?.data || []
+
+  // Find the matching event by ID - using both string and number comparison to be safe
   const event = eventId
-    ? events.find((e) => e.id.toString() === eventId)
-    : events[1] || events[0]
+    ? events.find((e) => e.id.toString() === eventId.toString())
+    : null
+
+  // Debug the event search
+  console.log("Event ID from URL:", eventId)
+  console.log(
+    "Available event IDs:",
+    events.map((e) => e.id)
+  )
+  console.log("Found event:", event?.id, event?.golf_club?.clubName)
 
   if (!event) {
-    return <p className="text-center pt-[85px] text-xl">Event not found</p>
+    return (
+      <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-[85px] pb-[25px]">
+        <div className="bg-white shadow-md rounded-lg p-10 text-center">
+          <h1 className="text-3xl font-bold mb-6">Results Not Available</h1>
+          <p className="text-lg mb-4">
+            We don't have any results for this event yet.
+          </p>
+          <p className="text-gray-600">
+            Please check back later once the event has concluded and results
+            have been posted.
+          </p>
+        </div>
+      </div>
+    )
   }
+
+  // Debug the selected event
+  console.log("Selected Event:", event)
 
   const sortedScores = event.scores
     ? [...event.scores].sort((a, b) => b.golferEventScore - a.golferEventScore)

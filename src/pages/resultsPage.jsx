@@ -23,10 +23,8 @@ const ResultsPage = () => {
   const { isLoading, isError, data, error } = useFetch(query)
   const [showContent, setShowContent] = useState(false)
 
-  // Once data is loaded, allow a small delay before showing content
   useEffect(() => {
     if (!isLoading && data) {
-      // Short delay to ensure all card images start loading
       const timer = setTimeout(() => {
         setShowContent(true)
       }, 100)
@@ -40,7 +38,6 @@ const ResultsPage = () => {
     return <p className="pt-[85px]">Something went wrong...</p>
   }
 
-  // Filter past events once when data is available
   const pastEvents =
     data?.data.filter((event) => isDateInPast(event.eventDate)) || []
 
@@ -88,7 +85,6 @@ const ResultsPage = () => {
               </p>
             </div>
           ) : (
-            // Empty placeholder div while loading - maintains layout
             <div className="col-span-3 min-h-svh"></div>
           )}
         </div>

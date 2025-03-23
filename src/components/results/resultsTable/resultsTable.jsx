@@ -18,14 +18,26 @@ const ResultsTable = ({ limit }) => {
 
   const results = useMemo(() => {
     if (data?.data) {
-      const playerScores = data.data.reduce((acc, item) => {
-        const playerName = item?.golfer?.golferName || "Unknown Player"
-        const playerScore = item?.golferEventScore || 0
-        const clubName = item?.golfer?.golf_club?.clubName || "No Club"
-        const clubID = item?.golfer?.golf_club?.clubID || null
-        const isPro = item?.golfer?.isPro || false
-        const isSenior = item?.golfer?.isSenior || false
-        const eventDate = item?.event?.eventDate || "Unknown Date"
+      const validItems = data.data.filter(
+        (item) =>
+          item &&
+          item.golfer &&
+          item.golfer.golferName &&
+          item.event &&
+          item.event.eventDate &&
+          item.golferEventScore !== null &&
+          item.golferEventScore !== undefined
+      )
+
+      // Now process only the valid items
+      const playerScores = validItems.reduce((acc, item) => {
+        const playerName = item.golfer.golferName
+        const playerScore = item.golferEventScore
+        const clubName = item.golfer.golf_club?.clubName || "No Club"
+        const clubID = item.golfer.golf_club?.clubID || null
+        const isPro = item.golfer.isPro || false
+        const isSenior = item.golfer.isSenior || false
+        const eventDate = item.event.eventDate
 
         if (!acc[playerName]) {
           acc[playerName] = {

@@ -1,5 +1,4 @@
 const Spinner = ({ size = "md", color = "#214A27" }) => {
-  // Size mapping
   const sizeMap = {
     sm: "w-4 h-4",
     md: "w-6 h-6",
@@ -7,7 +6,6 @@ const Spinner = ({ size = "md", color = "#214A27" }) => {
     xl: "w-12 h-12",
   }
 
-  // Get the correct size class
   const sizeClass = sizeMap[size] || sizeMap.md
 
   return (

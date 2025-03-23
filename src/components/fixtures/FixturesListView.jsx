@@ -46,10 +46,8 @@ const FixturesListView = () => {
   const query = queryBuilder(MODELS.events, QUERIES.eventsQuery)
   const { isLoading, isError, data, error } = useFetch(query)
 
-  // Add a transition effect when content loads
   useEffect(() => {
     if (!isLoading && data) {
-      // Small delay to ensure smooth transition
       const timer = setTimeout(() => setContentVisible(true), 50)
       return () => clearTimeout(timer)
     }

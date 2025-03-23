@@ -17,9 +17,7 @@ const posthog = window.posthog || null
 
 if (posthog && import.meta.env.DEV) {
   posthog.debug(true)
-  console.log("PostHog debug mode enabled")
 }
-console.log("PostHog available:", !!posthog)
 
 if (posthog && import.meta.env.DEV) {
   try {

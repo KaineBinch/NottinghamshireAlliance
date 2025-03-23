@@ -1,10 +1,17 @@
 const ExpandedRowDetails = ({ result, isClubView }) => {
   const formatDate = (dateString) => {
     if (!dateString) return ""
+
+    // Try to parse the date
     const date = new Date(dateString)
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) return "Invalid Date"
+
     const day = date.getDate()
     const month = date.toLocaleString("default", { month: "short" })
 
+    // Get ordinal suffix for day
     let daySuffix = "th"
     if (day === 1 || day === 21 || day === 31) {
       daySuffix = "st"
@@ -18,8 +25,19 @@ const ExpandedRowDetails = ({ result, isClubView }) => {
   }
 
   if (isClubView) {
+    // Make sure we have valid data for club view
+    if (!result || !Array.isArray(result) || result.length === 0) {
+      return <div className="p-4 bg-[#FFFFFF]">No club data available.</div>
+    }
+
     const dateScores = result.reduce((acc, player) => {
+      // Make sure player and scores exist
+      if (!player || !player.scores || !Array.isArray(player.scores)) return acc
+
       player.scores.forEach(({ date, score }) => {
+        // Make sure we have valid date and score
+        if (!date || score === undefined || score === null) return
+
         if (!acc[date]) {
           acc[date] = []
         }
@@ -35,42 +53,94 @@ const ExpandedRowDetails = ({ result, isClubView }) => {
       top4DateScores[date] = top4Scores.reduce((sum, score) => sum + score, 0)
     }
 
-    const sortedDates = Object.keys(top4DateScores).sort()
+    const sortedDates = Object.keys(top4DateScores).sort((a, b) => {
+      return new Date(a) - new Date(b)
+    })
+
+    if (sortedDates.length === 0) {
+      return <div className="p-4 bg-[#FFFFFF]">No date scores available.</div>
+    }
 
     return (
       <div className="bg-[#D9D9D9] p-2">
         <div className="flex flex-wrap justify-center">
-          {sortedDates.map((date, index) => (
-            <div
-              key={index}
-              className="flex flex-col w-1/2 sm:w-1/4 md:w-1/6 lg:w-1/12 border border-gray-300 p-1 text-center bg-[#FFFFFF]">
-              <div className="font-semibold">{formatDate(date)}</div>{" "}
-              {/* Format date */}
-              <div>{top4DateScores[date]}</div>
-            </div>
-          ))}
+          {sortedDates.map((date, index) => {
+            // Format date safely
+            const formattedDate = formatDate(date)
+            if (!formattedDate) return null
+
+            return (
+              <div
+                key={index}
+                className="flex flex-col w-1/2 sm:w-1/4 md:w-1/6 lg:w-1/12 border border-gray-300 p-1 text-center bg-[#FFFFFF]">
+                <div className="font-semibold">{formattedDate}</div>
+                <div>{top4DateScores[date]}</div>
+              </div>
+            )
+          })}
         </div>
       </div>
     )
   } else {
-    if (!result || !result.scores) {
+    // Make sure we have valid player data
+    if (
+      !result ||
+      !result.scores ||
+      !Array.isArray(result.scores) ||
+      result.scores.length === 0
+    ) {
       return <div className="p-4 bg-[#FFFFFF]">No scores available.</div>
     }
-    const sortedScores = result.scores
-      .map((item) => parseInt(item.score, 10))
-      .sort((a, b) => b - a)
-      .slice(0, 10)
 
-    const highlightScores = [...sortedScores]
+    // Safely parse and sort scores
+    const validScores = result.scores.filter(
+      (item) =>
+        item && item.score !== undefined && item.score !== null && item.date
+    )
+
+    if (validScores.length === 0) {
+      return <div className="p-4 bg-[#FFFFFF]">No valid scores available.</div>
+    }
+
+    // Limit to max 15 most recent scores
+    const sortedByDate = [...validScores]
+      .sort((a, b) => {
+        const dateA = new Date(a.date)
+        const dateB = new Date(b.date)
+        return dateB - dateA // Most recent first
+      })
+      .slice(0, 15)
+
+    // Get the top scores (max 10)
+    const MAX_HIGHLIGHT_SCORES = 10
+    const topScores = [...validScores]
+      .map((item) => parseInt(item.score, 10))
+      .filter((score) => !isNaN(score))
+      .sort((a, b) => b - a)
+      .slice(0, MAX_HIGHLIGHT_SCORES)
+
+    // Create a copy for tracking which scores have been highlighted
+    const highlightScoresTracker = [...topScores]
 
     return (
       <div className="bg-[#D9D9D9] p-2">
         <div className="flex flex-wrap justify-center">
-          {result.scores.map((res, index) => {
+          {sortedByDate.map((res, index) => {
+            // Safely parse the score
             const score = parseInt(res.score, 10)
-            const isTopScore = highlightScores.includes(score)
+            if (isNaN(score)) return null
+
+            // Format date safely
+            const formattedDate = formatDate(res.date)
+            if (!formattedDate) return null
+
+            // Check if this is a top score that hasn't been highlighted yet
+            const scoreIndex = highlightScoresTracker.indexOf(score)
+            const isTopScore = scoreIndex !== -1
+
+            // If it's a top score, remove it from the tracker so we don't highlight duplicates
             if (isTopScore) {
-              highlightScores.splice(highlightScores.indexOf(score), 1)
+              highlightScoresTracker.splice(scoreIndex, 1)
             }
 
             return (
@@ -79,9 +149,8 @@ const ExpandedRowDetails = ({ result, isClubView }) => {
                 className={`flex flex-col w-1/2 sm:w-1/4 md:w-1/6 lg:w-1/12 border border-gray-300 p-1 text-center ${
                   isTopScore ? "bg-[#214A27] text-white" : "bg-white"
                 }`}>
-                <div className="font-semibold">{formatDate(res.date)}</div>{" "}
-                {/* Format date */}
-                <div>{res.score}</div>
+                <div className="font-semibold">{formattedDate}</div>
+                <div>{score}</div>
               </div>
             )
           })}

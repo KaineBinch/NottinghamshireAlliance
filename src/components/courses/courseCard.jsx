@@ -7,16 +7,14 @@ const CourseCard = ({ name, address, contact, link, courseImage, logo }) => {
   const [showLogo, setShowLogo] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
 
-  // Trigger the main animation once the component is mounted
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true)
-    }, 100) // Small delay to ensure DOM is ready
+    }, 100)
 
     return () => clearTimeout(timer)
   }, [])
 
-  // Handle logo transition after images are loaded
   useEffect(() => {
     if (mainImageLoaded && logoLoaded) {
       const timer = setTimeout(() => {
@@ -27,7 +25,6 @@ const CourseCard = ({ name, address, contact, link, courseImage, logo }) => {
     }
   }, [mainImageLoaded, logoLoaded])
 
-  // Base transition classes
   const fadeInClass = "transition-all duration-700 ease-in-out"
   const hiddenClass = "opacity-0 translate-y-4"
   const visibleClass = "opacity-100 translate-y-0"

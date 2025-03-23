@@ -5,38 +5,30 @@ const ResultsCard = ({ courseImage, name, comp, date }) => {
   const [cardReady, setCardReady] = useState(false)
   const [textReady, setTextReady] = useState(false)
 
-  // Preload the image
   useEffect(() => {
-    // Create a new image object to preload
     const img = new Image()
     img.src = courseImage
     img.onload = () => {
       setImageLoaded(true)
     }
     img.onerror = () => {
-      // Mark as loaded even on error, so we can display the card
       setImageLoaded(true)
     }
 
-    // Clean up
     return () => {
       img.onload = null
       img.onerror = null
     }
   }, [courseImage])
 
-  // Staggered animations - first card, then text
   useEffect(() => {
     if (imageLoaded) {
-      // First show the card structure
       const cardTimer = setTimeout(() => {
         setCardReady(true)
 
-        // Then show the text with delay
         const textTimer = setTimeout(() => {
           setTextReady(true)
-        }, 200) // 200ms after card appears
-
+        }, 200)
         return () => clearTimeout(textTimer)
       }, 100)
 
@@ -44,9 +36,8 @@ const ResultsCard = ({ courseImage, name, comp, date }) => {
     }
   }, [imageLoaded])
 
-  // Base transition classes
-  const fadeInClass = "transition-all duration-500 ease-in-out" // Faster for card
-  const textFadeClass = "transition-all duration-700 ease-in-out" // Slower for text
+  const fadeInClass = "transition-all duration-500 ease-in-out"
+  const textFadeClass = "transition-all duration-700 ease-in-out"
   const hiddenClass = "opacity-0 translate-y-4"
   const visibleClass = "opacity-100 translate-y-0"
 

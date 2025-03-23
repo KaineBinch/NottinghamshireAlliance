@@ -12,11 +12,10 @@ const FixtureCard = ({
   const [imageLoaded, setImageLoaded] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
 
-  // Trigger the animation once the component is mounted
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true)
-    }, 100) // Small delay to ensure DOM is ready
+    }, 100)
 
     return () => clearTimeout(timer)
   }, [])
@@ -77,7 +76,6 @@ const FixtureCard = ({
         ).toLocaleDateString("en-US", { weekday: "short" })
       : "Date To Be Confirmed"
 
-  // Base transition classes
   const fadeInClass = "transition-all duration-700 ease-in-out"
   const hiddenClass = "opacity-0 translate-y-4"
   const visibleClass = "opacity-100 translate-y-0"

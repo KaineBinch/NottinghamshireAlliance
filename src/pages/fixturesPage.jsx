@@ -9,13 +9,11 @@ import useFetch from "../utils/hooks/useFetch"
 import defaultImage from "../assets/background.jpg"
 
 const FixturesPage = () => {
-  // Get saved view preference from localStorage, default to false if none found
   const getSavedViewPreference = () => {
     try {
       const savedPreference = localStorage.getItem("fixturesListView")
       return savedPreference === "true"
     } catch (error) {
-      // In case localStorage is not available (e.g., incognito mode)
       return false
     }
   }
@@ -26,7 +24,6 @@ const FixturesPage = () => {
   const query = queryBuilder(MODELS.events, QUERIES.eventsQuery)
   const { isLoading, isError, data, error } = useFetch(query)
 
-  // Check for mobile device on mount
   useEffect(() => {
     const checkIfMobile = () => {
       if (window.innerWidth < 768) {
@@ -37,10 +34,8 @@ const FixturesPage = () => {
     checkIfMobile()
   }, [])
 
-  // Once data is loaded, allow a small delay before showing content
   useEffect(() => {
     if (!isLoading && data) {
-      // Short delay to ensure all card images start loading
       const timer = setTimeout(() => {
         setShowContent(true)
       }, 100)
@@ -49,12 +44,10 @@ const FixturesPage = () => {
     }
   }, [isLoading, data])
 
-  // Save view preference to localStorage whenever it changes
   useEffect(() => {
     try {
       localStorage.setItem("fixturesListView", isListView.toString())
     } catch (error) {
-      // Handle potential localStorage errors
       console.warn("Could not save view preference")
     }
   }, [isListView])
@@ -144,7 +137,6 @@ const FixturesPage = () => {
                 })}
               </div>
             ) : (
-              // Empty space while loading
               <div className="min-h-[500px] w-full max-w-5xl px-5"></div>
             )}
           </div>

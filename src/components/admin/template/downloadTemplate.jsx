@@ -34,7 +34,7 @@ const DownloadTemplateButton = ({
       cell.alignment = {
         horizontal: "center",
         vertical: "middle",
-        wrapText: true, // Add text wrapping for header cells
+        wrapText: true,
       }
       cell.fill = {
         type: "pattern",
@@ -114,19 +114,16 @@ const DownloadTemplateButton = ({
           cell.font = { name: "Aptos Narrow", size: 12 }
         }
 
-        // Add bottom border to all cells
         cell.border = {
           bottom: { style: "thin", color: { argb: "000000" } },
         }
 
-        // Add right border to the last column
         if (colIndex === 9) {
           cell.border.right = { style: "thin", color: { argb: "000000" } }
         }
       }
     })
 
-    // Add right border to the header of the last column
     worksheet.getCell(1, 9).border = {
       right: { style: "thin", color: { argb: "000000" } },
     }
