@@ -51,6 +51,8 @@ const ListView = () => {
 
     const sortedGrouped = Object.entries(grouped)
       .sort(([clubA], [clubB]) => {
+        if (clubA === "No Club") return 1
+        if (clubB === "No Club") return -1
         const nameA = clubNameLookup[clubA]?.toLowerCase() || ""
         const nameB = clubNameLookup[clubB]?.toLowerCase() || ""
         return nameA.localeCompare(nameB)
