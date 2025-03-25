@@ -5,6 +5,7 @@ import DownloadCSVFile from "../components/admin/import/downloadCSV"
 import TemplateCard from "../components/admin/template/TemplateCard"
 import CSVPreview from "../components/admin/import/csvPreview"
 import { useState, useEffect } from "react"
+import "./AdminPage.css"
 
 const AdminPage = () => {
   const { isAuthenticated, isLoading, loginWithPopup, logout } = useAuth0()
@@ -43,23 +44,21 @@ const AdminPage = () => {
     <>
       <PageHeader title="Admin" />
       {isAuthenticated && (
-        <div className="relative">
-          <button
-            className="absolute -mt-20 top-4 right-10 bg-[#214A27] text-white py-2 px-4 rounded hover:bg-green-600 transition duration-300"
-            onClick={handleLogout}>
+        <div className="logout-button-container">
+          <button className="logout-button" onClick={handleLogout}>
             Log Out
           </button>
         </div>
       )}
 
-      <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-black">
+      <div className="admin-container">
         {isAuthenticated && (
           <>
-            <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
-              <div className="flex-1 bg-[#214A27] p-6 rounded-lg shadow-lg">
+            <div className="card-layout">
+              <div className="card-container">
                 <TemplateCard />
               </div>
-              <div className="flex-1 bg-[#214A27] p-6 rounded-lg shadow-lg">
+              <div className="card-container">
                 <DownloadCSVFile
                   setCsvData={setCsvData}
                   setGroupedData={setGroupedData}
@@ -69,7 +68,7 @@ const AdminPage = () => {
             </div>
 
             {csvData.length > 0 && (
-              <div className="mt-6 bg-[#214A27] p-6 rounded-lg shadow-lg max-w-5xl">
+              <div className="csv-preview-container">
                 <CSVPreview csvData={csvData} groupedData={groupedData} />
               </div>
             )}
@@ -87,7 +86,7 @@ const AdminPage = () => {
                   console.error("Login failed", error)
                 )
               }}
-              className="text-blue-500 hover:underline cursor-pointer">
+              className="login-link">
               log in
             </a>{" "}
             to continue.

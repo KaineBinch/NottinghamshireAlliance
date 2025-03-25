@@ -1,0 +1,15 @@
+.page-background {
+  @apply bg-[#D9D9D9] min-h-[500px];
+}
+
+.gallery-container {
+  @apply max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-start;
+}
+
+.gallery-ease-in {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.page-divider {
+  @apply border-black;
+}

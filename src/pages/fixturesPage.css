@@ -1,0 +1,44 @@
+/* Loading and error states */
+.error-container {
+  @apply pt-[85px];
+}
+
+/* Description section */
+.description-section {
+  @apply bg-[#d9d9d9];
+}
+
+.description-container {
+  @apply max-w-5xl mx-auto py-5 px-4 sm:px-6 lg:px-8 text-start;
+}
+
+.description-paragraph {
+  @apply pt-5;
+}
+
+/* View toggle button */
+.view-toggle-container {
+  @apply flex justify-center;
+}
+
+.view-toggle-button {
+  @apply bg-[#214A27] text-white px-6 py-2 rounded-lg shadow-md -mb-4;
+}
+
+/* Card view container */
+.card-view-container {
+  @apply w-full pt-8;
+}
+
+.cards-container {
+  @apply flex flex-col items-center;
+}
+
+.card-grid {
+  @apply w-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5;
+}
+
+/* Loading placeholder */
+.loading-placeholder {
+  @apply min-h-[500px] w-full max-w-5xl px-5;
+}

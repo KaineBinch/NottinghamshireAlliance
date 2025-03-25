@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import PageHeader from "../components/pageHeader"
 import ImageGallery from "react-image-gallery"
 import "react-image-gallery/styles/css/image-gallery.css"
+import "./galleryPage.css" // Import the new CSS file
 import { API_URL, BASE_URL } from "../constants/api"
 import Spinner from "../components/helpers/spinner"
 
@@ -67,9 +68,9 @@ const GalleryPage = () => {
   return (
     <>
       <PageHeader title="Gallery" />
-      <hr className="border-black" />
-      <div className="bg-[#D9D9D9] min-h-[500px]">
-        <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-start">
+      <hr className="page-divider" />
+      <div className="page-background">
+        <div className="gallery-container">
           {isLoading ? (
             <Spinner size="xl" color="#214A27" />
           ) : showGallery ? (

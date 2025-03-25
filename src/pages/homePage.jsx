@@ -5,21 +5,22 @@ import Scroller from "../components/homepage/Scroller.jsx"
 import WelcomeSection from "../components/homepage/welcomeSection.jsx"
 import TeeTimesSection from "../components/homepage/teeTimeSection.jsx"
 import ResultsSection from "../components/homepage/resultsSection.jsx"
+import "./homePage.css" // Import the new CSS file
 
 const HomePage = () => {
   return (
     <>
-      <div className="flex flex-col w-full">
+      <div className="home-page-container">
         <WelcomeSection />
         <Scroller />
         <TeeTimesSection />
-        <hr className="border-black" />
+        <hr className="section-divider" />
         <ResultsSection />
-        <hr className="border-black" />
+        <hr className="section-divider" />
         <OOMSection />
-        <hr className="border-black" />
+        <hr className="section-divider" />
         <CoursesSection />
-        <hr className="border-black" />
+        <hr className="section-divider" />
         <FixturesSection />
       </div>
     </>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import "./notFound.css" // Import the new CSS file
 
 const INITIAL_REDIRECT_TIME = 10
 
@@ -22,29 +23,31 @@ const NotFound = () => {
   const styles = getStyles()
   return (
     <div
-      className="hero min-h-screen"
+      className="not-found-hero"
       style={{
         backgroundImage:
           "url(https://images.unsplash.com/photo-1602212096437-d0af1ce0553e?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)",
       }}>
-      <div className="hero-overlay bg-opacity-30"></div>
-      <div className="hero-content text-center text-neutral-content">
-        <div className="max-w-md">
-          <h1 className="text-8xl font-bold">404</h1>
-          <p className="mb-10">Looks like that page isn{"'"}t available</p>
+      <div className="hero-background-overlay"></div>
+      <div className="hero-content-wrapper">
+        <div className="not-found-content">
+          <h1 className="page-title">404</h1>
+          <p className="page-subtitle">
+            Looks like that page isn{"'"}t available
+          </p>
           <div
             style={styles.progressBar}
             className="h-16 -mb-16 bg-secondary"
           />
-          <div className="h-16 w-[245px] relative bg-black p-1 border-double border-4 border-secondary bg-opacity-60">
+          <div className="countdown-container">
             <p>
               Automatically sending you home in:{" "}
-              <span className="countdown mt-1">
+              <span className="countdown-text">
                 <span style={{ "--value": redirectTime }}></span>
               </span>
               s
             </p>
-            <a href="/" className="btn mt-8">
+            <a href="/" className="home-button">
               Take me home now!
             </a>
           </div>

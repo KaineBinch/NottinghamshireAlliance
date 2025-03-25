@@ -5,6 +5,7 @@ import { BASE_URL, MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
 import { useState, useEffect } from "react"
+import "./resultsPage.css" // Import the new CSS file
 
 const formatDate = (dateString) => {
   if (!dateString) return null
@@ -35,7 +36,7 @@ const ResultsPage = () => {
 
   if (isError) {
     console.error("Error:", error)
-    return <p className="pt-[85px]">Something went wrong...</p>
+    return <p className="error-message">Something went wrong...</p>
   }
 
   const pastEvents =
@@ -44,25 +45,25 @@ const ResultsPage = () => {
   return (
     <>
       <PageHeader title="Results" />
-      <hr className="border-black" />
-      <div className="bg-[#d9d9d9]">
-        <div className="max-w-5xl mx-auto py-5 px-4 sm:px-6 lg:px-8 text-start">
+      <hr className="page-divider" />
+      <div className="content-background">
+        <div className="content-container">
           <p>
             Check out the latest results below, highlighting top performers in
             both the individual and club categories.
           </p>
         </div>
-        <hr className="border-black" />
+        <hr className="page-divider" />
       </div>
 
-      <div className="flex flex-col items-center">
-        <div className="w-auto max-w-5xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5 py-10">
+      <div className="results-wrapper">
+        <div className="results-grid">
           {showContent && pastEvents.length > 0 ? (
             pastEvents.map((event) => (
               <Link
                 to={`/results/${event.id}`}
                 key={event.id}
-                className="hover:opacity-80 transition">
+                className="results-card-link">
                 <ResultsCard
                   name={event.golf_club?.clubName || "Event"}
                   courseImage={
@@ -76,16 +77,14 @@ const ResultsPage = () => {
               </Link>
             ))
           ) : showContent && pastEvents.length === 0 ? (
-            <div className="col-span-3 text-center py-10">
-              <p className="text-lg font-medium text-gray-800">
-                No results available yet
-              </p>
-              <p className="text-sm text-gray-600 mt-2">
+            <div className="no-results-container">
+              <p className="no-results-title">No results available yet</p>
+              <p className="no-results-subtitle">
                 Check back soon for upcoming event results
               </p>
             </div>
           ) : (
-            <div className="col-span-3 min-h-svh"></div>
+            <div className="empty-state"></div>
           )}
         </div>
       </div>

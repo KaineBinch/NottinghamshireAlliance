@@ -1,0 +1,136 @@
+/* Page container */
+.page-container {
+  @apply max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-[85px] pb-[25px];
+}
+
+/* Content card */
+.content-card {
+  @apply bg-white shadow-md rounded-lg p-6 pb-[25px];
+}
+
+/* Loading and error states */
+.loading-container {
+  @apply text-center pt-[85px] text-xl;
+}
+
+.error-container {
+  @apply text-center pt-[85px] text-xl;
+}
+
+/* Not found container */
+.not-found-container {
+  @apply bg-white shadow-md rounded-lg p-10 text-center;
+}
+
+.not-found-title {
+  @apply text-3xl font-bold mb-6;
+}
+
+.not-found-message {
+  @apply text-lg mb-4;
+}
+
+.not-found-secondary {
+  @apply text-gray-600;
+}
+
+/* Header */
+.event-header {
+  @apply mb-[25px];
+}
+
+.event-title {
+  @apply text-3xl font-bold mt-[20px];
+}
+
+.event-type {
+  @apply text-xl my-[10px];
+}
+
+.event-date {
+  @apply pb-[10px];
+}
+
+/* Expandable text */
+.expandable-text-container {
+  @apply px-5 my-[25px] text-start flex flex-col;
+}
+
+.expandable-text-wrapper {
+  @apply relative;
+}
+
+.expandable-text {
+  @apply overflow-clip;
+}
+
+.expandable-text-collapsed {
+  @apply line-clamp-4;
+}
+
+.expandable-text-expanded {
+  @apply line-clamp-none;
+}
+
+.expand-button {
+  @apply font-bold text-[#214A27] mt-1 inline-block;
+}
+
+/* Tabs navigation */
+.tabs-navigation {
+  @apply mb-[50px] flex justify-center;
+}
+
+.tab-button {
+  @apply md:px-4 py-2 font-semibold text-sm md:text-lg flex items-center mx-3;
+}
+
+.tab-button-active {
+  @apply text-[#214A27] border-b-2 border-[#214A27];
+}
+
+.tab-button-inactive {
+  @apply text-gray-700 hover:text-[#214A27];
+}
+
+.tab-icon {
+  @apply mr-2;
+}
+
+/* Results table */
+.results-table-container {
+  @apply overflow-x-auto text-sm md:text-lg;
+}
+
+.results-table {
+  @apply w-full border-collapse;
+}
+
+.results-table-header {
+  @apply bg-[#214A27] text-white;
+}
+
+.results-table-header-cell {
+  @apply border p-2 text-center;
+}
+
+.results-table-row-even {
+  @apply bg-white;
+}
+
+.results-table-row-odd {
+  @apply bg-gray-50;
+}
+
+.results-table-cell {
+  @apply border p-2;
+}
+
+/* Team results */
+.team-title {
+  @apply text-xl text-start font-semibold my-4;
+}
+
+.team-divider {
+  @apply h-6;
+}

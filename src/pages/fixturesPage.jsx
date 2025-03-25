@@ -7,6 +7,7 @@ import { queryBuilder } from "../utils/queryBuilder"
 import { BASE_URL, MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import defaultImage from "../assets/background.jpg"
+import "./FixturesPage.css"
 
 const FixturesPage = () => {
   const getSavedViewPreference = () => {
@@ -54,7 +55,7 @@ const FixturesPage = () => {
 
   if (isError) {
     console.error("Error:", error)
-    return <p className="pt-[85px]">Something went wrong...</p>
+    return <p className="error-container">Something went wrong...</p>
   }
 
   const sortedData = (data?.data || []).sort((a, b) => {
@@ -70,13 +71,13 @@ const FixturesPage = () => {
     <>
       <PageHeader title="Fixtures" />
       <hr className="border-black" />
-      <div className="bg-[#d9d9d9]">
-        <div className="max-w-5xl mx-auto py-5 px-4 sm:px-6 lg:px-8 text-start">
+      <div className="description-section">
+        <div className="description-container">
           <p>
             Welcome to this year{"'"}s fixture list. Here, you{"'"}ll find all
             the upcoming events and match dates for the season.
           </p>
-          <p className="pt-5">
+          <p className="description-paragraph">
             Stay ahead by planning your schedule around these key fixtures. Make
             sure not to miss out on any of the action!
           </p>
@@ -84,10 +85,10 @@ const FixturesPage = () => {
         <hr className="border-black" />
       </div>
 
-      <div className="flex justify-center pt-4">
+      <div className="view-toggle-container">
         <button
           onClick={() => setIsListView(!isListView)}
-          className="bg-[#214A27] text-white px-6 mt-5 py-2 rounded-lg shadow-md -mb-4">
+          className="view-toggle-button">
           {isListView ? "Switch to Card View" : "Switch to List View"}
         </button>
       </div>
@@ -99,10 +100,10 @@ const FixturesPage = () => {
           <FixturesListView />
         )
       ) : (
-        <div className="w-full pt-8">
-          <div className="flex flex-col items-center">
+        <div className="card-view-container">
+          <div className="cards-container">
             {showContent && !isLoading ? (
-              <div className="w-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5">
+              <div className="card-grid">
                 {sortedData?.map((club) => {
                   const clubName = club.golf_club
                     ? `${club.golf_club.clubName} Golf Club`
@@ -137,7 +138,7 @@ const FixturesPage = () => {
                 })}
               </div>
             ) : (
-              <div className="min-h-[500px] w-full max-w-5xl px-5"></div>
+              <div className="loading-placeholder"></div>
             )}
           </div>
         </div>

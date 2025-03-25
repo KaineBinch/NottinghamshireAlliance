@@ -1,0 +1,26 @@
+/* Loading and error states */
+.error-container {
+  @apply pt-[85px];
+}
+
+/* Description section */
+.description-section {
+  @apply bg-[#D9D9D9] mb-8;
+}
+
+.description-container {
+  @apply max-w-5xl mx-auto py-5 px-4 sm:px-6 lg:px-8 text-start;
+}
+
+.description-paragraph {
+  @apply pt-5;
+}
+
+/* Course list section */
+.courses-section {
+  @apply bg-[#D9D9D9];
+}
+
+.courses-container {
+  @apply max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8;
+}

@@ -1,0 +1,33 @@
+/* Main container */
+.admin-container {
+  @apply max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-black;
+}
+
+/* Logout button */
+.logout-button-container {
+  @apply relative;
+}
+
+.logout-button {
+  @apply absolute -mt-20 top-4 right-10 bg-[#214A27] text-white py-2 px-4 rounded hover:bg-green-600 transition duration-300;
+}
+
+/* Card layout */
+.card-layout {
+  @apply flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0;
+}
+
+/* Card containers */
+.card-container {
+  @apply flex-1 bg-[#214A27] p-6 rounded-lg shadow-lg;
+}
+
+/* CSV preview container */
+.csv-preview-container {
+  @apply mt-6 bg-[#214A27] p-6 rounded-lg shadow-lg max-w-5xl;
+}
+
+/* Login prompt */
+.login-link {
+  @apply text-blue-500 hover:underline cursor-pointer;
+}
