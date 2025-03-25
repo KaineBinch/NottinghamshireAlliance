@@ -9,10 +9,10 @@ const Spinner = ({ size = "md", color = "#214A27" }) => {
   const sizeClass = sizeMap[size] || sizeMap.md
 
   return (
-    <div className="flex items-center justify-center w-full py-8">
+    <div className="inline-block ml-3">
       <div
-        className={`inline-block ${sizeClass} animate-spin rounded-full border-4 border-solid border-gray-200`}
-        style={{ borderTopColor: color }}
+        className={`${sizeClass} animate-spin rounded-full border-4 border-solid `}
+        style={{ borderColor: "rgba(33, 74, 39, 0.25)", borderTopColor: color }}
         role="status">
         <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
           Please Wait
