@@ -3,6 +3,7 @@ import { queryBuilder } from "../../utils/queryBuilder"
 import { MODELS, QUERIES } from "../../constants/api"
 import useFetch from "../../utils/hooks/useFetch"
 import { getNextEventDate } from "../../utils/getNextEventDate"
+import "./teeTimeListView.css"
 
 const ListView = () => {
   const [teeTimesData, setTeeTimesData] = useState([])
@@ -70,6 +71,7 @@ const ListView = () => {
 
     return sortedGrouped
   }, [teeTimesData, clubNameLookup])
+
   const formatTime = (time) => {
     if (!time || !time.includes(":")) return "Invalid Time"
     const [hours, minutes] = time.split(":")
@@ -77,34 +79,28 @@ const ListView = () => {
   }
 
   if (isLoading) {
-    return <p className="pt-[85px]"></p>
+    return <p className="loading-container"></p>
   }
 
   if (isError) {
     console.error("Error:", error)
-    return <p className="pt-[85px]">Something went wrong...</p>
+    return <p className="error-message">Something went wrong...</p>
   }
 
   return (
-    <div className="w-full flex justify-center">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl w-full">
+    <div className="list-view-container">
+      <div className="list-view-grid">
         {Object.entries(groupedByClub).map(([clubID, players], index) => (
-          <div
-            key={index}
-            className="border border-gray-400 shadow-md bg-[#d9d9d9]">
-            <div className="bg-[#214A27] text-white text-center p-4 ">
-              <h3 className="text-xl font-semibold">
-                {clubNameLookup[clubID] || clubID}
-              </h3>
+          <div key={index} className="club-card">
+            <div className="club-header">
+              <h3 className="club-title">{clubNameLookup[clubID] || clubID}</h3>
             </div>
-            <div className="p-4">
+            <div className="players-container">
               <ul>
                 {players.map((player, playerIndex) => (
-                  <li
-                    key={playerIndex}
-                    className="mb-2 text-gray-700 font-semibold">
+                  <li key={playerIndex} className="player-item">
                     {player.name} -{" "}
-                    <span className="font-medium">
+                    <span className="player-time">
                       {formatTime(player.time)}
                     </span>
                   </li>

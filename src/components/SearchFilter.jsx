@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react"
+import "./searchFilter.css"
 
 const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
   const [searchQuery, setSearchQuery] = useState("")
@@ -30,15 +31,15 @@ const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
   }, [filteredData, onFilteredDataChange, data])
 
   return (
-    <div className="flex flex-col mb-4 p-4 border border-gray-300">
+    <div className="filter-container">
       {/* Search by Name */}
-      <div className="mb-4">
+      <div className="search-group">
         <input
           type="text"
           placeholder="Search for a name..."
           value={searchQuery}
           onChange={handleSearchChange}
-          className="p-2 border border-gray-300 w-full placeholder-gray-500 text-base h-12 rounded-none"
+          className="input-field"
         />
       </div>
 
@@ -47,7 +48,7 @@ const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
         <select
           value={clubQuery}
           onChange={handleClubChange}
-          className="p-2 border border-gray-300 w-full placeholder-gray-500 text-base h-12 rounded-none">
+          className="select-field">
           <option value="">Select a club...</option>
           {uniqueClubs.map((club, index) => (
             <option key={index} value={club.toLowerCase()}>

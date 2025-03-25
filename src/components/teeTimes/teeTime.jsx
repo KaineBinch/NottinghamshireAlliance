@@ -4,6 +4,7 @@ import { MODELS, QUERIES } from "../../constants/api"
 import useFetch from "../../utils/hooks/useFetch"
 import SearchFilter from "../SearchFilter"
 import { getNextEventDate } from "../../utils/getNextEventDate"
+import "./teeTime.css" // Import the CSS file
 
 const TeeTimesTable = () => {
   const [filteredTeeTimes, setFilteredTeeTimes] = useState([])
@@ -72,11 +73,11 @@ const TeeTimesTable = () => {
   }, [filteredTeeTimes, teeTimesData])
 
   if (isLoading) {
-    return <p className="pt-[85px]"></p>
+    return <p className="loading-container"></p>
   }
   if (isError) {
     console.error("Error:", error)
-    return <p className="pt-[85px]">Something went wrong...</p>
+    return <p className="error-message">Something went wrong...</p>
   }
 
   const formatTime = (time) => {
@@ -88,9 +89,9 @@ const TeeTimesTable = () => {
   const displayData = sortedTeeTimes.length >= 0 ? sortedTeeTimes : teeTimesData
 
   return (
-    <div className="w-full">
+    <div className="teetimes-container">
       {/* Search Filter */}
-      <div className="mb-4">
+      <div className="search-filter-container">
         <SearchFilter
           data={searchFilterData}
           onFilteredDataChange={handleFilteredDataChange}
@@ -101,33 +102,31 @@ const TeeTimesTable = () => {
 
       {/* Tee Times List */}
       {displayData.length === 0 ? (
-        <div>
-          <p className="font-bold text-xl">No results found</p>
-          <p className="text-lg">Please check the name and try</p>
+        <div className="no-results-container">
+          <p className="no-results-heading">No results found</p>
+          <p className="no-results-message">Please check the name and try</p>
         </div>
       ) : (
-        <div className="grid l:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4 w-full drop-shadow-sm">
+        <div className="teetimes-grid">
           {displayData.map((teeTime, index) => (
-            <div
-              key={index}
-              className="col-span-1 border border-gray-400 bg-[#D9D9D9] drop-shadow">
-              <div className="p-2 border-b border-gray-300 text-white bg-[#214A27]">
-                <h2 className="text-lg font-semibold">
+            <div key={index} className="teetime-card">
+              <div className="teetime-header">
+                <h2 className="teetime-time">
                   {formatTime(teeTime.golferTeeTime) || "No Time Available"}
                 </h2>
               </div>
-              <div className="p-1">
-                <div className="grid md:grid-cols-2 grid-cols-1">
+              <div className="teetime-body">
+                <div className="players-grid">
                   {teeTime.golfers?.map((player, playerIndex) => (
-                    <div key={playerIndex} className="p-2">
+                    <div key={playerIndex} className="player-container">
                       <p>
                         <span>{player?.golferName || "Unnamed Player"}</span>
-                        <span className="ml-2 text-sm text-gray-500">
+                        <span className="player-club">
                           {player?.golf_club?.clubName || "No Club"}
                         </span>
                       </p>
                       {player?.isSenior && (
-                        <p className="text-sm text-red-500">Senior</p>
+                        <p className="player-senior-tag">Senior</p>
                       )}
                     </div>
                   ))}
