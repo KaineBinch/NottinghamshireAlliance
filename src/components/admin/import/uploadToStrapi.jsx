@@ -48,7 +48,8 @@ export const uploadToStrapi = async (
   setUploadStatus,
   setUploadMessage,
   setProgressLogs,
-  setSummaryMessage
+  setSummaryMessage,
+  setErrorLogs = null
 ) => {
   const userConfirmed = window.confirm(
     "Are you sure you want to make these changes? Your changes cannot be undone."
@@ -65,6 +66,10 @@ export const uploadToStrapi = async (
 
     if (setProgressLogs) {
       setProgressLogs([])
+    }
+
+    if (setErrorLogs) {
+      setErrorLogs([])
     }
 
     const blob = csvData.map((row) => row.join(",")).join("\n")
@@ -116,6 +121,14 @@ export const uploadToStrapi = async (
 
         setProgressLogs(formattedLogs)
 
+        // Collect error and warning logs
+        if (setErrorLogs) {
+          const errors = formattedLogs.filter(
+            (log) => log.type === "error" || log.type === "warning"
+          )
+          setErrorLogs(errors)
+        }
+
         if (setSummaryMessage) {
           const summaryLog = formattedLogs.find(
             (log) =>
@@ -137,8 +150,21 @@ export const uploadToStrapi = async (
             (created.scores || 0)
           : created || 0
 
+      // Calculate error counts if applicable
+      const errorCount = response.data.logs
+        ? response.data.logs.filter((log) => log.type === "error").length
+        : 0
+      const warningCount = response.data.logs
+        ? response.data.logs.filter((log) => log.type === "warning").length
+        : 0
+
+      let statusLabel = "Upload Successful!"
+      if (errorCount > 0 || warningCount > 0) {
+        statusLabel = "Upload Completed with Issues"
+      }
+
       const messageLines = [
-        `Upload Successful!`,
+        statusLabel,
         `Processed ${response.data.attempted || 0} rows in ${
           response.data.executionTimeSeconds || "N/A"
         } seconds.`,
@@ -162,9 +188,15 @@ export const uploadToStrapi = async (
         messageLines.push(`Failed entries: ${response.data.failed}`)
       }
 
-      messageLines.push(
-        `The data has been successfully imported to the database.`
-      )
+      if (errorCount > 0 || warningCount > 0) {
+        messageLines.push(
+          `Import completed with ${errorCount} errors and ${warningCount} warnings.`
+        )
+      } else {
+        messageLines.push(
+          `The data has been successfully imported to the database.`
+        )
+      }
 
       setUploadMessage(messageLines.join("||"))
 
@@ -204,7 +236,7 @@ export const uploadToStrapi = async (
               .join(", ")
           }
 
-          const summaryText = `==== IMPORT PROCESS SUMMARY ====
+          let summaryText = `==== IMPORT PROCESS SUMMARY ====
 Import completed in ${response.data.executionTimeSeconds || "N/A"} seconds
 
 Event Information:
@@ -217,7 +249,18 @@ Records Processed:
             typeof created === "object" ? created.teeTimes || 0 : 0
           } tee time assignments
 - ${typeof created === "object" ? created.scores || 0 : 0} score entries
-===============================`
+`
+
+          // Add issues summary if there are errors or warnings
+          if (errorCount > 0 || warningCount > 0) {
+            summaryText += `
+Issues Found:
+- ${errorCount} errors
+- ${warningCount} warnings
+`
+          }
+
+          summaryText += `===============================`
 
           setSummaryMessage(summaryText)
         } else if (!summaryLogFound && response.data.summaryText) {
@@ -269,6 +312,14 @@ Records Processed:
       })
 
       setProgressLogs(formattedLogs)
+
+      // Collect error logs
+      if (setErrorLogs) {
+        const errors = formattedLogs.filter(
+          (log) => log.type === "error" || log.type === "warning"
+        )
+        setErrorLogs(errors)
+      }
     }
 
     setUploadMessage(
@@ -285,6 +336,7 @@ export const CSVUploader = ({ initialData = [] }) => {
   const [uploadStatus, setUploadStatus] = useState("")
   const [uploadMessage, setUploadMessage] = useState("")
   const [progressLogs, setProgressLogs] = useState([])
+  const [errorLogs, setErrorLogs] = useState([])
   const [summaryMessage, setSummaryMessage] = useState("")
   const [showLogs, setShowLogs] = useState(false)
 
@@ -296,6 +348,7 @@ export const CSVUploader = ({ initialData = [] }) => {
 
     setShowLogs(false)
     setSummaryMessage("")
+    setErrorLogs([])
 
     await uploadToStrapi(
       csvData,
@@ -303,7 +356,8 @@ export const CSVUploader = ({ initialData = [] }) => {
       setUploadStatus,
       setUploadMessage,
       setProgressLogs,
-      setSummaryMessage
+      setSummaryMessage,
+      setErrorLogs
     )
   }
 
@@ -317,6 +371,14 @@ export const CSVUploader = ({ initialData = [] }) => {
       )
     }
     return uploadMessage
+  }
+
+  const formatSummaryText = (text) => {
+    if (!text) return []
+    return text
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
   }
 
   return (
@@ -343,6 +405,17 @@ export const CSVUploader = ({ initialData = [] }) => {
               <div
                 className="bg-[#214A27] h-2.5 rounded-full"
                 style={{ width: `${uploadProgress}%` }}></div>
+            </div>
+          )}
+
+          {/* Error/Warning counts if any */}
+          {errorLogs.length > 0 && (
+            <div className="mt-4 mb-2 text-center">
+              <span className="inline-block px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">
+                {errorLogs.filter((log) => log.type === "error").length} Errors
+                / {errorLogs.filter((log) => log.type === "warning").length}{" "}
+                Warnings
+              </span>
             </div>
           )}
 
@@ -379,25 +452,59 @@ export const CSVUploader = ({ initialData = [] }) => {
           )}
 
           {/* Only show the logs button if there are logs to show */}
-          {progressLogs.length > 0 && (
-            <div className="mt-4">
+          <div className="mt-4 flex justify-center space-x-4">
+            {progressLogs.length > 0 && (
               <button
                 onClick={() => setShowLogs(!showLogs)}
                 className="text-[#214A27] hover:text-[#183a1f] underline text-sm">
                 {showLogs ? "Hide Detailed Logs" : "Show Detailed Logs"}
               </button>
+            )}
+            {errorLogs.length > 0 && (
+              <button
+                onClick={() => setShowLogs(true)}
+                className="text-red-600 hover:text-red-800 underline text-sm">
+                View Issues ({errorLogs.length})
+              </button>
+            )}
+          </div>
+
+          {/* Display logs if enabled */}
+          {showLogs && progressLogs.length > 0 && (
+            <div className="mt-4 bg-[#D9D9D9] p-4 rounded-md overflow-y-auto max-h-80">
+              {progressLogs.map((log, index) => {
+                const isSectionHeader = log.message?.includes("===")
+                const isError = log.type === "error"
+                const isWarning = log.type === "warning"
+
+                return (
+                  <div
+                    key={index}
+                    className={`text-sm border-b border-[#396847] pb-1 mb-1 flex ${
+                      isError
+                        ? "text-red-600"
+                        : isWarning
+                        ? "text-yellow-700"
+                        : "text-gray-800"
+                    } ${isSectionHeader ? "font-semibold" : ""}`}>
+                    <div className="mr-2 w-6 text-center">{log.status}</div>
+                    <div className="flex-1">
+                      <span className={isSectionHeader ? "font-semibold" : ""}>
+                        {log.message}
+                      </span>
+                      {log.detail && (
+                        <span className="ml-2 text-[#214A27] text-xs">
+                          {log.detail}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           )}
         </div>
       )}
     </div>
   )
-}
-
-const formatSummaryText = (text) => {
-  if (!text) return []
-  return text
-    .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0)
 }

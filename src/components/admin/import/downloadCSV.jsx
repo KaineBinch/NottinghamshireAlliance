@@ -13,7 +13,9 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   const [progressLogs, setProgressLogs] = useState([])
   const [summaryMessage, setSummaryMessage] = useState("")
   const [showLogs, setShowLogs] = useState(false)
+  const [fileInputKey, setFileInputKey] = useState(Date.now())
   const [view, setView] = useState("upload") // "upload", "processing", "results"
+  const [errorLogs, setErrorLogs] = useState([])
 
   const formatLogSummary = (originalSummary) => {
     if (!originalSummary) return originalSummary
@@ -195,6 +197,7 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   const handleUploadToStrapi = async () => {
     try {
       setProgressLogs([])
+      setErrorLogs([])
       setSummaryMessage("")
       setShowLogs(false)
       setView("processing")
@@ -205,7 +208,8 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
         setUploadStatus,
         setUploadMessage,
         setProgressLogs,
-        setSummaryMessage
+        setSummaryMessage,
+        setErrorLogs // Pass setErrorLogs to collect errors
       )
 
       setView("results")
@@ -220,6 +224,13 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   const handleReset = () => {
     setView("upload")
     setUploadProgress(0)
+    setFileName("")
+    setCsvData([])
+    setGroupedData({})
+    setProgressLogs([])
+    setErrorLogs([])
+    setSummaryMessage("")
+    setFileInputKey(Date.now())
   }
 
   const renderProcessingMessage = () => {
@@ -246,7 +257,11 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
           Import Your Excel File
         </h2>
 
-        <FileUpload onFileUpload={handleFileUpload} />
+        <FileUpload
+          onFileUpload={handleFileUpload}
+          key={fileInputKey}
+          resetFileName={!fileName}
+        />
         {fileName && (
           <div>
             {/* Download CSV button */}
@@ -299,6 +314,12 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
 
     const displaySummary = summaryFromLogs || summaryMessage
 
+    // Count errors and warnings from errorLogs
+    const errorCount = errorLogs.filter((log) => log.type === "error").length
+    const warningCount = errorLogs.filter(
+      (log) => log.type === "warning"
+    ).length
+
     return (
       <div className="py-4">
         <div className="text-center">
@@ -310,6 +331,22 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
               {uploadMessage.split("||").map((line, index) => (
                 <div key={index}>{line}</div>
               ))}
+            </div>
+          )}
+
+          {/* Error/Warning counts if any */}
+          {(errorCount > 0 || warningCount > 0) && (
+            <div className="mt-4 mb-2">
+              {errorCount > 0 && (
+                <span className="inline-block mx-1 px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">
+                  {errorCount} {errorCount === 1 ? "Error" : "Errors"}
+                </span>
+              )}
+              {warningCount > 0 && (
+                <span className="inline-block mx-1 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm">
+                  {warningCount} {warningCount === 1 ? "Warning" : "Warnings"}
+                </span>
+              )}
             </div>
           )}
 
@@ -347,22 +384,31 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
             </div>
           )}
 
-          {/* Log toggle button */}
-          {progressLogs.length > 0 && (
-            <div className="mt-5">
+          {/* Log toggle buttons */}
+          <div className="mt-5 space-x-4">
+            {progressLogs.length > 0 && (
               <button
                 onClick={() => setShowLogs(!showLogs)}
                 className="text-[#214A27] underline font-semibold">
                 {showLogs ? "Hide All Logs" : "Show All Logs"}
               </button>
-            </div>
-          )}
+            )}
+            {errorLogs.length > 0 && (
+              <button
+                onClick={() => setShowLogs(true)}
+                className="text-red-600 hover:text-red-800 underline text-sm">
+                View Issues ({errorLogs.length})
+              </button>
+            )}
+          </div>
 
           {/* Display logs if enabled */}
           {showLogs && progressLogs.length > 0 && (
             <div className="mt-4 bg-[#D9D9D9] p-4 rounded-md overflow-y-auto max-h-80 max-w-4xl mx-auto">
               {progressLogs.map((log, index) => {
                 const isSectionHeader = log.message?.includes("===")
+                const isError = log.type === "error"
+                const isWarning = log.type === "warning"
 
                 return (
                   <div
@@ -370,8 +416,18 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
                     className={`text-sm border-b border-[#396847] pb-1 mb-1 flex text-gray-800 ${
                       isSectionHeader ? "font-semibold" : ""
                     }`}>
-                    {/* Remove the status/icon display */}
-                    <div className="flex-1">
+                    {/* Add status/icon display back */}
+                    <div className="mr-2 w-6 text-center">
+                      {isError && <span className="text-red-500">❌</span>}
+                      {isWarning && <span className="text-yellow-500">⚠️</span>}
+                      {!isError && !isWarning && log.status && (
+                        <span>{log.status}</span>
+                      )}
+                    </div>
+                    <div
+                      className={`flex-1 ${isError ? "text-red-600" : ""} ${
+                        isWarning ? "text-yellow-700" : ""
+                      }`}>
                       <span className={isSectionHeader ? "font-semibold" : ""}>
                         {log.message}
                       </span>
