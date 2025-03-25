@@ -1,3 +1,5 @@
+/* teeTimeListView.css */
+
 .list-view-container {
   @apply w-full flex justify-center;
 }
@@ -15,7 +17,13 @@
 }
 
 .club-title {
-  @apply text-xl font-semibold;
+  /* Reducing from text-xl to text-lg and adding line clamp */
+  @apply text-lg font-semibold truncate;
+  /* Optional: Add these for multi-line truncation if needed */
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .players-container {

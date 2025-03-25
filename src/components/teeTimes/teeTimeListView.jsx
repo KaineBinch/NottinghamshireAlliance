@@ -93,7 +93,12 @@ const ListView = () => {
         {Object.entries(groupedByClub).map(([clubID, players], index) => (
           <div key={index} className="club-card">
             <div className="club-header">
-              <h3 className="club-title">{clubNameLookup[clubID] || clubID}</h3>
+              <h3
+                className="club-title"
+                title={clubNameLookup[clubID] || clubID} // Add title attribute for tooltip on hover
+              >
+                {clubNameLookup[clubID] || clubID}
+              </h3>
             </div>
             <div className="players-container">
               <ul>
