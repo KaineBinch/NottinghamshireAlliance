@@ -36,6 +36,43 @@ const TeeTimeCard = ({
       .replace(`${day}`, `${day}${ordinal}`)
   }
 
+  // Check if we have a valid future tee time
+  const now = new Date()
+  const teeDateTime =
+    eventDate && golferTeeTime
+      ? new Date(`${eventDate}T${golferTeeTime}`)
+      : null
+  const isFutureTeeTime = teeDateTime && teeDateTime > now
+
+  // If no data is provided at all
+  if (!eventDate && !golferTeeTime && (!golfers || golfers.length === 0)) {
+    // Check if we need to find most recent tee time from parent component data
+    // This would require a different approach with data passed from parent
+
+    // For now, show empty state
+    return (
+      <div className="bg-[#D9D9D9] border border-[#214A27] border-[6px] shadow-md p-4 rounded-md w-full max-w-md m-1">
+        <div className="w-full flex justify-center items-center">
+          <div className="flex flex-col w-2/3 items-start mb-4">
+            <p className="text-xl font-bold text-[#214A27]">
+              {clubName || "No upcoming tee times"}
+            </p>
+          </div>
+          <div className="flex justify-center items-center drop-shadow w-1/3 relative">
+            <img
+              src={clubLogo || defaultImage}
+              alt="Club logo"
+              className="max-w-full h-[85px] object-contain drop-shadow-2xl"
+            />
+          </div>
+        </div>
+        <p className="text-lg font-bold text-black mb-2">
+          No tee times available
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className="bg-[#D9D9D9] border border-[#214A27] border-[6px] shadow-md p-4 rounded-md w-full max-w-md m-1">
       <div className="w-full flex justify-center items-center">
@@ -44,11 +81,16 @@ const TeeTimeCard = ({
           <p className="text-sm font-medium text-gray-700">
             {formatDateWithOrdinal(eventDate) || ""}
           </p>
+          {teeDateTime && !isFutureTeeTime && (
+            <p className="text-sm font-medium text-amber-700 mt-1">
+              Past tee time
+            </p>
+          )}
         </div>
         <div className="flex justify-center items-center drop-shadow w-1/3 relative">
           <img
             src={clubLogo || defaultImage}
-            alt={defaultImage}
+            alt="Club logo"
             className="max-w-full h-[85px] object-contain drop-shadow-2xl"
           />
         </div>

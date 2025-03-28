@@ -20,21 +20,80 @@ const TeeTimesSection = () => {
   const today = new Date()
   const teeTimes = data?.data || []
 
+  // Get upcoming tee times
   const upcomingTeeTimes = teeTimes.filter((entry) => {
     const eventDate = new Date(entry.event?.eventDate)
     return eventDate >= today
   })
 
-  const sortedTeeTimes = upcomingTeeTimes.sort((a, b) => {
+  // Sort all upcoming tee times by date
+  const sortedUpcomingTeeTimes = upcomingTeeTimes.sort((a, b) => {
     const dateA = new Date(`${a.event?.eventDate}T${a.golferTeeTime}`)
     const dateB = new Date(`${b.event?.eventDate}T${b.golferTeeTime}`)
     return dateA - dateB
   })
 
-  const nextEventDate = sortedTeeTimes[0]?.event?.eventDate
-  const teeTimesForNextEvent = sortedTeeTimes.filter(
-    (entry) => entry.event?.eventDate === nextEventDate
-  )
+  // Get past tee times and sort by date (most recent day first)
+  const pastTeeTimes = teeTimes
+    .filter((entry) => {
+      const eventDate = new Date(entry.event?.eventDate)
+      return eventDate < today
+    })
+    .sort((a, b) => {
+      // First sort by eventDate (most recent first)
+      const dateA = new Date(a.event?.eventDate)
+      const dateB = new Date(b.event?.eventDate)
+
+      if (dateA.getTime() !== dateB.getTime()) {
+        return dateB - dateA // Reverse order for past dates (most recent day first)
+      }
+
+      // If same day, sort by tee time (earliest first)
+      const timeA = a.golferTeeTime ? a.golferTeeTime : "23:59"
+      const timeB = b.golferTeeTime ? b.golferTeeTime : "23:59"
+      return timeA.localeCompare(timeB)
+    })
+
+  // Determine which tee times to display
+  let teeTimesToDisplay = []
+  let eventTitle = "the next event"
+
+  if (sortedUpcomingTeeTimes.length > 0) {
+    // Show upcoming event
+    const nextEventDate = sortedUpcomingTeeTimes[0]?.event?.eventDate
+    teeTimesToDisplay = sortedUpcomingTeeTimes.filter(
+      (entry) => entry.event?.eventDate === nextEventDate
+    )
+
+    // Sort by tee time (earliest first)
+    teeTimesToDisplay.sort((a, b) => {
+      const timeA = a.golferTeeTime || "23:59"
+      const timeB = b.golferTeeTime || "23:59"
+      return timeA.localeCompare(timeB)
+    })
+
+    eventTitle =
+      teeTimesToDisplay[0]?.event?.golf_club?.clubName || "the next event"
+  } else if (pastTeeTimes.length > 0) {
+    // Show most recent past event
+    const mostRecentEventDate = pastTeeTimes[0]?.event?.eventDate
+
+    // Get all tee times for the most recent day
+    const mostRecentDayTeeTimes = pastTeeTimes.filter(
+      (entry) => entry.event?.eventDate === mostRecentEventDate
+    )
+
+    // Sort by tee time (earliest first)
+    teeTimesToDisplay = mostRecentDayTeeTimes.sort((a, b) => {
+      const timeA = a.golferTeeTime || "23:59"
+      const timeB = b.golferTeeTime || "23:59"
+      return timeA.localeCompare(timeB)
+    })
+
+    eventTitle =
+      teeTimesToDisplay[0]?.event?.golf_club?.clubName ||
+      "the most recent event"
+  }
 
   const golfersToDisplay = (teeTime) => {
     return Array.isArray(teeTime?.golfers)
@@ -45,19 +104,23 @@ const TeeTimesSection = () => {
   }
 
   const filteredTeeTimes = searchQuery
-    ? teeTimesForNextEvent.filter(
+    ? teeTimesToDisplay.filter(
         (teeTime) => golfersToDisplay(teeTime).length > 0
       )
-    : teeTimesForNextEvent.slice(0, 1)
+    : teeTimesToDisplay.slice(0, 1)
+
+  // Determine if we're showing past or future tee times for the subtext
+  const isPastEvent =
+    pastTeeTimes.length > 0 && sortedUpcomingTeeTimes.length === 0
+  const subtextPrefix = isPastEvent
+    ? "View your tee time from"
+    : "Type your name below to check your tee time for"
 
   return (
     <div className="items-center justify-center flex flex-col w-full mx-auto max-w-5xl mb-5">
       <HomePageHeader
         title="Order of Play"
-        subtext={`Type your name below to check your tee time for ${
-          teeTimesForNextEvent[0]?.event?.golf_club?.clubName ||
-          "the next event"
-        }`}
+        subtext={`${subtextPrefix} ${eventTitle}`}
         btnName="Tee Times"
         btnStyle="text-black bg-white"
         page="teetimes"
