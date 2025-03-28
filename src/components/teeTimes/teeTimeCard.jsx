@@ -90,7 +90,7 @@ const TeeTimeCard = ({
         <div className="flex justify-center items-center drop-shadow w-1/3 relative">
           <img
             src={clubLogo || defaultImage}
-            alt="Club logo"
+            alt={defaultImage}
             className="max-w-full h-[85px] object-contain drop-shadow-2xl"
           />
         </div>
@@ -117,11 +117,18 @@ const TeeTimeCard = ({
               <p className={`${golfer.isSenior ? "text-black" : "text-black"}`}>
                 {golfer.golferName} - {golfer?.golf_club?.clubID}
               </p>
-              {golfer.isSenior && (
-                <p className="text-sm font-semibold ml-2 text-red-500">
-                  Senior
-                </p>
-              )}
+              <div className="flex">
+                {golfer.isSenior && (
+                  <p className="text-sm font-semibold ml-2 text-red-500">
+                    Senior
+                  </p>
+                )}
+                {golfer.isPro && (
+                  <p className="text-sm font-semibold ml-2 text-blue-700">
+                    Professional
+                  </p>
+                )}
+              </div>
             </div>
           ))
         ) : (

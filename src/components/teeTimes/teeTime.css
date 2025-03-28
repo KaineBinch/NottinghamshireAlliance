@@ -55,6 +55,10 @@
   @apply text-sm text-red-500;
 }
 
+.player-pro-tag {
+  @apply text-sm text-blue-700;
+}
+
 .loading-container {
   @apply pt-[85px];
 }
