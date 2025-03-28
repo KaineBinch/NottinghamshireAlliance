@@ -121,12 +121,17 @@ const TeeTimesTable = () => {
                     <div key={playerIndex} className="player-container">
                       <p>
                         <span>{player?.golferName || "Unnamed Player"}</span>
+                        <span> </span>
                         <span className="player-club">
                           {player?.golf_club?.clubName || "No Club"}
                         </span>
                       </p>
+
                       {player?.isSenior && (
                         <p className="player-senior-tag">Senior</p>
+                      )}
+                      {player?.isPro && (
+                        <p className="player-pro-tag">Professional</p>
                       )}
                     </div>
                   ))}

@@ -48,7 +48,7 @@
 }
 
 .event-date {
-  @apply pb-[10px];
+  @apply pb-[0px];
 }
 
 /* Expandable text */

@@ -45,6 +45,8 @@ const ListView = () => {
         acc[club].push({
           name: player?.golferName || "Unnamed Player",
           time: teeTime.golferTeeTime || "00:00",
+          isSenior: player?.isSenior || false,
+          isPro: player?.isPro || false,
         })
       })
       return acc
@@ -95,8 +97,7 @@ const ListView = () => {
             <div className="club-header">
               <h3
                 className="club-title"
-                title={clubNameLookup[clubID] || clubID} // Add title attribute for tooltip on hover
-              >
+                title={clubNameLookup[clubID] || clubID}>
                 {clubNameLookup[clubID] || clubID}
               </h3>
             </div>
@@ -104,7 +105,15 @@ const ListView = () => {
               <ul>
                 {players.map((player, playerIndex) => (
                   <li key={playerIndex} className="player-item">
-                    {player.name} -{" "}
+                    <span className="player-name">{player.name}</span>
+
+                    {player.isSenior && (
+                      <span className="player-senior-tag"> Senior</span>
+                    )}
+                    {player.isPro && (
+                      <span className="player-pro-tag"> Professional</span>
+                    )}
+                    <span className="player-time-separator"> - </span>
                     <span className="player-time">
                       {formatTime(player.time)}
                     </span>

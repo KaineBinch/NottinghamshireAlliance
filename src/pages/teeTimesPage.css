@@ -37,6 +37,10 @@
   @apply text-xl mt-2;
 }
 
+.past-event-indicator {
+  @apply text-amber-700 font-medium pb-[10px];
+}
+
 .view-toggle-container {
   @apply flex justify-end max-w-5xl mx-auto;
 }

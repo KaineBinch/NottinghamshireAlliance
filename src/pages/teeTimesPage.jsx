@@ -66,6 +66,11 @@ const TeeTimesPage = () => {
     ? formatDateWithOrdinal(nextEvent.event.eventDate)
     : "Upcoming Event"
 
+  // Check if this is a past event
+  const isPastEvent = nextEvent?.event?.eventDate
+    ? new Date(nextEvent.event.eventDate) < new Date()
+    : false
+
   const filteredTeeTimes = nextEvent?.golfers || []
 
   const handleToggleView = () => {
@@ -102,6 +107,9 @@ const TeeTimesPage = () => {
                   {nextEvent.event?.golf_club?.clubName}
                 </h4>
                 <h4 className="event-date">{eventDate}</h4>
+                {isPastEvent && (
+                  <p className="past-event-indicator">Past event</p>
+                )}
               </div>
             </div>
             <div className="view-toggle-container">
@@ -120,9 +128,15 @@ const TeeTimesPage = () => {
             {!!filteredTeeTimes.length && (
               <>
                 {isListView ? (
-                  <ListView teeTimes={filteredTeeTimes} />
+                  <ListView
+                    teeTimes={filteredTeeTimes}
+                    isPastEvent={isPastEvent}
+                  />
                 ) : (
-                  <TeeTimesTable teeTimes={filteredTeeTimes} />
+                  <TeeTimesTable
+                    teeTimes={filteredTeeTimes}
+                    isPastEvent={isPastEvent}
+                  />
                 )}
               </>
             )}
