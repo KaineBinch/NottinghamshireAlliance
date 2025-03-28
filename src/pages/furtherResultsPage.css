@@ -1,59 +1,94 @@
-/* Page container */
+/* Amateur section inner tabs */
+.inner-tab-button {
+  @apply py-2 font-semibold text-center;
+  flex: 1;
+}
+
+.inner-tab-active {
+  @apply bg-[#d9d9d9] text-black font-bold border-b-0;
+}
+
+.inner-tab-inactive {
+  @apply bg-[#17331B] text-white hover:bg-[#1A4923];
+} /* Page container */
 .page-container {
-  @apply max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-[85px] pb-[25px];
+  @apply w-full mx-auto max-w-5xl;
+  padding: clamp(1rem, 3vw, 2rem);
+  padding-top: 85px;
+  padding-bottom: clamp(1rem, 2vw, 1.5rem);
 }
 
 /* Content card */
 .content-card {
-  @apply bg-white shadow-md rounded-lg p-6 pb-[25px];
+  @apply bg-white rounded-lg;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  padding-bottom: clamp(1.25rem, 3vw, 1.75rem);
 }
 
 /* Loading and error states */
 .loading-container {
-  @apply text-center pt-[85px] text-xl;
+  @apply text-center;
+  padding-top: 85px;
+  font-size: clamp(1rem, 1vw + 0.75rem, 1.25rem);
 }
 
 .error-container {
-  @apply text-center pt-[85px] text-xl;
+  @apply text-center;
+  padding-top: 85px;
+  font-size: clamp(1rem, 1vw + 0.75rem, 1.25rem);
 }
 
 /* Not found container */
 .not-found-container {
-  @apply bg-white shadow-md rounded-lg p-10 text-center;
+  @apply bg-white shadow-md rounded-lg text-center;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
 }
 
 .not-found-title {
-  @apply text-3xl font-bold mb-6;
+  @apply font-bold;
+  font-size: clamp(1.5rem, 2vw + 1rem, 2rem);
+  margin-bottom: clamp(1rem, 2vw, 1.5rem);
 }
 
 .not-found-message {
-  @apply text-lg mb-4;
+  font-size: clamp(1rem, 1vw + 0.75rem, 1.25rem);
+  margin-bottom: clamp(1rem, 1.5vw, 1.5rem);
 }
 
 .not-found-secondary {
   @apply text-gray-600;
+  font-size: clamp(0.875rem, 0.8vw + 0.7rem, 1rem);
 }
 
 /* Header */
 .event-header {
-  @apply mb-[25px];
+  margin-bottom: clamp(1rem, 1.5vw, 1.75rem);
 }
 
 .event-title {
-  @apply text-3xl font-bold mt-[20px];
+  @apply font-bold;
+  font-size: clamp(1.5rem, 2.5vw + 0.75rem, 2.25rem);
+  margin-top: clamp(0.5rem, 1vw, 1.25rem);
 }
 
 .event-type {
-  @apply text-xl my-[10px];
+  font-size: clamp(1.125rem, 1.5vw + 0.75rem, 1.5rem);
+  margin-top: clamp(0.5rem, 0.5vw, 0.625rem);
+  margin-bottom: clamp(0.5rem, 0.5vw, 0.625rem);
 }
 
 .event-date {
-  @apply pb-[0px];
+  padding-bottom: 0;
+  font-size: clamp(0.875rem, 1vw + 0.75rem, 1.125rem);
 }
 
 /* Expandable text */
 .expandable-text-container {
-  @apply px-5 my-[25px] text-start flex flex-col;
+  margin-top: clamp(1rem, 1.5vw, 1.75rem);
+  margin-bottom: clamp(1rem, 1.5vw, 1.75rem);
+  padding-left: clamp(0.5rem, 2vw, 1.25rem);
+  padding-right: clamp(0.5rem, 2vw, 1.25rem);
+  @apply text-start flex flex-col;
 }
 
 .expandable-text-wrapper {
@@ -62,6 +97,7 @@
 
 .expandable-text {
   @apply overflow-clip;
+  font-size: clamp(0.875rem, 0.8vw + 0.7rem, 1rem);
 }
 
 .expandable-text-collapsed {
@@ -73,16 +109,23 @@
 }
 
 .expand-button {
-  @apply font-bold text-[#214A27] mt-1 inline-block;
+  @apply font-bold text-[#214A27] inline-block;
+  font-size: clamp(0.875rem, 0.6vw + 0.7rem, 1rem);
+  margin-top: clamp(0.25rem, 0.5vw, 0.5rem);
 }
 
 /* Tabs navigation */
 .tabs-navigation {
-  @apply mb-[50px] flex justify-center;
+  margin-bottom: clamp(1.5rem, 3vw, 3rem);
+  @apply flex justify-center;
 }
 
 .tab-button {
-  @apply md:px-4 py-2 font-semibold text-sm md:text-lg flex items-center mx-3;
+  @apply font-semibold flex items-center;
+  font-size: clamp(0.75rem, 1vw + 0.6rem, 1.125rem);
+  padding: clamp(0.25rem, 0.75vw, 0.75rem) clamp(0.5rem, 1vw, 1rem);
+  margin-left: clamp(0.25rem, 0.5vw, 0.75rem);
+  margin-right: clamp(0.25rem, 0.5vw, 0.75rem);
 }
 
 .tab-button-active {
@@ -94,16 +137,35 @@
 }
 
 .tab-icon {
-  @apply mr-2;
+  margin-right: clamp(0.25rem, 0.5vw, 0.5rem);
+  width: clamp(1rem, 1vw + 0.8rem, 1.25rem);
+  height: clamp(1rem, 1vw + 0.8rem, 1.25rem);
+}
+
+/* Section titles and dividers */
+.section-title {
+  @apply font-semibold text-[#214A27];
+  font-size: clamp(1.125rem, 1.2vw + 0.8rem, 1.5rem);
+  margin-bottom: clamp(1rem, 1.5vw, 1.5rem);
+  padding-bottom: clamp(0.25rem, 0.5vw, 0.5rem);
+}
+
+.section-divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin-top: clamp(1.5rem, 2vw, 2.5rem);
+  margin-bottom: clamp(1.5rem, 2vw, 2.5rem);
 }
 
 /* Results table */
 .results-table-container {
-  @apply overflow-x-auto text-sm md:text-lg;
+  @apply overflow-x-auto;
+  margin-bottom: clamp(1rem, 1.5vw, 1.5rem);
 }
 
 .results-table {
   @apply w-full border-collapse;
+  font-size: clamp(0.75rem, 0.7vw + 0.65rem, 1rem);
 }
 
 .results-table-header {
@@ -111,26 +173,122 @@
 }
 
 .results-table-header-cell {
-  @apply border p-2 text-center;
+  @apply border text-center;
+  font-size: clamp(0.75rem, 0.7vw + 0.65rem, 1rem);
+  padding: clamp(0.25rem, 0.5vw, 0.75rem);
 }
 
 .results-table-row-even {
-  @apply bg-white;
+  @apply bg-[#d9d9d9];
 }
 
 .results-table-row-odd {
-  @apply bg-gray-50;
+  @apply bg-white;
 }
 
 .results-table-cell {
-  @apply border p-2;
+  @apply border;
+  font-size: clamp(0.75rem, 0.7vw + 0.65rem, 1rem);
+  padding: clamp(0.25rem, 0.5vw, 0.75rem);
+}
+
+.golfer-senior-tag {
+  @apply text-red-500 font-semibold;
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+}
+
+.golfer-pro-tag {
+  @apply text-blue-700 font-semibold;
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
 }
 
 /* Team results */
 .team-title {
-  @apply text-xl text-start font-semibold my-4;
+  @apply text-center font-semibold;
+  font-size: clamp(1rem, 1.2vw + 0.8rem, 1.375rem);
+  margin-top: clamp(0.5rem, 0.75vw, 1rem);
+  margin-bottom: clamp(0.5rem, 0.75vw, 1rem);
 }
 
 .team-divider {
-  @apply h-6;
+  height: clamp(1rem, 1.5vw, 1.5rem);
+}
+
+/* Horizontal team layout specific adjustments */
+@media (min-width: 768px) {
+  .md\:flex-1 {
+    padding: 0 clamp(0.25rem, 0.75vw, 1rem);
+  }
+
+  .md\:flex-1 .team-title {
+    font-size: clamp(0.9rem, 1vw + 0.7rem, 1.25rem);
+  }
+
+  .md\:flex-1 .results-table {
+    font-size: clamp(0.7rem, 0.5vw + 0.65rem, 0.9rem);
+  }
+
+  .md\:flex-1 p {
+    font-size: clamp(0.7rem, 0.5vw + 0.65rem, 0.9rem);
+  }
+
+  .md\:gap-4 {
+    gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  }
+
+  .md\:mb-0 {
+    margin-bottom: 0;
+  }
+}
+
+/* Single-column layout spacing */
+@media (max-width: 767px) {
+  .mb-6 {
+    margin-bottom: clamp(1rem, 4vw, 1.5rem);
+  }
+}
+/* Button Styles for Amateur Section Tabs */
+.amateur-tab-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 50px;
+  background-color: #214a27;
+  color: white;
+  margin-bottom: 16px;
+}
+
+.amateur-tab-button {
+  width: 33.33%;
+  font-size: 14px;
+  height: 100%;
+  border-right: 1px solid #4a4a4a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .amateur-tab-button {
+    font-size: 16px;
+  }
+}
+
+.amateur-tab-button-active {
+  background-color: #d9d9d9;
+  color: black;
+  font-weight: bold;
+  border: none;
+}
+
+.amateur-tab-button-inactive {
+  background-color: #214a27;
+  color: white;
+}
+
+.amateur-tab-button-inactive:hover {
+  background-color: #1a4923;
 }

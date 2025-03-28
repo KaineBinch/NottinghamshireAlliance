@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import { Trophy, Users, User } from "lucide-react"
 import { MODELS, QUERIES } from "../constants/api"
@@ -22,7 +22,7 @@ const ExpandableText = ({ text }) => {
               : "expandable-text-collapsed"
           }`}>
           {fullText}
-        </p>{" "}
+        </p>
         {fullText !== "No event review available." && (
           <button onClick={toggleExpand} className="expand-button">
             {isExpanded ? "Read Less" : "Read More"}
@@ -43,6 +43,40 @@ const TabButton = ({ id, label, icon: Icon, activeTab, onClick }) => (
     {label}
   </button>
 )
+
+const AmateurTableButtons = ({ activeCategory, onCategoryChange }) => {
+  return (
+    <div className="flex flex-row place-content-evenly items-center h-[50px] text-white bg-[#17331B]">
+      <button
+        className={`w-1/3 border-r border-gray-400 text-sm md:text-base ${
+          activeCategory === "all"
+            ? "bg-[#d9d9d9] text-black font-bold h-full border-none"
+            : "bg-[#17331B] text-white hover:bg-[#1A4923] active:bg-[#0F2C17] h-full"
+        }`}
+        onClick={() => onCategoryChange("all")}>
+        All Scores
+      </button>
+      <button
+        className={`w-1/3 border-r border-gray-400 text-sm md:text-base ${
+          activeCategory === "amateur"
+            ? "bg-[#d9d9d9] text-black font-bold h-full border-none"
+            : "bg-[#17331B] text-white hover:bg-[#1A4923] active:bg-[#0F2C17] h-full"
+        }`}
+        onClick={() => onCategoryChange("amateur")}>
+        Amateur
+      </button>
+      <button
+        className={`w-1/3 text-sm md:text-base ${
+          activeCategory === "senior"
+            ? "bg-[#d9d9d9] text-black font-bold h-full border-none"
+            : "bg-[#17331B] text-white hover:bg-[#1A4923] active:bg-[#0F2C17] h-full"
+        }`}
+        onClick={() => onCategoryChange("senior")}>
+        Senior
+      </button>
+    </div>
+  )
+}
 
 const ResultTable = ({ headers, data }) => (
   <div className="results-table-container">
@@ -85,64 +119,66 @@ const formatDate = (dateString) => {
 
 const FurtherResultsPage = () => {
   const [activeTab, setActiveTab] = useState("winners")
-  const { eventId } = useParams()
-  const query = queryBuilder(MODELS.events, QUERIES.resultsQuery)
-  const { isLoading, isError, data, error } = useFetch(query)
 
-  const getOrdinal = (n) => {
-    const s = ["th", "st", "nd", "rd"]
-    const v = n % 100
-    return s[(v - 20) % 10] || s[v] || s[0]
-  }
+  const [amateurSubTab, setAmateurSubTab] = useState("all")
+
+  const { clubName } = useParams()
+
+  const query = queryBuilder(MODELS.events, QUERIES.resultsQuery)
+  const { isLoading, data, error } = useFetch(query)
+
+  useEffect(() => {
+    console.log("Data loading state:", { isLoading, hasData: !!data, error })
+
+    if (data) {
+      const event = data.data?.find((e) => e.id.toString() === clubName)
+      console.log("Found event:", {
+        eventId: clubName,
+        found: !!event,
+        eventClubName: event?.golf_club?.clubName || "N/A",
+        hasScores: !!event?.scores,
+        scoreCount: event?.scores?.length || 0,
+      })
+    }
+  }, [data, isLoading, error, clubName])
 
   if (isLoading) {
-    return <p className="loading-container">Loading results...</p>
-  } else if (isError) {
-    console.error("Error:", error)
-    return <p className="error-container">Something went wrong...</p>
+    return <div className="loading-container">Loading results...</div>
   }
 
-  const events = data?.data || []
-
-  const event = eventId
-    ? events.find((e) => e.id.toString() === eventId.toString())
-    : null
-
-  console.log("Event ID from URL:", eventId)
-  console.log(
-    "Available event IDs:",
-    events.map((e) => e.id)
-  )
-  console.log("Found event:", event?.id, event?.golf_club?.clubName)
+  const event = data?.data?.find((e) => e.id.toString() === clubName)
 
   if (!event) {
-    return (
-      <div className="page-container">
-        <div className="not-found-container">
-          <h1 className="not-found-title">Results Not Available</h1>
-          <p className="not-found-message">
-            We don&apos;t have any results for this event yet.
-          </p>
-          <p className="not-found-secondary">
-            Please check back later once the event has concluded and results
-            have been posted.
-          </p>
-        </div>
-      </div>
-    )
+    return null
   }
 
-  const sortedScores = event.scores
-    ? [...event.scores].sort((a, b) => b.golferEventScore - a.golferEventScore)
-    : []
+  const getOrdinal = (n) => {
+    if (n <= 0) return ""
+
+    const s = ["th", "st", "nd", "rd"]
+    const v = n % 100
+
+    if (v >= 11 && v <= 13) {
+      return "th"
+    }
+
+    const lastDigit = n % 10
+    return s[lastDigit] || "th"
+  }
+
+  const sortedScores = [...event.scores].sort(
+    (a, b) => (b.golferEventScore || 0) - (a.golferEventScore || 0)
+  )
+
+  const amateurScores = sortedScores.filter(
+    (score) => score.golfer && !score.golfer.isPro
+  )
 
   const scoresByClub = {}
-  event.scores?.forEach((score) => {
-    const clubName =
-      score.golfer?.golf_club?.clubName ||
-      (score.golfer && score.golfer.club_name) ||
-      "Unaffiliated"
+  event.scores.forEach((score) => {
+    if (!score.golfer) return
 
+    const clubName = score.golfer?.golf_club?.clubName || "Unaffiliated"
     if (!scoresByClub[clubName]) {
       scoresByClub[clubName] = []
     }
@@ -152,91 +188,173 @@ const FurtherResultsPage = () => {
   const teamResults = Object.entries(scoresByClub)
     .map(([clubName, scores]) => {
       const topScores = scores
-        .sort((a, b) => b.golferEventScore - a.golferEventScore)
+        .sort((a, b) => (b.golferEventScore || 0) - (a.golferEventScore || 0))
         .slice(0, 4)
+
       const totalPoints = topScores.reduce(
-        (sum, score) => sum + score.golferEventScore,
+        (sum, score) => sum + (score.golferEventScore || 0),
         0
       )
+
       return { clubName, totalPoints, scores: topScores }
     })
     .sort((a, b) => b.totalPoints - a.totalPoints)
 
-  const professionalScores =
-    event.scores?.filter((score) => score.golfer?.isPro === true) || []
+  const professionalScores = event.scores.filter((score) => score.golfer?.isPro)
   const sortedProfessionalScores = [...professionalScores].sort(
-    (a, b) => b.golferEventScore - a.golferEventScore
+    (a, b) => (b.golferEventScore || 0) - (a.golferEventScore || 0)
   )
 
-  const WinnersTab = () => {
-    const topAmateurs = sortedScores
-      .filter((score) => !score.golfer?.isPro)
-      .slice(0, 3)
+  const filteredAmateurScores = amateurScores.filter((score) => {
+    if (amateurSubTab === "all") return true
+    if (amateurSubTab === "amateur") return !score.golfer?.isSenior
+    if (amateurSubTab === "senior") return score.golfer?.isSenior
+    return true
+  })
 
-    if (topAmateurs.length === 0) {
-      return <p>No amateur results available</p>
-    }
+  const WinnersTab = () => {
+    const topAmateurs = amateurScores.slice(0, 3)
 
     return (
-      <ResultTable
-        headers={["Position", "Name", "Club", "Points"]}
-        data={topAmateurs.map((score, index) => [
-          `${index + 1}${getOrdinal(index + 1)}`,
-          score.golfer?.golferName || "Unknown",
-          score.golfer?.golf_club?.clubName || "Unaffiliated",
-          score.golferEventScore.toString(),
-        ])}
-      />
+      <div>
+        <h2 className="section-title">Top Amateurs</h2>
+        {topAmateurs.length === 0 ? (
+          <p className="text-center py-4">No amateur results available</p>
+        ) : (
+          <ResultTable
+            headers={["Position", "Name", "Club", "Points"]}
+            data={topAmateurs.map((score, index) => [
+              `${index + 1}${getOrdinal(index + 1)}`,
+              <>
+                {score.golfer?.golferName || "Unknown"}
+                {score.golfer?.isSenior && (
+                  <span className="golfer-senior-tag">Senior</span>
+                )}
+              </>,
+              score.golfer?.golf_club?.clubName || "Unaffiliated",
+              score.golferEventScore?.toString() || "0",
+            ])}
+          />
+        )}
+
+        <div className="section-divider"></div>
+
+        <h2 className="section-title">All Amateur Scores</h2>
+        <div className="">
+          <AmateurTableButtons
+            activeCategory={amateurSubTab}
+            onCategoryChange={setAmateurSubTab}
+          />
+        </div>
+
+        {filteredAmateurScores.length === 0 ? (
+          <p className="text-center py-4">
+            No scores available for this category
+          </p>
+        ) : (
+          <ResultTable
+            headers={["Position", "Name", "Club", "Points"]}
+            data={filteredAmateurScores.map((score, index) => [
+              `${index + 1}${getOrdinal(index + 1)}`,
+              <>
+                {score.golfer?.golferName || "Unknown"}
+                {score.golfer?.isSenior && (
+                  <span className="golfer-senior-tag">Senior</span>
+                )}
+              </>,
+              score.golfer?.golf_club?.clubName || "Unaffiliated",
+              score.golferEventScore?.toString() || "0",
+            ])}
+          />
+        )}
+      </div>
     )
   }
 
   const TeamsTab = () => {
     if (teamResults.length === 0) {
-      return <p>No team results available</p>
+      return <p className="text-center py-4">No team results available</p>
     }
 
     return (
-      <div>
-        {teamResults.slice(0, 2).map((team, teamIndex) => (
-          <div key={team.clubName}>
-            <h2 className="team-title">
-              {`${teamIndex + 1}${getOrdinal(teamIndex + 1)}: ${
-                team.clubName
-              } (${team.totalPoints} Points)`}
-            </h2>
-            <ResultTable
-              headers={["Name", "Points"]}
-              data={team.scores.map((score) => [
-                score.golfer?.golferName || "Unknown",
-                score.golferEventScore.toString(),
-              ])}
-            />
-            {teamIndex < 2 && teamResults.length > 1 && (
-              <div className="team-divider"></div>
-            )}
-          </div>
-        ))}
+      <div className="w-full">
+        <h2 className="section-title">Top Teams</h2>
+        <div className="flex flex-col md:flex-row md:justify-between md:gap-4">
+          {teamResults.slice(0, 3).map((team, teamIndex) => (
+            <div key={team.clubName} className="md:flex-1 mb-6 md:mb-0">
+              <h2 className="team-title text-center">
+                {`${teamIndex + 1}${getOrdinal(teamIndex + 1)}: ${
+                  team.clubName
+                }`}
+              </h2>
+              <p className="text-center mb-3">({team.totalPoints} Points)</p>
+              <ResultTable
+                headers={["Name", "Points"]}
+                data={team.scores.map((score) => [
+                  score.golfer?.golferName || "Unknown",
+                  score.golferEventScore?.toString() || "0",
+                ])}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="section-divider"></div>
+
+        <h2 className="section-title">All Team Scores</h2>
+        <ResultTable
+          headers={["Position", "Club", "Total Points"]}
+          data={teamResults.map((team, index) => [
+            `${index + 1}${getOrdinal(index + 1)}`,
+            team.clubName,
+            team.totalPoints.toString(),
+          ])}
+        />
       </div>
     )
   }
 
   const ProfessionalsTab = () => {
     if (sortedProfessionalScores.length === 0) {
-      return <p>No professional results available</p>
+      return (
+        <p className="text-center py-4">No professional results available</p>
+      )
     }
 
+    const topProfessionals = sortedProfessionalScores.slice(0, 5)
+
     return (
-      <ResultTable
-        headers={["Place", "Name", "Club", "Points"]}
-        data={sortedProfessionalScores
-          .slice(0, 5)
-          .map((score, index) => [
+      <div>
+        <h2 className="section-title">Top Professionals</h2>
+        <ResultTable
+          headers={["Position", "Name", "Club", "Points"]}
+          data={topProfessionals.map((score, index) => [
             `${index + 1}${getOrdinal(index + 1)}`,
-            score.golfer?.golferName || "Unknown",
+            <>
+              {score.golfer?.golferName || "Unknown"}
+              <span className="golfer-pro-tag">Professional</span>
+            </>,
             score.golfer?.golf_club?.clubName || "Unaffiliated",
-            score.golferEventScore.toString(),
+            score.golferEventScore?.toString() || "0",
           ])}
-      />
+        />
+
+        <div className="section-divider"></div>
+
+        <h2 className="section-title">All Professional Scores</h2>
+        <ResultTable
+          headers={["Position", "Name", "Club", "Points"]}
+          data={sortedProfessionalScores.map((score, index) => [
+            `${index + 1}${getOrdinal(index + 1)}`,
+            <>
+              {score.golfer?.golferName || "Unknown"}
+              <span className="golfer-pro-tag">Professional</span>
+            </>,
+            score.golfer?.golf_club?.clubName || "Unaffiliated",
+            score.golferEventScore?.toString() || "0",
+          ])}
+        />
+      </div>
     )
   }
 
@@ -266,7 +384,9 @@ const FurtherResultsPage = () => {
           <p className="event-type">{event.eventType || "Competition"}</p>
           <p className="event-date">Date: {formatDate(event.eventDate)}</p>
         </header>
+
         <ExpandableText text={event.eventReview} />
+
         <nav className="tabs-navigation">
           {tabs.map((tab) => (
             <TabButton

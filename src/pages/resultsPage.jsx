@@ -1,10 +1,10 @@
+import { useState, useEffect } from "react"
 import ResultsCard from "../components/results/resultsCard"
 import PageHeader from "../components/pageHeader"
 import { Link } from "react-router-dom"
 import { BASE_URL, MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
-import { useState, useEffect } from "react"
 import "./resultsPage.css"
 
 const formatDate = (dateString) => {
@@ -13,34 +13,31 @@ const formatDate = (dateString) => {
   return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
 }
 
-const isDateInPast = (dateString) => {
-  if (!dateString) return false
-  const date = new Date(dateString)
-  return date < new Date()
-}
-
 const ResultsPage = () => {
-  const query = queryBuilder(MODELS.events, QUERIES.resultsQuery)
-  const { isLoading, isError, data, error } = useFetch(query)
   const [showContent, setShowContent] = useState(false)
+
+  const query = queryBuilder(MODELS.events, QUERIES.resultsQuery)
+  const { isLoading, data } = useFetch(query)
 
   useEffect(() => {
     if (!isLoading && data) {
-      const timer = setTimeout(() => {
-        setShowContent(true)
-      }, 100)
-
+      const timer = setTimeout(() => setShowContent(true), 100)
       return () => clearTimeout(timer)
     }
   }, [isLoading, data])
 
-  if (isError) {
-    console.error("Error:", error)
-    return <p className="error-message">Something went wrong...</p>
-  }
+  const validEvents =
+    !isLoading && data?.data
+      ? data.data.filter((event) => {
+          const eventDate = new Date(event.eventDate)
+          const today = new Date()
+          const isPastEvent = eventDate < today
 
-  const pastEvents =
-    data?.data.filter((event) => isDateInPast(event.eventDate)) || []
+          const hasScores = event.scores && event.scores.length > 0
+
+          return isPastEvent && hasScores
+        })
+      : []
 
   return (
     <>
@@ -58,8 +55,16 @@ const ResultsPage = () => {
 
       <div className="results-wrapper">
         <div className="results-grid">
-          {showContent && pastEvents.length > 0 ? (
-            pastEvents.map((event) => (
+          {isLoading ? (
+            Array(3)
+              .fill(0)
+              .map((_, index) => (
+                <div
+                  key={index}
+                  className="bg-gray-200 animate-pulse h-[350px] rounded-md"></div>
+              ))
+          ) : showContent && validEvents.length > 0 ? (
+            validEvents.map((event) => (
               <Link
                 to={`/results/${event.id}`}
                 key={event.id}
@@ -71,21 +76,19 @@ const ResultsPage = () => {
                       ? `${BASE_URL}${event.golf_club.clubImage[0].url}`
                       : "default-image.jpg"
                   }
-                  comp={event.eventType}
+                  comp={event.eventType || "Competition"}
                   date={formatDate(event.eventDate) || "Date TBD"}
                 />
               </Link>
             ))
-          ) : showContent && pastEvents.length === 0 ? (
+          ) : showContent ? (
             <div className="no-results-container">
               <p className="no-results-title">No results available yet</p>
               <p className="no-results-subtitle">
                 Check back soon for upcoming event results
               </p>
             </div>
-          ) : (
-            <div className="empty-state"></div>
-          )}
+          ) : null}
         </div>
       </div>
     </>
