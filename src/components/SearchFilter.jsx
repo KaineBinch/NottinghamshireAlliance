@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react"
-import "./searchFilter.css"
+import "./SearchFilter.css"
 
 const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
   const [searchQuery, setSearchQuery] = useState("")
