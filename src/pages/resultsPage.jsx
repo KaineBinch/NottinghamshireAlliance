@@ -5,7 +5,7 @@ import { BASE_URL, MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
 import { useState, useEffect } from "react"
-import "./resultsPage.css" // Import the new CSS file
+import "./resultsPage.css"
 
 const formatDate = (dateString) => {
   if (!dateString) return null

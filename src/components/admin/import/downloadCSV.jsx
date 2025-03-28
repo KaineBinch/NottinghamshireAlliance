@@ -14,7 +14,7 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   const [summaryMessage, setSummaryMessage] = useState("")
   const [showLogs, setShowLogs] = useState(false)
   const [fileInputKey, setFileInputKey] = useState(Date.now())
-  const [view, setView] = useState("upload") // "upload", "processing", "results"
+  const [view, setView] = useState("upload")
   const [errorLogs, setErrorLogs] = useState([])
 
   const formatLogSummary = (originalSummary) => {
@@ -79,10 +79,8 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
           if (rowIndex === 0)
             return row.map((cell) => safelyExtractCellValue(cell))
           return row.map((cell, cellIndex) => {
-            // Extract the cell value safely first
             const cellValue = safelyExtractCellValue(cell)
 
-            // Then format dates if needed
             if (cellIndex === 0) {
               return cellValue && !isNaN(new Date(cellValue))
                 ? new Date(cellValue).toLocaleDateString("en-GB")
@@ -126,13 +124,11 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
     }
   }
 
-  // Helper function to safely extract the value from Excel cells
   const safelyExtractCellValue = (cell) => {
     if (cell === null || cell === undefined) {
       return ""
     }
 
-    // If cell is already a primitive value
     if (
       typeof cell === "string" ||
       typeof cell === "number" ||
@@ -141,30 +137,24 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
       return cell
     }
 
-    // If cell is a complex ExcelJS Cell object
     if (typeof cell === "object") {
-      // Handle cells with formulas
       if (cell.formula || cell.sharedFormula) {
         return cell.result !== undefined ? cell.result : ""
       }
 
-      // Handle cells with rich text
       if (cell.richText) {
         return cell.richText.map((rt) => rt.text).join("")
       }
 
-      // Handle cells with a value property
       if (cell.value !== undefined) {
         return safelyExtractCellValue(cell.value)
       }
 
-      // Handle Excel date serial numbers
       if (cell.text && typeof cell.text === "string") {
         return cell.text
       }
     }
 
-    // Convert the cell to a string as a fallback
     try {
       return String(cell)
     } catch (e) {
@@ -209,7 +199,7 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
         setUploadMessage,
         setProgressLogs,
         setSummaryMessage,
-        setErrorLogs // Pass setErrorLogs to collect errors
+        setErrorLogs
       )
 
       setView("results")
@@ -314,7 +304,6 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
 
     const displaySummary = summaryFromLogs || summaryMessage
 
-    // Count errors and warnings from errorLogs
     const errorCount = errorLogs.filter((log) => log.type === "error").length
     const warningCount = errorLogs.filter(
       (log) => log.type === "warning"

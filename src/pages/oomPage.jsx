@@ -2,7 +2,7 @@ import PageHeader from "../components/pageHeader"
 import { results } from "../constants/results"
 import { transformResults } from "../utils/transformResults"
 import ResultsTable from "../components/results/resultsTable/resultsTable"
-import "./oomPage.css" // Import the new CSS file
+import "./oomPage.css"
 
 const OrderOfMeritPage = () => {
   const { rows, columns } = transformResults(results)

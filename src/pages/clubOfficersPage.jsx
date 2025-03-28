@@ -2,7 +2,7 @@ import PageHeader from "../components/pageHeader"
 import { MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
-import "./ClubOfficersPage.css"
+import "./clubOfficersPage.css"
 
 const ClubOfficersPage = () => {
   const query = queryBuilder(MODELS.clubOfficers, QUERIES.officerQuery)

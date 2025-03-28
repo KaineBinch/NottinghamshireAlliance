@@ -29,7 +29,6 @@ const ResultsTable = ({ limit }) => {
           item.golferEventScore !== undefined
       )
 
-      // Now process only the valid items
       const playerScores = validItems.reduce((acc, item) => {
         const playerName = item.golfer.golferName
         const playerScore = item.golferEventScore

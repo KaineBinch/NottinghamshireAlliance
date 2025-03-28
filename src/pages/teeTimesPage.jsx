@@ -6,7 +6,7 @@ import { queryBuilder } from "../utils/queryBuilder"
 import { MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { getNextEventDate } from "../utils/getNextEventDate"
-import "./teeTimesPage.css" // Import the CSS file
+import "./teeTimesPage.css"
 
 const getOrdinalSuffix = (day) => {
   if (day > 3 && day < 21) return "th"
@@ -66,7 +66,6 @@ const TeeTimesPage = () => {
     ? formatDateWithOrdinal(nextEvent.event.eventDate)
     : "Upcoming Event"
 
-  // Check if this is a past event
   const isPastEvent = nextEvent?.event?.eventDate
     ? new Date(nextEvent.event.eventDate) < new Date()
     : false

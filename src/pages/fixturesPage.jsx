@@ -7,7 +7,7 @@ import { queryBuilder } from "../utils/queryBuilder"
 import { BASE_URL, MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import defaultImage from "../assets/background.jpg"
-import "./FixturesPage.css"
+import "./fixturesPage.css"
 
 const FixturesPage = () => {
   const getSavedViewPreference = () => {

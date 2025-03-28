@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import "./notFound.css" // Import the new CSS file
+import "./notFound.css"
 
 const INITIAL_REDIRECT_TIME = 10
 

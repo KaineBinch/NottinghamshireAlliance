@@ -121,7 +121,6 @@ export const uploadToStrapi = async (
 
         setProgressLogs(formattedLogs)
 
-        // Collect error and warning logs
         if (setErrorLogs) {
           const errors = formattedLogs.filter(
             (log) => log.type === "error" || log.type === "warning"
@@ -150,7 +149,6 @@ export const uploadToStrapi = async (
             (created.scores || 0)
           : created || 0
 
-      // Calculate error counts if applicable
       const errorCount = response.data.logs
         ? response.data.logs.filter((log) => log.type === "error").length
         : 0
@@ -251,7 +249,6 @@ Records Processed:
 - ${typeof created === "object" ? created.scores || 0 : 0} score entries
 `
 
-          // Add issues summary if there are errors or warnings
           if (errorCount > 0 || warningCount > 0) {
             summaryText += `
 Issues Found:
@@ -313,7 +310,6 @@ Issues Found:
 
       setProgressLogs(formattedLogs)
 
-      // Collect error logs
       if (setErrorLogs) {
         const errors = formattedLogs.filter(
           (log) => log.type === "error" || log.type === "warning"

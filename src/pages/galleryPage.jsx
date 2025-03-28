@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import PageHeader from "../components/pageHeader"
 import ImageGallery from "react-image-gallery"
 import "react-image-gallery/styles/css/image-gallery.css"
-import "./galleryPage.css" // Import the new CSS file
+import "./galleryPage.css"
 import { API_URL, BASE_URL } from "../constants/api"
 import Spinner from "../components/helpers/spinner"
 

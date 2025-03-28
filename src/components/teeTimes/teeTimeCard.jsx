@@ -36,7 +36,6 @@ const TeeTimeCard = ({
       .replace(`${day}`, `${day}${ordinal}`)
   }
 
-  // Check if we have a valid future tee time
   const now = new Date()
   const teeDateTime =
     eventDate && golferTeeTime
@@ -44,12 +43,7 @@ const TeeTimeCard = ({
       : null
   const isFutureTeeTime = teeDateTime && teeDateTime > now
 
-  // If no data is provided at all
   if (!eventDate && !golferTeeTime && (!golfers || golfers.length === 0)) {
-    // Check if we need to find most recent tee time from parent component data
-    // This would require a different approach with data passed from parent
-
-    // For now, show empty state
     return (
       <div className="bg-[#D9D9D9] border border-[#214A27] border-[6px] shadow-md p-4 rounded-md w-full max-w-md m-1">
         <div className="w-full flex justify-center items-center">

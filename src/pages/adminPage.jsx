@@ -5,7 +5,7 @@ import DownloadCSVFile from "../components/admin/import/downloadCSV"
 import TemplateCard from "../components/admin/template/TemplateCard"
 import CSVPreview from "../components/admin/import/csvPreview"
 import { useState, useEffect } from "react"
-import "./AdminPage.css"
+import "./adminPage.css"
 
 const AdminPage = () => {
   const { isAuthenticated, isLoading, loginWithPopup, logout } = useAuth0()

@@ -3,7 +3,7 @@ import PageHeader from "../components/pageHeader"
 import { MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
-import "./rulesPage.css" // Import the CSS file
+import "./rulesPage.css"
 
 const RulesPage = () => {
   const rulesQuery = queryBuilder(MODELS.rules, QUERIES.rulesQuery)
@@ -25,13 +25,11 @@ const RulesPage = () => {
     error: errorConditions,
   } = useFetch(conditionsQuery)
 
-  // Single active section tracking
   const [activeSection, setActiveSection] = useState({
     type: null,
     index: null,
   })
 
-  // State to track content visibility with animation
   const [visibleSections, setVisibleSections] = useState({
     rules: {},
     conditions: {},
@@ -98,15 +96,10 @@ const RulesPage = () => {
   }
 
   const toggleSection = (type, index) => {
-    // Check if we're clicking the currently active section
     const isCurrentlyActive = isSectionOpen(type, index)
 
-    // If it's already open, close it
     if (isCurrentlyActive) {
-      // Start the closing animation
       setActiveSection({ type: null, index: null })
-
-      // Hide the content after animation finishes
       setTimeout(() => {
         setVisibleSections((prev) => ({
           ...prev,
@@ -116,12 +109,8 @@ const RulesPage = () => {
           },
         }))
       }, 300)
-    }
-    // If it's not open, close the currently open one (if any) and open this one
-    else {
-      // First, close any currently open section
+    } else {
       if (activeSection.type) {
-        // Hide the previous content after animation
         setTimeout(() => {
           setVisibleSections((prev) => ({
             ...prev,
@@ -133,10 +122,8 @@ const RulesPage = () => {
         }, 300)
       }
 
-      // Set the new active section
       setActiveSection({ type, index })
 
-      // Show the new content immediately
       setVisibleSections((prev) => ({
         ...prev,
         [type]: {

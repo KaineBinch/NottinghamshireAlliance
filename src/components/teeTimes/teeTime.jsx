@@ -4,7 +4,7 @@ import { MODELS, QUERIES } from "../../constants/api"
 import useFetch from "../../utils/hooks/useFetch"
 import SearchFilter from "../SearchFilter"
 import { getNextEventDate } from "../../utils/getNextEventDate"
-import "./teeTime.css" // Import the CSS file
+import "./teeTime.css"
 
 const TeeTimesTable = () => {
   const [filteredTeeTimes, setFilteredTeeTimes] = useState([])

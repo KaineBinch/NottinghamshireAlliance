@@ -4,7 +4,7 @@ import { Trophy, Users, User } from "lucide-react"
 import { MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
-import "./FurtherResultsPage.css"
+import "./furtherResultsPage.css"
 
 const ExpandableText = ({ text }) => {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -131,9 +131,6 @@ const FurtherResultsPage = () => {
       </div>
     )
   }
-
-  // Debug the selected event
-  console.log("Selected Event:", event)
 
   const sortedScores = event.scores
     ? [...event.scores].sort((a, b) => b.golferEventScore - a.golferEventScore)

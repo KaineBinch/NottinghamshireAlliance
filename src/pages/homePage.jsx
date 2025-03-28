@@ -5,7 +5,7 @@ import Scroller from "../components/homepage/Scroller.jsx"
 import WelcomeSection from "../components/homepage/welcomeSection.jsx"
 import TeeTimesSection from "../components/homepage/teeTimeSection.jsx"
 import ResultsSection from "../components/homepage/resultsSection.jsx"
-import "./homePage.css" // Import the new CSS file
+import "./homePage.css"
 
 const HomePage = () => {
   return (
