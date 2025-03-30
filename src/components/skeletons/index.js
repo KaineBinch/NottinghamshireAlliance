@@ -1,5 +1,4 @@
 export * from './SkeletonElements';
-export { default as HomePageSkeleton } from './HomePageSkeleton';
 export { default as CoursesPageSkeleton } from './CoursesPageSkeleton';
 export { default as FixturesPageSkeleton } from './FixturesPageSkeleton';
 export { default as GalleryPageSkeleton } from './GalleryPageSkeleton';
