@@ -12,12 +12,42 @@ import {
   faBriefcase,
 } from "@fortawesome/free-solid-svg-icons"
 
+const fontStyles = {
+  heading: {
+    fontSize: "clamp(1.25rem, 3vw + 0.5rem, 2rem)",
+  },
+  subheading: {
+    fontSize: "clamp(0.8rem, 1.5vw + 0.5rem, 1.1rem)",
+  },
+  name: {
+    fontSize: "clamp(0.875rem, 1.5vw + 0.5rem, 1.125rem)",
+  },
+  info: {
+    fontSize: "clamp(0.75rem, 1vw + 0.5rem, 0.9rem)",
+  },
+  tab: {
+    fontSize: "clamp(0.7rem, 1vw + 0.5rem, 0.9rem)",
+  },
+  score: {
+    fontSize: "clamp(0.875rem, 1.5vw + 0.5rem, 1.1rem)",
+  },
+  unit: {
+    fontSize: "clamp(0.5rem, 0.5vw + 0.4rem, 0.7rem)",
+  },
+  icon: {
+    fontSize: "clamp(0.875rem, 1.5vw + 0.5rem, 1.25rem)",
+  },
+  message: {
+    fontSize: "clamp(0.75rem, 1vw + 0.3rem, 0.875rem)",
+  },
+}
+
 const ResultsHighlightCard = () => {
   const [isVisible, setIsVisible] = useState(false)
   const [latestEvent, setLatestEvent] = useState(null)
   const [topAmateurs, setTopAmateurs] = useState([])
   const [topPros, setTopPros] = useState([])
-  const [topTeams, setTopTeams] = useState([])
+  const [topClubs, setTopClubs] = useState([])
   const [activeTab, setActiveTab] = useState("amateurs")
 
   const query = queryBuilder(MODELS.events, QUERIES.resultsQuery)
@@ -49,7 +79,6 @@ const ResultsHighlightCard = () => {
           .slice(0, 3)
         setTopPros(pros)
 
-        // Process team results if available - using same logic as FurtherResultsPage
         if (latest.scores && latest.scores.length > 0) {
           const scoresByClub = {}
           latest.scores.forEach((score) => {
@@ -62,7 +91,7 @@ const ResultsHighlightCard = () => {
             scoresByClub[clubName].push(score)
           })
 
-          const teamResults = Object.entries(scoresByClub)
+          const clubResults = Object.entries(scoresByClub)
             .map(([clubName, scores]) => {
               const topScores = scores
                 .sort(
@@ -86,7 +115,7 @@ const ResultsHighlightCard = () => {
             .sort((a, b) => b.totalPoints - a.totalPoints)
             .slice(0, 3)
 
-          setTopTeams(teamResults)
+          setTopClubs(clubResults)
         }
 
         setTimeout(() => {
@@ -111,11 +140,11 @@ const ResultsHighlightCard = () => {
   const getMedalColor = (index) => {
     switch (index) {
       case 0:
-        return "text-yellow-500" // Gold
+        return "text-yellow-500"
       case 1:
-        return "text-gray-400" // Silver
+        return "text-gray-400"
       case 2:
-        return "text-amber-700" // Bronze
+        return "text-amber-700"
       default:
         return "text-gray-600"
     }
@@ -128,6 +157,7 @@ const ResultsHighlightCard = () => {
           <FontAwesomeIcon
             icon={faTrophy}
             className={`${getMedalColor(index)}`}
+            style={fontStyles.icon}
           />
         )
       case 1:
@@ -135,6 +165,7 @@ const ResultsHighlightCard = () => {
           <FontAwesomeIcon
             icon={faMedal}
             className={`${getMedalColor(index)}`}
+            style={fontStyles.icon}
           />
         )
       case 2:
@@ -142,10 +173,15 @@ const ResultsHighlightCard = () => {
           <FontAwesomeIcon
             icon={faAward}
             className={`${getMedalColor(index)}`}
+            style={fontStyles.icon}
           />
         )
       default:
-        return <span className="font-semibold">{index + 1}</span>
+        return (
+          <span className="font-semibold" style={fontStyles.icon}>
+            {index + 1}
+          </span>
+        )
     }
   }
 
@@ -185,15 +221,19 @@ const ResultsHighlightCard = () => {
                 {topAmateurs.map((score, index) => (
                   <div
                     key={index}
-                    className="flex items-center bg-white shadow-sm p-4 transition-all hover:shadow-md">
-                    <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-[#F5F5F5] mr-4">
+                    className="flex items-center bg-white shadow-sm p-2 transition-all hover:shadow-md">
+                    <div className="flex-shrink-0 w-4 h-12 flex items-center justify-start bg-[#F5F5F5] ml-2">
                       {getPositionIcon(index)}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-lg font-semibold truncate">
+                    <div className="flex-1 ml-3">
+                      <h4
+                        className="font-semibold break-words"
+                        style={fontStyles.name}>
                         {score.golfer?.golferName}
                       </h4>
-                      <p className="text-gray-600 truncate">
+                      <p
+                        className="text-gray-600 break-words"
+                        style={fontStyles.info}>
                         {score.golfer?.golf_club?.clubName || "No Club"}
                         {score.golfer?.isSenior && (
                           <span className="text-red-600 text-xs ml-2">
@@ -202,18 +242,24 @@ const ResultsHighlightCard = () => {
                         )}
                       </p>
                     </div>
-                    <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full w-14 h-14 flex items-center justify-center">
-                      <span className="font-bold">
-                        {score.golferEventScore || 0}
-                      </span>
-                      <span className="text-xs ml-1">pts</span>
+                    <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full w-12 h-12 flex items-center justify-center">
+                      <div>
+                        <span className="font-bold" style={fontStyles.score}>
+                          {score.golferEventScore || 0}
+                        </span>
+                        <span style={fontStyles.unit} className="ml-0.5">
+                          pts
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="text-center py-8 bg-white">
-                <p className="text-gray-500">No amateur results available</p>
+                <p className="text-gray-500" style={fontStyles.message}>
+                  No amateur results available
+                </p>
               </div>
             )}
           </>
@@ -226,67 +272,87 @@ const ResultsHighlightCard = () => {
                 {topPros.map((score, index) => (
                   <div
                     key={index}
-                    className="flex items-center bg-white shadow-sm p-4 transition-all hover:shadow-md">
-                    <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-[#F5F5F5] mr-4">
+                    className="flex items-center bg-white shadow-sm p-2 transition-all hover:shadow-md">
+                    <div className="flex-shrink-0 w-4 h-12 flex items-center justify-start bg-[#F5F5F5] ml-2">
                       {getPositionIcon(index)}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-lg font-semibold truncate">
+                    <div className="flex-1 min-w-0 ml-3">
+                      <h4
+                        className="font-semibold break-words"
+                        style={fontStyles.name}>
                         {score.golfer?.golferName}
                       </h4>
-                      <p className="text-gray-600 truncate">
+                      <p
+                        className="text-gray-600 break-words"
+                        style={fontStyles.info}>
                         {score.golfer?.golf_club?.clubName || "No Club"}
                       </p>
                     </div>
-                    <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full w-14 h-14 flex items-center justify-center">
-                      <span className="font-bold">
-                        {score.golferEventScore || 0}
-                      </span>
-                      <span className="text-xs ml-1">pts</span>
+                    <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full w-12 h-12 flex items-center justify-center">
+                      <div>
+                        <span className="font-bold" style={fontStyles.score}>
+                          {score.golferEventScore || 0}
+                        </span>
+                        <span style={fontStyles.unit} className="ml-0.5">
+                          pts
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="text-center py-8 bg-white">
-                <p className="text-gray-500">
+                <p className="text-gray-500" style={fontStyles.message}>
                   No professional results available
                 </p>
               </div>
             )}
           </>
         )
-      case "teams":
+      case "clubs":
         return (
           <>
-            {topTeams.length > 0 ? (
+            {topClubs.length > 0 ? (
               <div className="space-y-4">
-                {topTeams.map((team, index) => (
+                {topClubs.map((club, index) => (
                   <div
                     key={index}
-                    className="flex items-center bg-white shadow-sm p-4 transition-all hover:shadow-md">
-                    <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-[#F5F5F5] mr-4">
+                    className="flex items-center bg-white shadow-sm p-2 transition-all hover:shadow-md">
+                    <div className="flex-shrink-0 w-4 h-12 flex items-center justify-start bg-[#F5F5F5] ml-2">
                       {getPositionIcon(index)}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-lg font-semibold truncate">
-                        {team.clubName}
+                    <div className="flex-1 min-w-0 ml-3">
+                      <h4
+                        className="font-semibold break-words"
+                        style={fontStyles.name}>
+                        {club.clubName}
                       </h4>
-                      <p className="text-gray-600 truncate">
-                        Top {team.memberCount}{" "}
-                        {team.memberCount === 1 ? "player" : "players"}
+                      <p
+                        className="text-gray-600 break-words"
+                        style={fontStyles.info}>
+                        Top {club.memberCount}{" "}
+                        {club.memberCount === 1 ? "player" : "players"}
                       </p>
                     </div>
                     <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full w-14 h-14 flex items-center justify-center">
-                      <span className="font-bold">{team.totalPoints}</span>
-                      <span className="text-xs ml-1">pts</span>
+                      <div>
+                        <span className="font-bold" style={fontStyles.score}>
+                          {club.totalPoints}
+                        </span>
+                        <span style={fontStyles.unit} className="ml-0.5">
+                          pts
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="text-center py-8 bg-white">
-                <p className="text-gray-500">No team results available</p>
+                <p className="text-gray-500" style={fontStyles.message}>
+                  No club results available
+                </p>
               </div>
             )}
           </>
@@ -305,10 +371,12 @@ const ResultsHighlightCard = () => {
         transform: isVisible ? "translateY(0)" : "translateY(20px)",
         transition: "opacity 0.5s ease, transform 0.5s ease",
       }}>
-      <h2 className="text-2xl font-bold mb-2 text-center">
+      <h2 style={fontStyles.heading} className="font-bold mb-2 text-center">
         {latestEvent.golf_club?.clubName || "Recent"} Results
       </h2>
-      <p className="text-md mb-6 text-center text-gray-700">
+      <p
+        style={fontStyles.subheading}
+        className="mb-6 text-center text-gray-700">
         {formatDate(latestEvent.eventDate)}
       </p>
 
@@ -321,8 +389,12 @@ const ResultsHighlightCard = () => {
               ? "bg-[#214A27] text-white font-semibold"
               : "bg-white text-gray-700 hover:bg-gray-100"
           }`}>
-          <FontAwesomeIcon icon={faUser} className="mr-2" />
-          <span className="hidden sm:inline">Amateurs</span>
+          <FontAwesomeIcon
+            icon={faUser}
+            className="mr-2"
+            style={fontStyles.tab}
+          />
+          <span style={fontStyles.tab}>Amateurs</span>
         </button>
         <button
           onClick={() => setActiveTab("professionals")}
@@ -331,18 +403,31 @@ const ResultsHighlightCard = () => {
               ? "bg-[#214A27] text-white font-semibold"
               : "bg-white text-gray-700 hover:bg-gray-100"
           }`}>
-          <FontAwesomeIcon icon={faBriefcase} className="mr-2" />
-          <span className="hidden sm:inline">Professionals</span>
+          <FontAwesomeIcon
+            icon={faBriefcase}
+            className="mr-2"
+            style={fontStyles.tab}
+          />
+          <span className="hidden sm:inline" style={fontStyles.tab}>
+            Professionals
+          </span>
+          <span className="inline sm:hidden" style={fontStyles.tab}>
+            Pro&apos;s
+          </span>
         </button>
         <button
-          onClick={() => setActiveTab("teams")}
+          onClick={() => setActiveTab("clubs")}
           className={`flex items-center justify-center flex-1 py-3 px-2 ${
-            activeTab === "teams"
+            activeTab === "clubs"
               ? "bg-[#214A27] text-white font-semibold"
               : "bg-white text-gray-700 hover:bg-gray-100"
           }`}>
-          <FontAwesomeIcon icon={faUsers} className="mr-2" />
-          <span className="hidden sm:inline">Teams</span>
+          <FontAwesomeIcon
+            icon={faUsers}
+            className="mr-2"
+            style={fontStyles.tab}
+          />
+          <span style={fontStyles.tab}>Clubs</span>
         </button>
       </div>
 
