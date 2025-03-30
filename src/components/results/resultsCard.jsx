@@ -43,16 +43,18 @@ const ResultsCard = ({ courseImage, name, comp, date }) => {
 
   return (
     <div
-      className={`p-4 bg-[#214A27] shadow-lg rounded-md max-w-[350px] ${fadeInClass} ${
+      className={`p-4 bg-[#214A27] shadow-lg rounded-md max-w-[350px] w-full mx-auto ${fadeInClass} ${
         cardReady ? visibleClass : hiddenClass
       }`}>
-      <div className="flex flex-col bg-[#D9D9D9] text-black border border-black relative">
+      <div className="flex flex-col bg-[#D9D9D9] text-black border border-black relative w-full">
         {/* Image Section */}
         <div className="relative">
           <div className="w-full h-[250px] bg-gray-300 absolute top-0 left-0" />
           <img
             src={courseImage}
-            className="w-full h-[250px] object-cover relative"
+            className={`w-full h-[250px] object-cover relative transition-opacity duration-700 ease-in-out ${
+              imageLoaded ? "opacity-100" : "opacity-0"
+            }`}
             alt={`${name} course`}
           />
         </div>

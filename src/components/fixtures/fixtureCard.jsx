@@ -82,10 +82,16 @@ const FixtureCard = ({
 
   return (
     <div
-      className={`p-4 bg-[#214A27] shadow-lg rounded-md ${fadeInClass} ${
+      className={`fixture-card p-4 bg-[#214A27] shadow-lg rounded-md flex justify-center items-center ${fadeInClass} ${
         isVisible ? visibleClass : hiddenClass
       }`}>
-      <div className="flex flex-col bg-[#D9D9D9] text-black border border-black relative max-w-[300px] min-h-[300px]">
+      <div
+        className="fixture-card-inner bg-[#D9D9D9] text-black border border-black relative"
+        style={{
+          width: "100%",
+          minHeight: "300px",
+          maxWidth: "350px",
+        }}>
         <div className="relative">
           <div className="w-full h-[250px] bg-gray-300 absolute top-0 left-0" />
           <img
@@ -99,7 +105,7 @@ const FixtureCard = ({
         </div>
 
         <div
-          className={`flex-1 flex flex-col py-1 text-center place-content-evenly md:min-h-[175px] min-h-[185px] ${fadeInClass} ${
+          className={`flex-1 flex flex-col py-1 text-center place-content-evenly min-h-[175px] ${fadeInClass} ${
             isVisible ? visibleClass : hiddenClass
           }`}
           style={{ transitionDelay: "100ms" }}>

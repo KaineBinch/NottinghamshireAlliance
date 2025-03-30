@@ -4,13 +4,14 @@ import ImageGallery from "react-image-gallery"
 import "react-image-gallery/styles/css/image-gallery.css"
 import "./galleryPage.css"
 import { API_URL, BASE_URL } from "../constants/api"
-import Spinner from "../components/helpers/spinner"
+import { GalleryPageSkeleton } from "../components/skeletons"
 
 const GalleryPage = () => {
   const [images, setImages] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [showGallery, setShowGallery] = useState(false)
   const [imagesPreloaded, setImagesPreloaded] = useState(false)
+  const [fetchError, setFetchError] = useState(null)
 
   useEffect(() => {
     const loadImages = async () => {
@@ -58,6 +59,7 @@ const GalleryPage = () => {
         }
       } catch (error) {
         console.error("Error fetching images:", error)
+        setFetchError(error.message)
         setIsLoading(false)
       }
     }
@@ -65,18 +67,51 @@ const GalleryPage = () => {
     loadImages()
   }, [])
 
+  if (isLoading) {
+    return <GalleryPageSkeleton />
+  }
+
+  if (fetchError) {
+    return (
+      <>
+        <PageHeader title="Gallery" />
+        <hr className="page-divider" />
+        <div className="page-background">
+          <div className="gallery-container">
+            <div className="text-center text-red-600">
+              <p>Error loading gallery: {fetchError}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-4 bg-[#214A27] text-white px-4 py-2 rounded">
+                Try Again
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
+
   return (
     <>
       <PageHeader title="Gallery" />
       <hr className="page-divider" />
       <div className="page-background">
         <div className="gallery-container">
-          {isLoading ? (
-            <Spinner size="xl" color="#214A27" />
+          {images.length === 0 ? (
+            <div className="text-center p-8">
+              <p className="text-lg text-gray-700">
+                No gallery images available at this time.
+              </p>
+            </div>
           ) : showGallery ? (
             <div
               className="gallery-ease-in"
-              style={{ minHeight: imagesPreloaded ? "auto" : "500px" }}>
+              style={{
+                opacity: showGallery ? 1 : 0,
+                transition: "opacity 0.3s ease-in-out",
+                minHeight: imagesPreloaded ? "auto" : "500px",
+              }}>
               <ImageGallery
                 eagerload={true}
                 items={images}

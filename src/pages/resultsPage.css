@@ -11,15 +11,19 @@
 }
 
 .results-wrapper {
-  @apply flex flex-col items-center;
+  @apply flex flex-col items-center w-full;
 }
 
 .results-grid {
-  @apply w-auto max-w-5xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5 py-10;
+  @apply w-full max-w-5xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5 py-10;
+}
+
+.results-grid > * {
+  @apply w-full;
 }
 
 .results-card-link {
-  @apply hover:opacity-80 transition;
+  @apply hover:opacity-80 transition block w-full;
 }
 
 .no-results-container {

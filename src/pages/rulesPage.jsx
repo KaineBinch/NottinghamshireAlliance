@@ -1,8 +1,10 @@
+// Example of how to update RulesPage.jsx
 import { useState } from "react"
 import PageHeader from "../components/pageHeader"
 import { MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
+import { RulesPageSkeleton } from "../components/skeletons"
 import "./rulesPage.css"
 
 const RulesPage = () => {
@@ -36,7 +38,7 @@ const RulesPage = () => {
   })
 
   if (isLoadingRules || isLoadingConditions) {
-    return <p className="loading-placeholder"></p>
+    return <RulesPageSkeleton />
   }
 
   if (isErrorRules || isErrorConditions) {

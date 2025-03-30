@@ -6,6 +6,7 @@ import { queryBuilder } from "../utils/queryBuilder"
 import { MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { getNextEventDate } from "../utils/getNextEventDate"
+import { TeeTimesPageSkeleton } from "../components/skeletons"
 import "./teeTimesPage.css"
 
 const getOrdinalSuffix = (day) => {
@@ -51,7 +52,7 @@ const TeeTimesPage = () => {
   const { isLoading, isError, data, error } = useFetch(query)
 
   if (isLoading) {
-    return <p className="loading-placeholder"></p>
+    return <TeeTimesPageSkeleton isListView={isListView} />
   } else if (isError) {
     console.error("Error:", error)
     return <p className="error-message">Something went wrong...</p>

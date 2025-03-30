@@ -1,16 +1,18 @@
 import CourseCard from "../components/courses/courseCard"
-import CourseCardSkeleton from "../components/courses/courseCardSkeleton"
 import PageHeader from "../components/pageHeader"
 import { BASE_URL, MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
+import { CoursesPageSkeleton } from "../components/skeletons"
 import "./coursesPage.css"
 
 const CoursesPage = () => {
   const query = queryBuilder(MODELS.golfClubs, QUERIES.clubsQuery)
   const { isLoading, isError, data, error } = useFetch(query)
 
-  const skeletonCards = Array(4).fill(0)
+  if (isLoading) {
+    return <CoursesPageSkeleton />
+  }
 
   if (isError) {
     console.error("Error:", error)
@@ -39,29 +41,25 @@ const CoursesPage = () => {
       <div className="courses-section">
         <div className="courses-container">
           <div className="courses-grid">
-            {isLoading
-              ? skeletonCards.map((_, index) => (
-                  <CourseCardSkeleton key={index} />
-                ))
-              : data.data.map((club) => (
-                  <CourseCard
-                    key={club.id}
-                    name={`${club.clubName} Golf Club`}
-                    address={club.clubAddress}
-                    contact={club.clubContactNumber}
-                    link={club.clubURL}
-                    courseImage={
-                      club.clubImage?.[0]?.url
-                        ? `${BASE_URL}${club.clubImage[0].url}`
-                        : "default-image.jpg"
-                    }
-                    logo={
-                      club.clubLogo?.[0]?.url
-                        ? `${BASE_URL}${club.clubLogo[0].url}`
-                        : "default-logo.jpg"
-                    }
-                  />
-                ))}
+            {data.data.map((club) => (
+              <CourseCard
+                key={club.id}
+                name={`${club.clubName} Golf Club`}
+                address={club.clubAddress}
+                contact={club.clubContactNumber}
+                link={club.clubURL}
+                courseImage={
+                  club.clubImage?.[0]?.url
+                    ? `${BASE_URL}${club.clubImage[0].url}`
+                    : "default-image.jpg"
+                }
+                logo={
+                  club.clubLogo?.[0]?.url
+                    ? `${BASE_URL}${club.clubLogo[0].url}`
+                    : "default-logo.jpg"
+                }
+              />
+            ))}
           </div>
         </div>
       </div>

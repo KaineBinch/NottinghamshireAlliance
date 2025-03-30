@@ -1,7 +1,3 @@
 .home-page-container {
   @apply flex flex-col w-full;
 }
-
-.section-divider {
-  @apply border-black;
-}

@@ -1,3 +1,4 @@
+// Example of how to update ResultsPage.jsx
 import { useState, useEffect } from "react"
 import ResultsCard from "../components/results/resultsCard"
 import PageHeader from "../components/pageHeader"
@@ -5,6 +6,7 @@ import { Link } from "react-router-dom"
 import { BASE_URL, MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
+import { ResultsPageSkeleton } from "../components/skeletons"
 import "./resultsPage.css"
 
 const formatDate = (dateString) => {
@@ -17,7 +19,7 @@ const ResultsPage = () => {
   const [showContent, setShowContent] = useState(false)
 
   const query = queryBuilder(MODELS.events, QUERIES.resultsQuery)
-  const { isLoading, data } = useFetch(query)
+  const { isLoading, isError, data, error } = useFetch(query)
 
   useEffect(() => {
     if (!isLoading && data) {
@@ -26,18 +28,26 @@ const ResultsPage = () => {
     }
   }, [isLoading, data])
 
-  const validEvents =
-    !isLoading && data?.data
-      ? data.data.filter((event) => {
-          const eventDate = new Date(event.eventDate)
-          const today = new Date()
-          const isPastEvent = eventDate < today
+  if (isLoading) {
+    return <ResultsPageSkeleton />
+  }
 
-          const hasScores = event.scores && event.scores.length > 0
+  if (isError) {
+    console.error("Error:", error)
+    return <p className="error-container">Something went wrong...</p>
+  }
 
-          return isPastEvent && hasScores
-        })
-      : []
+  const validEvents = data?.data
+    ? data.data.filter((event) => {
+        const eventDate = new Date(event.eventDate)
+        const today = new Date()
+        const isPastEvent = eventDate < today
+
+        const hasScores = event.scores && event.scores.length > 0
+
+        return isPastEvent && hasScores
+      })
+    : []
 
   return (
     <>
@@ -55,15 +65,7 @@ const ResultsPage = () => {
 
       <div className="results-wrapper">
         <div className="results-grid">
-          {isLoading ? (
-            Array(3)
-              .fill(0)
-              .map((_, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-200 animate-pulse h-[350px] rounded-md"></div>
-              ))
-          ) : showContent && validEvents.length > 0 ? (
+          {showContent && validEvents.length > 0 ? (
             validEvents.map((event) => (
               <Link
                 to={`/results/${event.id}`}

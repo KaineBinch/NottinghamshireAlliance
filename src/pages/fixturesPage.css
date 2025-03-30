@@ -16,18 +16,27 @@
   @apply pt-5;
 }
 
-/* View toggle button */
+/* View toggle button - override approach to force centering */
 .view-toggle-container {
-  @apply flex justify-center;
+  display: flex;
+  justify-content: center !important;
+  width: 100% !important;
+  align-items: center !important;
+  margin: 0 auto;
+  position: relative;
+  text-align: center;
 }
 
 .view-toggle-button {
   @apply bg-[#214A27] text-white px-6 py-2 rounded-lg shadow-md -mb-4;
+  position: absolute;
+  transform: translateX(-50%);
+  left: 50%;
 }
 
 /* Card view container */
 .card-view-container {
-  @apply w-full pt-8;
+  @apply w-full pt-4;
 }
 
 .cards-container {
@@ -38,7 +47,26 @@
   @apply w-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5;
 }
 
+/* Fixed-size fixture card container */
+.fixture-card {
+  @apply p-4 bg-[#214A27] shadow-lg rounded-md flex justify-center items-center;
+  width: 100%;
+}
+
+/* Inner card with consistent width constraints */
+.fixture-card-inner {
+  @apply bg-[#D9D9D9] text-black border border-black relative;
+  width: 100%;
+  min-height: 300px;
+  max-width: 350px;
+}
+
 /* Loading placeholder */
 .loading-placeholder {
   @apply min-h-[500px] w-full max-w-5xl px-5;
+}
+
+/* Ensure consistent sizing in grid */
+.card-grid > * {
+  @apply flex justify-center;
 }

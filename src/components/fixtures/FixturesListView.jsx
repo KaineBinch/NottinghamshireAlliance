@@ -72,7 +72,7 @@ const FixturesListView = () => {
   })
 
   return (
-    <div className="w-full pt-8 px-2 sm:px-4">
+    <div className="w-full pt-4 px-2 sm:px-4">
       <div className="max-w-5xl mx-auto">
         <div className="bg-white shadow-md rounded-lg overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-400">

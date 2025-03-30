@@ -1,12 +1,14 @@
+// Example of how to update FixturesPage.jsx
 import { useState, useEffect } from "react"
 import PageHeader from "../components/pageHeader"
 import FixtureCard from "../components/fixtures/fixtureCard"
 import FixturesListView from "../components/fixtures/FixturesListView"
-import FixturesListViewSkeleton from "../components/fixtures/fixturesListViewSkeleton"
 import { queryBuilder } from "../utils/queryBuilder"
 import { BASE_URL, MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import defaultImage from "../assets/background.jpg"
+import ToggleViewButton from "../components/toggleViewButton"
+import { FixturesPageSkeleton } from "../components/skeletons"
 import "./fixturesPage.css"
 
 const FixturesPage = () => {
@@ -53,6 +55,10 @@ const FixturesPage = () => {
     }
   }, [isListView])
 
+  if (isLoading) {
+    return <FixturesPageSkeleton isListView={isListView} />
+  }
+
   if (isError) {
     console.error("Error:", error)
     return <p className="error-container">Something went wrong...</p>
@@ -85,24 +91,14 @@ const FixturesPage = () => {
         <hr className="border-black" />
       </div>
 
-      <div className="view-toggle-container">
-        <button
-          onClick={() => setIsListView(!isListView)}
-          className="view-toggle-button">
-          {isListView ? "Switch to Card View" : "Switch to List View"}
-        </button>
-      </div>
+      <ToggleViewButton isListView={isListView} setIsListView={setIsListView} />
 
       {isListView ? (
-        isLoading ? (
-          <FixturesListViewSkeleton />
-        ) : (
-          <FixturesListView />
-        )
+        <FixturesListView />
       ) : (
         <div className="card-view-container">
           <div className="cards-container">
-            {showContent && !isLoading ? (
+            {showContent ? (
               <div className="card-grid">
                 {sortedData?.map((club) => {
                   const clubName = club.golf_club
