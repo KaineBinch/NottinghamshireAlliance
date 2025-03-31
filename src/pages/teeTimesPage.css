@@ -42,7 +42,7 @@
 }
 
 .view-toggle-container {
-  @apply flex justify-end max-w-5xl mx-auto;
+  @apply flex justify-end max-w-5xl mx-auto py-4;
 }
 
 .view-toggle-button {

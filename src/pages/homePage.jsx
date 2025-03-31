@@ -126,7 +126,7 @@ const HomePage = () => {
         <TeeTimesSection />
       </div>
 
-      {visibleSections.teeTimes && <hr className="section-divider" />}
+      {visibleSections.teeTimes && <hr className="border-black" />}
 
       {/* Scroll-based loading for below-the-fold content */}
       {initialLoadComplete && (
@@ -135,19 +135,19 @@ const HomePage = () => {
             <ResultsSection />
           </ScrollRevealSection>
 
-          <hr className="section-divider" />
+          <hr className="border-black" />
 
           <ScrollRevealSection id="oom-section">
             <OOMSection />
           </ScrollRevealSection>
 
-          <hr className="section-divider" />
+          <hr className="border-black" />
 
           <ScrollRevealSection id="courses-section">
             <CoursesSection />
           </ScrollRevealSection>
 
-          <hr className="section-divider" />
+          <hr className="border-black" />
 
           <ScrollRevealSection id="fixtures-section">
             <FixturesSection />
