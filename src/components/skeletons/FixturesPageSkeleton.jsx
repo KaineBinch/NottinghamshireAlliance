@@ -32,7 +32,9 @@ const FixturesPageSkeleton = ({ isListView = true }) => {
               {Array(6)
                 .fill()
                 .map((_, index) => (
-                  <div key={index} className="flex justify-center w-full">
+                  <div
+                    key={index}
+                    className="flex justify-center w-full min-w-[380px]">
                     <FixtureCardSkeleton />
                   </div>
                 ))}
