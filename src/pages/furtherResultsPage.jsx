@@ -330,10 +330,7 @@ const FurtherResultsPage = () => {
           headers={["Position", "Name", "Club", "Points"]}
           data={topProfessionals.map((score, index) => [
             `${index + 1}${getOrdinal(index + 1)}`,
-            <>
-              {score.golfer?.golferName || "Unknown"}
-              <span className="golfer-pro-tag">Professional</span>
-            </>,
+            <>{score.golfer?.golferName || "Unknown"}</>,
             score.golfer?.golf_club?.clubName || "Unaffiliated",
             score.golferEventScore?.toString() || "0",
           ])}
@@ -346,10 +343,7 @@ const FurtherResultsPage = () => {
           headers={["Position", "Name", "Club", "Points"]}
           data={sortedProfessionalScores.map((score, index) => [
             `${index + 1}${getOrdinal(index + 1)}`,
-            <>
-              {score.golfer?.golferName || "Unknown"}
-              <span className="golfer-pro-tag">Professional</span>
-            </>,
+            <>{score.golfer?.golferName || "Unknown"}</>,
             score.golfer?.golf_club?.clubName || "Unaffiliated",
             score.golferEventScore?.toString() || "0",
           ])}
