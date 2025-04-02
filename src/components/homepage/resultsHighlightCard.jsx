@@ -242,7 +242,7 @@ const ResultsHighlightCard = () => {
                         )}
                       </p>
                     </div>
-                    <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full w-12 h-12 flex items-center justify-center">
+                    <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full md:w-14 md:h-14 w-12 h-12 flex items-center justify-center">
                       <div>
                         <span className="font-bold" style={fontStyles.score}>
                           {score.golferEventScore || 0}
@@ -288,7 +288,7 @@ const ResultsHighlightCard = () => {
                         {score.golfer?.golf_club?.clubName || "No Club"}
                       </p>
                     </div>
-                    <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full w-12 h-12 flex items-center justify-center">
+                    <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full md:w-14 md:h-14 w-12 h-12 flex items-center justify-center">
                       <div>
                         <span className="font-bold" style={fontStyles.score}>
                           {score.golferEventScore || 0}
@@ -335,7 +335,7 @@ const ResultsHighlightCard = () => {
                         {club.memberCount === 1 ? "player" : "players"}
                       </p>
                     </div>
-                    <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full w-14 h-14 flex items-center justify-center">
+                    <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full md:w-14 md:h-14 w-12 h-12 flex items-center justify-center">
                       <div>
                         <span className="font-bold" style={fontStyles.score}>
                           {club.totalPoints}
