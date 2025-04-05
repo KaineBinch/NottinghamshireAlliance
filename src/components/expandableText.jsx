@@ -4,6 +4,7 @@ const ExpandableText = ({ text }) => {
   const [expanded, setExpanded] = useState(false)
   const [shouldTruncate, setShouldTruncate] = useState(false)
   const textRef = useRef(null)
+  const fullTextRef = useRef(null)
 
   // Format the text from ALL CAPS to Sentence case
   const formatText = (inputText) => {
@@ -23,20 +24,56 @@ const ExpandableText = ({ text }) => {
   const content = formatText(text)
 
   useEffect(() => {
-    // Check if content is long enough to need truncation
-    if (textRef.current) {
-      const fullHeight = textRef.current.scrollHeight
-      const lineHeight = parseInt(getComputedStyle(textRef.current).lineHeight)
-      const approxLines = fullHeight / (lineHeight || 20) // Fallback to 20px if lineHeight is not available
+    // More reliable check for truncation needs
+    const checkTruncation = () => {
+      if (textRef.current && fullTextRef.current) {
+        const truncatedHeight = textRef.current.clientHeight
+        const fullHeight = fullTextRef.current.clientHeight
 
-      // If more than 4 lines (or 3 on mobile), we should truncate
-      setShouldTruncate(approxLines > (window.innerWidth <= 768 ? 3 : 4))
+        // If the full text is taller than the truncated container,
+        // we need to show the read more button
+        setShouldTruncate(fullHeight > truncatedHeight)
+      }
+    }
+
+    // Add a small delay to ensure rendering is complete
+    const timer = setTimeout(checkTruncation, 10)
+
+    // Also check on window resize
+    window.addEventListener("resize", checkTruncation)
+
+    // Cleanup
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener("resize", checkTruncation)
     }
   }, [content])
 
-  // Simply show the entire text or a truncated version with Read more/less buttons
+  // If the content is just "No event review available" we don't need any buttons
+  if (content === "No event review available.") {
+    return (
+      <div className="event-review-container">
+        <p className="event-review-full">{content}</p>
+      </div>
+    )
+  }
+
   return (
     <div className="event-review-container">
+      {/* Hidden full text element for height comparison */}
+      <div className="hidden-text-measure">
+        <p
+          ref={fullTextRef}
+          className="event-review-full"
+          style={{
+            position: "absolute",
+            visibility: "hidden",
+            height: "auto",
+          }}>
+          {content}
+        </p>
+      </div>
+
       {!expanded ? (
         <>
           <p ref={textRef} className="event-review-truncated">
@@ -53,11 +90,13 @@ const ExpandableText = ({ text }) => {
       ) : (
         <>
           <p className="event-review-full">{content}</p>
-          <button
-            className="read-less-button"
-            onClick={() => setExpanded(false)}>
-            Read less
-          </button>
+          {shouldTruncate && (
+            <button
+              className="read-less-button"
+              onClick={() => setExpanded(false)}>
+              Read less
+            </button>
+          )}
         </>
       )}
     </div>

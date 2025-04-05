@@ -23,8 +23,6 @@
 /* Content card */
 .content-card {
   @apply bg-white rounded-lg;
-  padding: clamp(1rem, 3vw, 1.5rem);
-  padding-bottom: clamp(1.25rem, 3vw, 1.75rem);
 }
 
 /* Loading and error states */
@@ -70,7 +68,6 @@
 .event-title {
   @apply font-bold;
   font-size: clamp(1.5rem, 2.5vw + 0.75rem, 2.25rem);
-  margin-top: clamp(0.5rem, 1vw, 1.25rem);
 }
 
 .event-type {
@@ -122,8 +119,10 @@
   color: #214a27;
   font-weight: 600;
   padding: 0;
+  padding-bottom: 1.5rem;
   margin-top: 0.25rem;
   cursor: pointer;
+  place-self: center;
 }
 
 .read-more-button:hover,
