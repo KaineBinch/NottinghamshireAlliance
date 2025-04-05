@@ -4,6 +4,7 @@ import FileUpload from "../import/fileUpload"
 import ActionButtons from "../import/actionButtons"
 import { uploadToStrapi } from "../import/uploadToStrapi"
 import Spinner from "../../helpers/spinner"
+import EventReviewInput from "./eventReviewInput"
 
 const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   const [fileName, setFileName] = useState("")
@@ -16,6 +17,11 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   const [fileInputKey, setFileInputKey] = useState(Date.now())
   const [view, setView] = useState("upload")
   const [errorLogs, setErrorLogs] = useState([])
+  const [eventReview, setEventReview] = useState("")
+
+  const handleEventReviewChange = (review) => {
+    setEventReview(review)
+  }
 
   const formatLogSummary = (originalSummary) => {
     if (!originalSummary) return originalSummary
@@ -194,6 +200,7 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
 
       await uploadToStrapi(
         csvData,
+        eventReview, // Pass the event review text
         setUploadProgress,
         setUploadStatus,
         setUploadMessage,
@@ -252,6 +259,16 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
           key={fileInputKey}
           resetFileName={!fileName}
         />
+
+        {fileName && (
+          <div className="mt-4">
+            <EventReviewInput
+              onReviewChange={handleEventReviewChange}
+              disabled={view === "processing" || view === "results"}
+            />
+          </div>
+        )}
+
         {fileName && (
           <div>
             {/* Download CSV button */}

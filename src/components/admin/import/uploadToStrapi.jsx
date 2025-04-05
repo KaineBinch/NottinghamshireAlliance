@@ -44,6 +44,7 @@ const formatLogSummary = (originalSummary) => {
 
 export const uploadToStrapi = async (
   csvData,
+  eventReview = "",
   setUploadProgress,
   setUploadStatus,
   setUploadMessage,
@@ -73,7 +74,7 @@ export const uploadToStrapi = async (
     }
 
     const blob = csvData.map((row) => row.join(",")).join("\n")
-    const body = { blob }
+    const body = { blob, eventReview }
 
     const query = queryBuilder(MODELS.imports, QUERIES.csvImport)
     const response = await axios.post(query, body, {
