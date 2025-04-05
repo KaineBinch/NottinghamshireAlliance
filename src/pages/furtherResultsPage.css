@@ -10,7 +10,9 @@
 
 .inner-tab-inactive {
   @apply bg-[#17331B] text-white hover:bg-[#1A4923];
-} /* Page container */
+}
+
+/* Page container */
 .page-container {
   @apply w-full mx-auto max-w-5xl;
   padding: clamp(1rem, 3vw, 2rem);
@@ -82,36 +84,57 @@
   font-size: clamp(0.875rem, 1vw + 0.75rem, 1.125rem);
 }
 
-/* Expandable text */
-.expandable-text-container {
-  margin-top: clamp(1rem, 1.5vw, 1.75rem);
-  margin-bottom: clamp(1rem, 1.5vw, 1.75rem);
-  padding-left: clamp(0.5rem, 2vw, 1.25rem);
-  padding-right: clamp(0.5rem, 2vw, 1.25rem);
-  @apply text-start flex flex-col;
+/* Add these styles to your furtherResultsPage.css file */
+
+.event-review-container {
+  margin: 1rem 0;
 }
 
-.expandable-text-wrapper {
-  @apply relative;
+.event-review-truncated {
+  overflow: hidden;
+  text-transform: none;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  margin: 0;
+  line-height: 1.5;
 }
 
-.expandable-text {
-  @apply overflow-clip;
-  font-size: clamp(0.875rem, 0.8vw + 0.7rem, 1rem);
+.event-review-truncated,
+.event-review-full {
+  text-transform: none; /* Overrides any uppercase formatting */
+  font-weight: normal;
+  margin: 0;
+  line-height: 1.5;
 }
 
-.expandable-text-collapsed {
-  @apply line-clamp-4;
+.event-review-full {
+  margin: 0;
+  text-transform: none;
+  line-height: 1.5;
 }
 
-.expandable-text-expanded {
-  @apply line-clamp-none;
+.read-more-button,
+.read-less-button {
+  display: block;
+  background: none;
+  border: none;
+  color: #214a27;
+  font-weight: 600;
+  padding: 0;
+  margin-top: 0.25rem;
+  cursor: pointer;
 }
 
-.expand-button {
-  @apply font-bold text-[#214A27] inline-block;
-  font-size: clamp(0.875rem, 0.6vw + 0.7rem, 1rem);
-  margin-top: clamp(0.25rem, 0.5vw, 0.5rem);
+.read-more-button:hover,
+.read-less-button:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .event-review-truncated {
+    -webkit-line-clamp: 3;
+  }
 }
 
 /* Tabs navigation */
@@ -249,6 +272,7 @@
     margin-bottom: clamp(1rem, 4vw, 1.5rem);
   }
 }
+
 /* Button Styles for Amateur Section Tabs */
 .amateur-tab-buttons {
   display: flex;

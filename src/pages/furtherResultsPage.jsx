@@ -4,35 +4,10 @@ import { Trophy, Users, User } from "lucide-react"
 import { MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
+import ExpandableText from "../components/expandableText"
 import "./furtherResultsPage.css"
 
-const ExpandableText = ({ text }) => {
-  const [isExpanded, setIsExpanded] = useState(false)
-  const toggleExpand = () => setIsExpanded(!isExpanded)
-
-  const fullText = text || "No event review available."
-
-  return (
-    <div className="expandable-text-container">
-      <div className="expandable-text-wrapper">
-        <p
-          className={`expandable-text ${
-            isExpanded
-              ? "expandable-text-expanded"
-              : "expandable-text-collapsed"
-          }`}>
-          {fullText}
-        </p>
-        {fullText !== "No event review available." && (
-          <button onClick={toggleExpand} className="expand-button">
-            {isExpanded ? "Read Less" : "Read More"}
-          </button>
-        )}
-      </div>
-    </div>
-  )
-}
-
+// TabButton component remained the same
 const TabButton = ({ id, label, icon: Icon, activeTab, onClick }) => (
   <button
     onClick={() => onClick(id)}
@@ -44,6 +19,7 @@ const TabButton = ({ id, label, icon: Icon, activeTab, onClick }) => (
   </button>
 )
 
+// AmateurTableButtons component remained the same
 const AmateurTableButtons = ({ activeCategory, onCategoryChange }) => {
   return (
     <div className="flex flex-row place-content-evenly items-center h-[50px] text-white bg-[#17331B]">
@@ -78,6 +54,7 @@ const AmateurTableButtons = ({ activeCategory, onCategoryChange }) => {
   )
 }
 
+// ResultTable component remained the same
 const ResultTable = ({ headers, data }) => (
   <div className="results-table-container">
     <table className="results-table">
@@ -119,9 +96,7 @@ const formatDate = (dateString) => {
 
 const FurtherResultsPage = () => {
   const [activeTab, setActiveTab] = useState("winners")
-
   const [amateurSubTab, setAmateurSubTab] = useState("all")
-
   const { clubName } = useParams()
 
   const query = queryBuilder(MODELS.events, QUERIES.resultsQuery)
@@ -379,6 +354,7 @@ const FurtherResultsPage = () => {
           <p className="event-date">Date: {formatDate(event.eventDate)}</p>
         </header>
 
+        {/* Use the new ExpandableText component here */}
         <ExpandableText text={event.eventReview} />
 
         <nav className="tabs-navigation">
