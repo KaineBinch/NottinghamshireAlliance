@@ -1,26 +1,56 @@
 import { useState, useEffect } from "react"
-import { queryBuilder } from "../../utils/queryBuilder"
-import { BASE_URL, MODELS, QUERIES } from "../../constants/api"
-import useFetch from "../../utils/hooks/useFetch"
+import { BASE_URL } from "../../constants/api"
 import ScrollingImages from "./scrollingImages"
 
 const LogoScroller = () => {
   const [isVisible, setIsVisible] = useState(false)
   const [imagesLoaded, setImagesLoaded] = useState(false)
-  const query = queryBuilder(MODELS.golfClubs, QUERIES.clubsQuery)
-  const { isLoading, isError, data, error } = useFetch(query)
+  const [clubLogos, setClubLogos] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    if (!isLoading && data?.data) {
-      setImagesLoaded(true)
+    const fetchLogos = async () => {
+      setIsLoading(true)
+      try {
+        console.log("Fetching files from Strapi...")
+        const response = await fetch(`${BASE_URL}/api/upload/files`)
 
-      const timer = setTimeout(() => {
-        setIsVisible(true)
-      }, 100)
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`)
+        }
 
-      return () => clearTimeout(timer)
+        const data = await response.json()
+
+        // Filter files by looking for names that contain "ScrollLogo"
+        const scrollLogos = data.filter(
+          (file) => file.name && file.name.includes("ScrollLogo")
+        )
+
+        console.log("Found scroll logos:", scrollLogos.length)
+
+        // Map to full URLs
+        const logoUrls = scrollLogos.map((file) => `${BASE_URL}${file.url}`)
+        console.log("Logo URLs:", logoUrls)
+
+        setClubLogos(logoUrls)
+        setImagesLoaded(true)
+
+        const timer = setTimeout(() => {
+          setIsVisible(true)
+        }, 100)
+
+        return () => clearTimeout(timer)
+      } catch (err) {
+        console.error("Error fetching logos:", err)
+        setError(err)
+      } finally {
+        setIsLoading(false)
+      }
     }
-  }, [isLoading, data])
+
+    fetchLogos()
+  }, [])
 
   if (isLoading) {
     return (
@@ -32,17 +62,10 @@ const LogoScroller = () => {
     )
   }
 
-  if (isError) {
+  if (error) {
     console.error("Error:", error)
     return <p className="pt-[85px]">Something went wrong...</p>
   }
-
-  const clubLogos =
-    data?.data
-      ?.filter(
-        (club) => club.clubLogo && club.clubLogo[0] && club.clubLogo[0].url
-      )
-      .map((club) => `${BASE_URL}${club.clubLogo[0].url}`) || []
 
   return (
     <div className="flex flex-col items-center bg-[#214A27]">
@@ -53,12 +76,14 @@ const LogoScroller = () => {
           opacity: isVisible ? 1 : 0,
           transition: "opacity 0.8s ease-in-out",
         }}>
-        {imagesLoaded && (
+        {imagesLoaded && clubLogos.length > 0 ? (
           <ScrollingImages
             images={clubLogos}
             velocity={-50}
             isVisible={isVisible}
           />
+        ) : (
+          <div className="text-white">No logo images found</div>
         )}
       </div>
       <hr className="border-black w-full" />
