@@ -371,9 +371,9 @@ const ResultsHighlightCard = () => {
         transform: isVisible ? "translateY(0)" : "translateY(20px)",
         transition: "opacity 0.5s ease, transform 0.5s ease",
       }}>
-      <h2 style={fontStyles.heading} className="font-bold mb-2 text-center">
-        {latestEvent.golf_club?.clubName || "Recent"} Results
-      </h2>
+      <h3 style={fontStyles.heading} className="font-bold mb-2 text-center">
+        {latestEvent.golf_club?.clubName || "Recent"}
+      </h3>
       <p
         style={fontStyles.subheading}
         className="mb-6 text-center text-gray-700">
