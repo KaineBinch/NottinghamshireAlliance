@@ -4,81 +4,71 @@ import { motion as m, useMotionValue, useAnimationFrame } from "framer-motion"
 const ScrollingImages = ({ images, velocity = -10, isVisible = true }) => {
   const baseX = useMotionValue(0)
   const imageCount = images.length
-  const duplicatedImages = [...images, ...images, ...images]
+  // Only creating the duplicated array once
+  const duplicatedImages = useRef([...images, ...images, ...images]).current
   const mover = useRef(null)
   const [imagesReady, setImagesReady] = useState(false)
   const [loadedImages, setLoadedImages] = useState({})
-  const loadedCountRef = useRef(0)
+  const loadedImagesCount = useRef(0)
+  // Store the threshold in a ref to avoid recreating it on every render
+  const threshold = useRef(Math.min(3, Math.ceil(images.length / 2)))
 
+  // Handle image loading
   useEffect(() => {
-    if (images.length === 0) return
-
-    const imageStatus = {}
-    // Reset the loaded count when images change
-    loadedCountRef.current = 0
-
-    const markImageLoaded = (src) => {
-      if (!imageStatus[src]) {
-        imageStatus[src] = true
-        loadedCountRef.current++
-
-        // Update loadedImages state only once
-        setLoadedImages((prev) => ({ ...prev, [src]: true }))
-
-        const threshold = Math.min(3, Math.ceil(images.length / 2))
-        if (loadedCountRef.current >= threshold && !imagesReady) {
-          setImagesReady(true)
-        }
-      }
-    }
-
-    // Check if images are already loaded in state
-    const preloadedCount = images.filter((src) => loadedImages[src]).length
-    if (
-      preloadedCount >= Math.min(3, Math.ceil(images.length / 2)) &&
-      !imagesReady
-    ) {
+    if (images.length === 0) {
       setImagesReady(true)
+      return
     }
 
-    // Only preload new images that aren't already loaded
-    duplicatedImages.forEach((src) => {
-      if (src && !loadedImages[src]) {
-        const img = new Image()
-        img.src = src
-        img.onload = () => markImageLoaded(src)
-        img.onerror = () => markImageLoaded(src)
-      } else if (src && loadedImages[src]) {
-        // Count already loaded images
-        loadedCountRef.current++
-      }
-    })
+    // Update threshold if images change
+    threshold.current = Math.min(3, Math.ceil(images.length / 2))
 
-    // Safety timeout to proceed even if images don't load
+    // Safety timeout to ensure we eventually show something
     const timeout = setTimeout(() => {
-      if (!imagesReady) {
-        setImagesReady(true)
-      }
-    }, 1500)
+      setImagesReady(true)
+    }, 2000)
 
     return () => clearTimeout(timeout)
-  }, [images, imagesReady]) // Only depend on images and imagesReady state
+  }, [images])
+
+  const handleImageLoad = (src) => {
+    if (!loadedImages[src]) {
+      loadedImagesCount.current += 1
+
+      setLoadedImages((prev) => ({
+        ...prev,
+        [src]: true,
+      }))
+
+      // Check if we've loaded enough images to show
+      if (loadedImagesCount.current >= threshold.current) {
+        setImagesReady(true)
+      }
+    }
+  }
 
   const getContentWidth = () => {
     if (!mover?.current) return 100 * imageCount
     return mover.current.scrollWidth / 3
   }
 
+  // Animation frame for smooth scrolling
   useAnimationFrame((_, delta) => {
-    if (isVisible && imagesReady && mover.current) {
+    if (isVisible && mover.current) {
       const moveBy = velocity * (delta / 1000)
-      baseX.set(baseX.get() + moveBy)
+      const currentX = baseX.get()
       const contentWidth = getContentWidth()
-      if (baseX.get() <= -contentWidth) baseX.set(0)
+
+      if (currentX <= -contentWidth) {
+        // Reset position when scrolled through full width
+        baseX.set(0)
+      } else {
+        baseX.set(currentX + moveBy)
+      }
     }
   })
 
-  if (!imagesReady) {
+  if (!imagesReady && images.length > 0) {
     return (
       <div className="w-full h-full flex items-center justify-center">
         <div className="w-full h-[50px] bg-[#2D5E34] opacity-30 animate-pulse"></div>
@@ -98,7 +88,7 @@ const ScrollingImages = ({ images, velocity = -10, isVisible = true }) => {
         style={{ x: baseX }}>
         {duplicatedImages.map((src, index) => (
           <img
-            key={index}
+            key={`${index}-${src}`}
             src={src}
             alt={`Logo ${index}`}
             className="inline-block h-[50px] px-5"
@@ -107,6 +97,7 @@ const ScrollingImages = ({ images, velocity = -10, isVisible = true }) => {
               opacity: loadedImages[src] ? 1 : 0,
               transition: "opacity 0.3s ease-in-out",
             }}
+            onLoad={() => handleImageLoad(src)}
           />
         ))}
       </m.div>

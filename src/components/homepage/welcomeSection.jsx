@@ -1,20 +1,63 @@
+import { useState, useEffect } from "react"
 import Weather from "./weather.jsx"
-import image from "../../assets/background.jpg"
+import backgroundImage from "../../assets/background.jpg"
+import CachedImage from "../../utils/CachedImage.jsx"
 
 const WelcomeSection = () => {
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [showContent, setShowContent] = useState(false)
+
+  useEffect(() => {
+    if (imageLoaded) {
+      const timer = setTimeout(() => {
+        setShowContent(true)
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [imageLoaded])
+
   return (
     <>
       <div
-        className="mt-[58px] w-full h-[40svh] place-content-end"
+        className="mt-[58px] w-full h-[40svh] place-content-end relative"
         style={{
-          backgroundImage: `url(${image})`,
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundColor: "#214A27",
+          transition: "opacity 0.5s ease-in-out",
+          opacity: imageLoaded ? 1 : 0.7,
         }}>
-        <Weather city="Nottingham" />
+        {/* Background image with caching */}
+        <div
+          className="absolute inset-0 w-full h-full"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            opacity: imageLoaded ? 1 : 0,
+            transition: "opacity 0.5s ease-in-out",
+          }}>
+          {/* Hidden image for preloading */}
+          <CachedImage
+            src={backgroundImage}
+            alt="Background"
+            className="hidden"
+            onLoad={() => setImageLoaded(true)}
+          />
+        </div>
+
+        {/* Weather component */}
+        <div className="relative z-10">
+          <Weather city="Nottingham" />
+        </div>
       </div>
-      <div className="bg-[#D9D9D9] flex place-content-center">
+
+      <div
+        className="bg-[#D9D9D9] flex place-content-center"
+        style={{
+          opacity: showContent ? 1 : 0,
+          transform: showContent ? "translateY(0)" : "translateY(10px)",
+          transition: "opacity 0.5s ease, transform 0.5s ease",
+        }}>
         <div className="text-center text-black px-5 py-[50px] max-w-5xl">
           <h1>Welcome to the Nottinghamshire Golf Alliance</h1>
           <p className="py-[25px]">

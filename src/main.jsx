@@ -16,18 +16,23 @@ library.add(fab, faPhone, faEnvelope, faSquareFacebook, faSquareInstagram)
 const posthog = window.posthog || null
 
 if (posthog && import.meta.env.DEV) {
-  posthog.debug(true)
+  posthog.debug(false) // Reduced debug noise
 }
 
-if (posthog && import.meta.env.DEV) {
-  try {
-    posthog.capture("test_event", { property: "value", source: "main.jsx" })
-  } catch (error) {
-    console.warn("Error sending test event:", error)
-  }
-}
+// Configure React Query with 24-hour caching
+const TWENTY_FOUR_HOURS = 1000 * 60 * 60 * 24
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false, // Don't refetch when window regains focus
+      refetchOnMount: false, // Don't refetch when component mounts if data is fresh
+      staleTime: TWENTY_FOUR_HOURS, // Consider data fresh for 24 hours
+      cacheTime: TWENTY_FOUR_HOURS, // Keep unused data in cache for 24 hours
+      retry: 1, // Only retry failed requests once
+    },
+  },
+})
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
