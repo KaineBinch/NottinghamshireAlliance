@@ -4,6 +4,7 @@ import useFetch from "../../utils/hooks/useFetch.js"
 import { queryBuilder } from "../../utils/queryBuilder.js"
 import HomePageHeader from "./homepageHeader.jsx"
 import TeeTimeCard from "../teeTimes/teeTimeCard.jsx"
+import TeeTimeSectionSkeleton from "./teeTimeSectionSkeleton.jsx"
 
 const TeeTimesSection = () => {
   const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery)
@@ -11,7 +12,7 @@ const TeeTimesSection = () => {
   const [searchQuery, setSearchQuery] = useState("")
 
   if (isLoading) {
-    return <p className="pt-[85px]"></p>
+    return <TeeTimeSectionSkeleton />
   } else if (isError) {
     console.error("Error:", error)
     return <p className="pt-[85px]">Something went wrong...</p>
