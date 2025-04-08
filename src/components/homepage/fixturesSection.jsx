@@ -4,13 +4,14 @@ import { queryBuilder } from "../../utils/queryBuilder.js"
 import FixtureCard from "../fixtures/fixtureCard.jsx"
 import HomePageHeader from "./homepageHeader.jsx"
 import defaultImage from "../../assets/background.jpg"
+import FixturesSectionSkeleton from "./fixturesSectionSkeleton.jsx"
 
 const FixturesSection = () => {
   const query = queryBuilder(MODELS.events, QUERIES.eventsQuery)
   const { isLoading, isError, data, error } = useFetch(query)
 
   if (isLoading) {
-    return <p className="pt-[85px]"></p>
+    return <FixturesSectionSkeleton />
   } else if (isError) {
     console.error("Error:", error)
     return <p className="pt-[85px]">Something went wrong...</p>
