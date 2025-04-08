@@ -222,7 +222,7 @@ const ResultsHighlightCard = () => {
                   <div
                     key={index}
                     className="flex items-center bg-white shadow-sm p-2 transition-all hover:shadow-md">
-                    <div className="flex-shrink-0 w-4 h-12 flex items-center justify-start bg-[#F5F5F5] ml-2">
+                    <div className="flex-shrink-0 w-4 h-12 flex items-center justify-start ml-2">
                       {getPositionIcon(index)}
                     </div>
                     <div className="flex-1 ml-3">
@@ -273,7 +273,7 @@ const ResultsHighlightCard = () => {
                   <div
                     key={index}
                     className="flex items-center bg-white shadow-sm p-2 transition-all hover:shadow-md">
-                    <div className="flex-shrink-0 w-4 h-12 flex items-center justify-start bg-[#F5F5F5] ml-2">
+                    <div className="flex-shrink-0 w-4 h-12 flex items-center justify-start ml-2">
                       {getPositionIcon(index)}
                     </div>
                     <div className="flex-1 min-w-0 ml-3">
