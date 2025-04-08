@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useParams } from "react-router-dom"
 import { Trophy, Users, User } from "lucide-react"
 import { MODELS, QUERIES } from "../constants/api"
@@ -100,22 +100,7 @@ const FurtherResultsPage = () => {
   const { clubName } = useParams()
 
   const query = queryBuilder(MODELS.events, QUERIES.resultsQuery)
-  const { isLoading, data, error } = useFetch(query)
-
-  useEffect(() => {
-    console.log("Data loading state:", { isLoading, hasData: !!data, error })
-
-    if (data) {
-      const event = data.data?.find((e) => e.id.toString() === clubName)
-      console.log("Found event:", {
-        eventId: clubName,
-        found: !!event,
-        eventClubName: event?.golf_club?.clubName || "N/A",
-        hasScores: !!event?.scores,
-        scoreCount: event?.scores?.length || 0,
-      })
-    }
-  }, [data, isLoading, error, clubName])
+  const { isLoading, data } = useFetch(query)
 
   if (isLoading) {
     return <div className="loading-container">Loading results...</div>

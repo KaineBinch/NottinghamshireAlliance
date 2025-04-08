@@ -1,5 +1,5 @@
 const isProd = import.meta.env.VITE_ENV === 'production';
-console.log('Running in production mode?', isProd);
+if (!isProd) console.log('Running in production mode?', isProd);
 
 export const API_BASE_URLS = {
   local: 'http://localhost:1337',

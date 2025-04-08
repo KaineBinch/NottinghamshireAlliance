@@ -8,46 +8,61 @@ const ScrollingImages = ({ images, velocity = -10, isVisible = true }) => {
   const mover = useRef(null)
   const [imagesReady, setImagesReady] = useState(false)
   const [loadedImages, setLoadedImages] = useState({})
+  const loadedCountRef = useRef(0)
 
   useEffect(() => {
     if (images.length === 0) return
 
     const imageStatus = {}
-    let loadedCount = 0
+    // Reset the loaded count when images change
+    loadedCountRef.current = 0
 
     const markImageLoaded = (src) => {
       if (!imageStatus[src]) {
         imageStatus[src] = true
-        loadedCount++
+        loadedCountRef.current++
+
+        // Update loadedImages state only once
         setLoadedImages((prev) => ({ ...prev, [src]: true }))
 
         const threshold = Math.min(3, Math.ceil(images.length / 2))
-        if (loadedCount >= threshold) {
+        if (loadedCountRef.current >= threshold && !imagesReady) {
           setImagesReady(true)
         }
       }
     }
 
-    duplicatedImages.forEach((src) => {
-      if (src) {
-        if (loadedImages[src]) {
-          markImageLoaded(src)
-          return
-        }
+    // Check if images are already loaded in state
+    const preloadedCount = images.filter((src) => loadedImages[src]).length
+    if (
+      preloadedCount >= Math.min(3, Math.ceil(images.length / 2)) &&
+      !imagesReady
+    ) {
+      setImagesReady(true)
+    }
 
+    // Only preload new images that aren't already loaded
+    duplicatedImages.forEach((src) => {
+      if (src && !loadedImages[src]) {
         const img = new Image()
         img.src = src
         img.onload = () => markImageLoaded(src)
         img.onerror = () => markImageLoaded(src)
+      } else if (src && loadedImages[src]) {
+        // Count already loaded images
+        loadedCountRef.current++
       }
     })
 
+    // Safety timeout to proceed even if images don't load
     const timeout = setTimeout(() => {
-      setImagesReady(true)
+      if (!imagesReady) {
+        setImagesReady(true)
+      }
     }, 1500)
 
     return () => clearTimeout(timeout)
-  }, [images, duplicatedImages, loadedImages])
+  }, [images, imagesReady]) // Only depend on images and imagesReady state
 
   const getContentWidth = () => {
     if (!mover?.current) return 100 * imageCount
@@ -91,9 +106,6 @@ const ScrollingImages = ({ images, velocity = -10, isVisible = true }) => {
               width: "auto",
               opacity: loadedImages[src] ? 1 : 0,
               transition: "opacity 0.3s ease-in-out",
-            }}
-            onLoad={() => {
-              setLoadedImages((prev) => ({ ...prev, [src]: true }))
             }}
           />
         ))}

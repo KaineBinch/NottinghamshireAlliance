@@ -13,7 +13,6 @@ const LogoScroller = () => {
     const fetchLogos = async () => {
       setIsLoading(true)
       try {
-        console.log("Fetching files from Strapi...")
         const response = await fetch(`${BASE_URL}/api/upload/files`)
 
         if (!response.ok) {
@@ -27,11 +26,8 @@ const LogoScroller = () => {
           (file) => file.name && file.name.includes("ScrollLogo")
         )
 
-        console.log("Found scroll logos:", scrollLogos.length)
-
         // Map to full URLs
         const logoUrls = scrollLogos.map((file) => `${BASE_URL}${file.url}`)
-        console.log("Logo URLs:", logoUrls)
 
         setClubLogos(logoUrls)
         setImagesLoaded(true)
