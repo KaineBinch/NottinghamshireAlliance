@@ -35,6 +35,10 @@ const OrderOfMeritPage = () => {
             latest rankings showcasing the top performers.
           </p>
           <p className="description-text">
+            Make sure that you click on each line to see the details of the
+            players and their scores for each event.
+          </p>
+          <p className="description-text">
             Stay updated with our leaderboard to track progress and plan your
             next steps.
           </p>
