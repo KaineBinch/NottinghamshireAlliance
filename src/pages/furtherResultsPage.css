@@ -316,3 +316,52 @@
 .amateur-tab-button-inactive:hover {
   background-color: #1a4923;
 }
+
+/* Search filter styles for further results page */
+.results-search-filter {
+  margin-bottom: 1.5rem;
+}
+
+.results-search-filter .filter-container {
+  background-color: #f5f5f5;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.results-search-filter .search-group {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.results-search-filter .input-field,
+.results-search-filter .select-field {
+  width: 100%;
+  height: 45px;
+  border: 1px solid #ddd;
+  background-color: white;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+}
+
+/* Override the media query that puts inputs side by side */
+@media (min-width: 768px) {
+  .results-search-filter .filter-container {
+    flex-direction: column;
+  }
+
+  .results-search-filter .search-group {
+    flex: 1;
+    margin-bottom: 1rem;
+    margin-right: 0;
+    width: 100%;
+  }
+
+  .results-search-filter div:last-child {
+    width: 100%;
+  }
+}
