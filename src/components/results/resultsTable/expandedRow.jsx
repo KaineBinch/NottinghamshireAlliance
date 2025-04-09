@@ -101,7 +101,7 @@ const ExpandedRowDetails = ({ result, isClubView }) => {
       })
       .slice(0, 15)
 
-    const MAX_HIGHLIGHT_SCORES = 10
+    const MAX_HIGHLIGHT_SCORES = 9
     const topScores = [...validScores]
       .map((item) => parseInt(item.score, 10))
       .filter((score) => !isNaN(score))
