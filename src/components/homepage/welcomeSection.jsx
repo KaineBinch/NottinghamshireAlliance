@@ -1,3 +1,4 @@
+// Enhanced welcomeSection.jsx
 import { useState, useEffect } from "react"
 import Weather from "./weather.jsx"
 import backgroundImage from "../../assets/background.jpg"
@@ -6,6 +7,32 @@ import CachedImage from "../../utils/CachedImage.jsx"
 const WelcomeSection = () => {
   const [imageLoaded, setImageLoaded] = useState(false)
   const [showContent, setShowContent] = useState(false)
+  const [blurredImageLoaded, setBlurredImageLoaded] = useState(false)
+
+  // Add a tiny blurred version for initial render
+  const blurredImageSrc = "../../assets/background-tiny.jpg" // Create a 20px wide version of your background
+
+  useEffect(() => {
+    // Preload the blurred image
+    const blurredImg = new Image()
+    blurredImg.src = blurredImageSrc
+    blurredImg.onload = () => setBlurredImageLoaded(true)
+
+    // Check if main image is in cache
+    const checkMainImageCache = () => {
+      const img = new Image()
+      img.src = backgroundImage
+
+      // If complete is true, the image was loaded from cache
+      if (img.complete) {
+        setImageLoaded(true)
+      } else {
+        img.onload = () => setImageLoaded(true)
+      }
+    }
+
+    checkMainImageCache()
+  }, [])
 
   useEffect(() => {
     if (imageLoaded) {
@@ -23,9 +50,24 @@ const WelcomeSection = () => {
         style={{
           backgroundColor: "#214A27",
           transition: "opacity 0.5s ease-in-out",
-          opacity: imageLoaded ? 1 : 0.7,
+          opacity: imageLoaded || blurredImageLoaded ? 1 : 0.7,
         }}>
-        {/* Background image with caching */}
+        {/* Blurred background fallback */}
+        {blurredImageLoaded && !imageLoaded && (
+          <div
+            className="absolute inset-0 w-full h-full"
+            style={{
+              backgroundImage: `url(${blurredImageSrc})`,
+              backgroundRepeat: "no-repeat",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              filter: "blur(20px)",
+              transform: "scale(1.1)",
+            }}
+          />
+        )}
+
+        {/* Main background image */}
         <div
           className="absolute inset-0 w-full h-full"
           style={{

@@ -1,6 +1,6 @@
-import { useState } from "react"
+// Enhancement for CachedImage.jsx
+import { useState, useEffect, useMemo } from "react"
 
-// A much simpler CachedImage component that will work reliably
 const CachedImage = ({
   src,
   alt,
@@ -12,6 +12,39 @@ const CachedImage = ({
   const [isLoaded, setIsLoaded] = useState(false)
   const [hasError, setHasError] = useState(false)
 
+  // Check if WebP is supported
+  const [supportsWebP, setSupportsWebP] = useState(false)
+
+  useEffect(() => {
+    // Detect WebP support
+    const checkWebPSupport = async () => {
+      try {
+        const webPCheck = new Image()
+        webPCheck.onload = function () {
+          setSupportsWebP(this.width > 0 && this.height > 0)
+        }
+        webPCheck.onerror = function () {
+          setSupportsWebP(false)
+        }
+        webPCheck.src =
+          "data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA=="
+      } catch (e) {
+        setSupportsWebP(false)
+      }
+    }
+
+    checkWebPSupport()
+  }, [])
+
+  // Convert src to WebP if supported
+  const optimizedSrc = useMemo(() => {
+    if (supportsWebP && src && src.match(/\.(jpg|jpeg|png)$/i)) {
+      // If you have WebP versions available, use this logic
+      return src.replace(/\.(jpg|jpeg|png)$/i, ".webp")
+    }
+    return src
+  }, [src, supportsWebP])
+
   const handleLoad = () => {
     setIsLoaded(true)
     if (onLoad) onLoad()
@@ -21,7 +54,6 @@ const CachedImage = ({
     setHasError(true)
   }
 
-  // Show a placeholder until the image loads
   const placeholderElement =
     !isLoaded && !hasError ? (
       <div className={placeholderClassName || className}>
@@ -29,7 +61,6 @@ const CachedImage = ({
       </div>
     ) : null
 
-  // If there was an error loading, show a fallback
   if (hasError) {
     return <div className={className}>{alt || "Image failed to load"}</div>
   }
@@ -38,11 +69,12 @@ const CachedImage = ({
     <>
       {placeholderElement}
       <img
-        src={src}
+        src={optimizedSrc}
         alt={alt || ""}
         className={`${className} ${!isLoaded ? "hidden" : ""}`}
         onLoad={handleLoad}
         onError={handleError}
+        loading="lazy"
         {...props}
       />
     </>
