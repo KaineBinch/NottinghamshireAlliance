@@ -84,16 +84,29 @@ function App() {
     // Listen for storage events (for cross-tab communication)
     const handleStorageChange = (e) => {
       if (e.key === "refresh_trigger") {
-        // Check if we're on a page that needs refreshing
-        const currentPath = window.location.pathname
-        if (
-          currentPath.includes("/teetimes") ||
-          currentPath.includes("/results") ||
-          currentPath.includes("/oom") ||
-          currentPath === "/"
-        ) {
-          console.log("Refresh triggered from another tab. Reloading...")
-          window.location.reload()
+        const refreshTimestamp = parseInt(e.newValue || "0")
+        const currentTime = Date.now()
+        const isRecent = currentTime - refreshTimestamp < 30000 // Within 30 seconds
+
+        if (isRecent) {
+          // Check if we're on a page that needs refreshing
+          const currentPath = window.location.pathname
+          const shouldRefresh =
+            currentPath.includes("/teetimes") ||
+            currentPath.includes("/results") ||
+            currentPath.includes("/oom") ||
+            currentPath === "/"
+
+          if (shouldRefresh) {
+            console.log(
+              `Refresh triggered from another tab at ${new Date(
+                refreshTimestamp
+              ).toLocaleTimeString()}. Reloading...`
+            )
+
+            // Force a full reload to clear all caches
+            window.location.reload()
+          }
         }
       }
     }

@@ -5,13 +5,19 @@ const useFetch = (url, options = {}) => {
   const {
     cacheTime = 15 * 60 * 1000,
     forceRefresh = false,
+    bustCache = false, // New option
     ...queryOptions
   } = options;
+
+  // If bustCache is true, append timestamp to the URL
+  const queryUrl = bustCache ?
+    `${url}${url.includes('?') ? '&' : '?'}_t=${Date.now()}` :
+    url;
 
   const fetchWithCache = async ({ queryKey }) => {
     const [actualUrl] = queryKey;
 
-    if (!forceRefresh) {
+    if (!forceRefresh && !bustCache) {
       const cachedData = getFromCache(actualUrl);
       if (cachedData) {
         setTimeout(() => {
@@ -32,19 +38,19 @@ const useFetch = (url, options = {}) => {
     const response = await fetch(actualUrl)
     const data = await response.json()
 
-    if (!forceRefresh) {
+    if (!forceRefresh && !bustCache) {
       saveToCache(actualUrl, data)
     }
 
     return data
   }
 
-  return useQuery(url, fetchWithCache, {
+  return useQuery(queryUrl, fetchWithCache, {
     retry: 1,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    staleTime: 2 * 60 * 1000,
-    cacheTime: cacheTime,
+    staleTime: bustCache ? 0 : 2 * 60 * 1000, // Zero stale time if bustCache is true
+    cacheTime: bustCache ? 0 : cacheTime,     // Zero cache time if bustCache is true
     ...queryOptions,
   })
 }

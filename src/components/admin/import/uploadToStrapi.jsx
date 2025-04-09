@@ -3,7 +3,6 @@ import axios from "axios"
 import { queryBuilder } from "../../../utils/queryBuilder"
 import { MODELS, QUERIES } from "../../../constants/api"
 import Spinner from "../../helpers/spinner"
-import { clearCache, forceRefresh } from "../../../utils/api/cacheService"
 
 const formatLogSummary = (originalSummary) => {
   if (!originalSummary) return originalSummary
@@ -333,40 +332,44 @@ Issues Found:
 
 function clearCachesAfterPublish() {
   try {
-    // Clear caches for all endpoints that might be affected
-    const endpointsToRefresh = ["/teeTimes", "/events", "/scores", "/results"]
+    // Use a more aggressive approach to clear all API caches
 
-    // Use forceRefresh for specific endpoints
-    endpointsToRefresh.forEach((endpoint) => {
-      forceRefresh(endpoint)
-      console.log(`Cleared cache for ${endpoint}`)
-    })
+    // 1. Clear React Query cache by forcing a window reload on the current page
+    // This is the most reliable way to clear all in-memory caches
+    if (window.location.pathname.includes("/admin")) {
+      console.log("Admin page detected - skipping immediate reload")
+    } else {
+      window.location.reload()
+      return // Stop execution as we're reloading anyway
+    }
 
-    // Also call clearCache to clear any other cached data
-    const clearedCount = clearCache()
-    console.log(`Cleared ${clearedCount} additional cache entries`)
-
-    // Refresh the data on all open tabs (if needed)
-    broadcastRefreshMessage()
-
-    console.log("All caches cleared successfully")
-  } catch (e) {
-    console.warn("Error clearing caches:", e)
-  }
-}
-
-function broadcastRefreshMessage() {
-  try {
+    // 2. For all other tabs, broadcast a refresh message with a timestamp
     localStorage.setItem("refresh_trigger", Date.now().toString())
 
-    if (
-      window.location.pathname.includes("/teetimes") ||
-      window.location.pathname.includes("/results")
-    ) {
-      window.location.reload()
+    // 3. Explicitly clear localStorage cache with a more thorough pattern matching
+    // This finds and clears all API cache entries
+    const cacheKeys = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      // Match any key related to our API cache
+      if (
+        key &&
+        (key.startsWith("notts_alliance_api_cache_") || key.includes("/api/"))
+      ) {
+        localStorage.removeItem(key)
+        cacheKeys.push(key)
+      }
+    }
+
+    console.log(`Cleared ${cacheKeys.length} cache entries:`, cacheKeys)
+
+    // 4. If we're in development mode, output more detailed logs
+    if (import.meta.env.DEV) {
+      console.log("Cache cleared in development mode")
+      console.log("Remaining localStorage items:", Object.keys(localStorage))
     }
   } catch (e) {
-    console.warn("Error broadcasting refresh:", e)
+    console.warn("Error clearing caches:", e)
   }
 }
 

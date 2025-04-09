@@ -30,13 +30,18 @@ self.addEventListener('install', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Check if this is an excluded domain
+  // Check if this is an excluded domain or API request
   const isExcludedDomain = EXCLUDED_DOMAINS.some(domain => url.hostname.includes(domain));
 
-  // Skip caching and pass through the request for excluded domains
-  if (isExcludedDomain) {
+  // Don't cache API requests or POST requests at all
+  const isApiRequest = url.pathname.includes('/api/');
+  const isPostRequest = event.request.method === 'POST';
+
+  // Skip caching and pass through the request for excluded domains and API requests
+  if (isExcludedDomain || isApiRequest || isPostRequest) {
     return;
   }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -62,7 +67,7 @@ self.addEventListener('fetch', event => {
 
             caches.open(CACHE_NAME)
               .then(cache => {
-                // Cache successful responses for images and fonts
+                // Only cache assets like images and fonts - not API responses
                 if (event.request.url.match(/\.(jpg|jpeg|png|gif|svg|webp|woff|woff2|ttf)$/i)) {
                   cache.put(event.request, responseToCache);
                 }
