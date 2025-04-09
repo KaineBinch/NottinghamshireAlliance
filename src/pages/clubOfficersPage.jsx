@@ -23,7 +23,7 @@ const ClubOfficersPage = () => {
 
       const animationInterval = setInterval(() => {
         if (index < officers.length) {
-          setAnimatedItems((prev) => [...prev, officers[index].id])
+          setAnimatedItems((prev) => [...prev, officers[index]?.id])
           index++
         } else {
           clearInterval(animationInterval)
