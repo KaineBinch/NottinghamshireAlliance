@@ -45,7 +45,7 @@ const ResultsPage = () => {
 
         const hasScores = event.scores && event.scores.length > 0
 
-        return isPastEvent && hasScores
+        return (isPastEvent && hasScores) || hasScores
       })
     : []
 
