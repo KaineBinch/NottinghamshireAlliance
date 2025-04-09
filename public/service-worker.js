@@ -8,6 +8,12 @@ const STATIC_ASSETS = [
   '/assets/fonts/weathericons-regular-webfont.ttf',
   // Add other critical assets
 ];
+const EXCLUDED_DOMAINS = [
+  'posthog.com',
+  'i.posthog.com',
+  'eu.i.posthog.com',
+  'eu-assets.i.posthog.com'
+];
 
 // Install event - cache critical assets
 self.addEventListener('install', event => {
@@ -22,6 +28,15 @@ self.addEventListener('install', event => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+
+  // Check if this is an excluded domain
+  const isExcludedDomain = EXCLUDED_DOMAINS.some(domain => url.hostname.includes(domain));
+
+  // Skip caching and pass through the request for excluded domains
+  if (isExcludedDomain) {
+    return;
+  }
   event.respondWith(
     caches.match(event.request)
       .then(response => {

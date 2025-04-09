@@ -3,6 +3,7 @@ import axios from "axios"
 import { queryBuilder } from "../../../utils/queryBuilder"
 import { MODELS, QUERIES } from "../../../constants/api"
 import Spinner from "../../helpers/spinner"
+import { clearCache, forceRefresh } from "../../../utils/api/cacheService"
 
 const formatLogSummary = (originalSummary) => {
   if (!originalSummary) return originalSummary
@@ -77,6 +78,7 @@ export const uploadToStrapi = async (
     const body = { blob, eventReview }
 
     const query = queryBuilder(MODELS.imports, QUERIES.csvImport)
+
     const response = await axios.post(query, body, {
       headers: { "Content-Type": "application/JSON" },
       onUploadProgress: (progressEvent) => {
@@ -91,6 +93,8 @@ export const uploadToStrapi = async (
     if (response.status === 200) {
       console.log("Upload successful ✅")
       setUploadStatus("Success! ✅")
+
+      clearCachesAfterPublish()
 
       if (response.data.logs && setProgressLogs) {
         const logTypeIcons = {
@@ -324,6 +328,45 @@ Issues Found:
         error.response?.data?.error?.message || error.message
       }`
     )
+  }
+}
+
+function clearCachesAfterPublish() {
+  try {
+    // Clear caches for all endpoints that might be affected
+    const endpointsToRefresh = ["/teeTimes", "/events", "/scores", "/results"]
+
+    // Use forceRefresh for specific endpoints
+    endpointsToRefresh.forEach((endpoint) => {
+      forceRefresh(endpoint)
+      console.log(`Cleared cache for ${endpoint}`)
+    })
+
+    // Also call clearCache to clear any other cached data
+    const clearedCount = clearCache()
+    console.log(`Cleared ${clearedCount} additional cache entries`)
+
+    // Refresh the data on all open tabs (if needed)
+    broadcastRefreshMessage()
+
+    console.log("All caches cleared successfully")
+  } catch (e) {
+    console.warn("Error clearing caches:", e)
+  }
+}
+
+function broadcastRefreshMessage() {
+  try {
+    localStorage.setItem("refresh_trigger", Date.now().toString())
+
+    if (
+      window.location.pathname.includes("/teetimes") ||
+      window.location.pathname.includes("/results")
+    ) {
+      window.location.reload()
+    }
+  } catch (e) {
+    console.warn("Error broadcasting refresh:", e)
   }
 }
 
