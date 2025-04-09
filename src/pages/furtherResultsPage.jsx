@@ -19,43 +19,8 @@ const TabButton = ({ id, label, icon: Icon, activeTab, onClick }) => (
   </button>
 )
 
-// AmateurTableButtons component remained the same
-const AmateurTableButtons = ({ activeCategory, onCategoryChange }) => {
-  return (
-    <div className="flex flex-row place-content-evenly items-center h-[50px] text-white bg-[#17331B]">
-      <button
-        className={`w-1/3 border-r border-gray-400 text-sm md:text-base ${
-          activeCategory === "all"
-            ? "bg-[#d9d9d9] text-black font-bold h-full border-none"
-            : "bg-[#17331B] text-white hover:bg-[#1A4923] active:bg-[#0F2C17] h-full"
-        }`}
-        onClick={() => onCategoryChange("all")}>
-        All Scores
-      </button>
-      <button
-        className={`w-1/3 border-r border-gray-400 text-sm md:text-base ${
-          activeCategory === "amateur"
-            ? "bg-[#d9d9d9] text-black font-bold h-full border-none"
-            : "bg-[#17331B] text-white hover:bg-[#1A4923] active:bg-[#0F2C17] h-full"
-        }`}
-        onClick={() => onCategoryChange("amateur")}>
-        Amateur
-      </button>
-      <button
-        className={`w-1/3 text-sm md:text-base ${
-          activeCategory === "senior"
-            ? "bg-[#d9d9d9] text-black font-bold h-full border-none"
-            : "bg-[#17331B] text-white hover:bg-[#1A4923] active:bg-[#0F2C17] h-full"
-        }`}
-        onClick={() => onCategoryChange("senior")}>
-        Senior
-      </button>
-    </div>
-  )
-}
-
-// ResultTable component remained the same
-const ResultTable = ({ headers, data }) => (
+// A general table component for most results
+const ResultsTable = ({ headers, data }) => (
   <div className="results-table-container">
     <table className="results-table">
       <thead>
@@ -78,7 +43,20 @@ const ResultTable = ({ headers, data }) => (
             }>
             {row.map((cell, cellIndex) => (
               <td key={cellIndex} className="results-table-cell">
-                {cell}
+                {typeof cell === "object" && cell?.content ? (
+                  <div className="flex items-center">
+                    <span>{cell.content}</span>
+                    {cell.usedTiebreaker && (
+                      <span
+                        className="text-blue-700 ml-1 text-xs font-medium"
+                        title="Back 9: {cell.back9Score}">
+                        (B9: {cell.back9Score})
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  cell
+                )}
               </td>
             ))}
           </tr>
@@ -88,6 +66,246 @@ const ResultTable = ({ headers, data }) => (
   </div>
 )
 
+// Specialized table for the top winners section with extracted headers
+const TopWinnersTable = ({ data, title }) => (
+  <div className="mb-3">
+    <h3 className="text-[#214A27] font-bold text-sm mb-1">{title}</h3>
+    <table className="w-full border-collapse">
+      <thead>
+        <tr className="bg-[#214A27] text-white">
+          {data.headerRow.map((cell, index) => (
+            <th key={index} className="border border-gray-300 p-1 text-center">
+              {cell}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {data.rows.map((row, rowIndex) => (
+          <tr
+            key={rowIndex}
+            className={rowIndex % 2 === 0 ? "bg-[#d9d9d9]" : "bg-white"}>
+            {row.map((cell, cellIndex) => (
+              <td key={cellIndex} className="border border-gray-300 p-1">
+                {typeof cell === "object" && cell?.content ? (
+                  <div className="flex items-center">
+                    <span>{cell.content}</span>
+                    {cell.usedTiebreaker && (
+                      <span
+                        className="text-blue-700 ml-1 text-xs font-medium"
+                        title="Back 9: {cell.back9Score}">
+                        (B9: {cell.back9Score})
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  cell
+                )}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)
+
+// Team scores table with extracted title and simplified columns
+const TeamScoresTable = ({ team, title, position }) => {
+  const headerTitle = position
+    ? `${position} Team - ${team.clubName} ${team.totalPoints} Points${
+        team.usedTiebreaker ? ` (B9: ${team.totalBack9})` : ""
+      }`
+    : `${title} - ${team.clubName} ${team.totalPoints} Points${
+        team.usedTiebreaker ? ` (B9: ${team.totalBack9})` : ""
+      }`
+
+  return (
+    <div className="mb-3 h-full">
+      <h3 className="text-[#214A27] font-bold text-sm mb-1">{headerTitle}</h3>
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="bg-[#214A27] text-white">
+            <th className="border border-gray-300 p-1">Golfer Name</th>
+            <th className="border border-gray-300 p-1 text-center">
+              Individual points
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {team.scores.map((score, index) => (
+            <tr
+              key={index}
+              className={index % 2 === 0 ? "bg-[#d9d9d9]" : "bg-white"}>
+              <td className="border border-gray-300 p-1 font-semibold">
+                {score.golfer?.golferName || "Unknown Player"}
+              </td>
+              <td className="border border-gray-300 p-1 text-center">
+                {typeof score.golferEventScore === "number" ? (
+                  <div className="flex items-center justify-center">
+                    <span>{score.golferEventScore}</span>
+                    {score.usedTiebreaker && (
+                      <span
+                        className="text-blue-700 ml-1 text-xs font-medium"
+                        title={`Back 9: ${score.back9Score || 0}`}>
+                        (B9: {score.back9Score || 0})
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  "N/A"
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+// Individual winner table with extracted title
+const IndividualWinnerTable = ({
+  player,
+  position,
+  isNTP = false,
+  isSenior = false,
+}) => (
+  <div className="mb-3">
+    <h3 className="text-[#214A27] font-bold text-sm mb-1">
+      {isNTP
+        ? "NTP"
+        : isSenior
+        ? "Senior Winner"
+        : `${position} Individual (not in Winning Teams)`}
+    </h3>
+    <table className="w-full border-collapse">
+      <thead>
+        <tr className="bg-[#214A27] text-white">
+          <th className="border border-gray-300 p-1">Golfer</th>
+          <th className="border border-gray-300 p-1">Club</th>
+          <th className="border border-gray-300 p-1 text-center">Points</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr className="bg-[#d9d9d9]">
+          <td className="border border-gray-300 p-1 font-semibold">
+            {player.golfer?.golferName || "Unknown Player"}
+          </td>
+          <td className="border border-gray-300 p-1">
+            {player.golfer?.golf_club?.clubName || "Unknown Club"}
+          </td>
+          <td className="border border-gray-300 p-1 text-center">
+            {typeof player.golferEventScore === "number" ? (
+              <div className="flex items-center justify-center">
+                <span>{player.golferEventScore}</span>
+                {player.usedTiebreaker && (
+                  <span
+                    className="text-blue-700 ml-1 text-xs font-medium"
+                    title={`Back 9: ${player.back9Score || 0}`}>
+                    (B9: {player.back9Score || 0})
+                  </span>
+                )}
+              </div>
+            ) : (
+              player.specialScore || "N/A"
+            )}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+)
+
+// Professionals table with extracted title
+const ProfessionalsTable = ({ scores }) => {
+  // Group professionals by score to handle ties
+  const scoreGroups = {}
+  scores.forEach((score) => {
+    const eventScore = score.golferEventScore || 0
+    if (!scoreGroups[eventScore]) {
+      scoreGroups[eventScore] = []
+    }
+    scoreGroups[eventScore].push(score)
+  })
+
+  // Sort scores in descending order
+  const sortedScores = Object.keys(scoreGroups)
+    .map(Number)
+    .sort((a, b) => b - a)
+
+  // Build rows with position handling for ties
+  let currentPosition = 1
+  const proRows = []
+
+  sortedScores.forEach((score) => {
+    const playersWithScore = scoreGroups[score]
+
+    // Sort players with the same score by back9 (if applicable)
+    playersWithScore.sort((a, b) => (b.back9Score || 0) - (a.back9Score || 0))
+
+    // Add each player to the rows array
+    playersWithScore.forEach((player) => {
+      proRows.push({
+        position: currentPosition,
+        player: player,
+        club: player.golfer?.golf_club?.clubName || "Unknown Club",
+        score: player.golferEventScore || 0,
+        back9: player.back9Score || 0,
+        usedTiebreaker: player.usedTiebreaker,
+      })
+    })
+
+    // Move position counter forward based on number of players with this score
+    currentPosition += playersWithScore.length
+  })
+
+  return (
+    <div className="mb-3">
+      <h3 className="text-[#214A27] font-bold text-sm mb-1">
+        PGA Professionals / Assistants
+      </h3>
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="bg-[#214A27] text-white">
+            <th className="border border-gray-300 p-1 text-center">Position</th>
+            <th className="border border-gray-300 p-1">Name</th>
+            <th className="border border-gray-300 p-1">Club</th>
+            <th className="border border-gray-300 p-1 text-center">Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          {proRows.slice(0, 5).map((row, index) => (
+            <tr
+              key={index}
+              className={index % 2 === 0 ? "bg-[#d9d9d9]" : "bg-white"}>
+              <td className="border border-gray-300 p-1 text-center">
+                {row.position}
+              </td>
+              <td className="border border-gray-300 p-1">
+                {row.player.golfer?.golferName || "Unknown"}
+              </td>
+              <td className="border border-gray-300 p-1">{row.club}</td>
+              <td className="border border-gray-300 p-1 text-center">
+                <div className="flex items-center justify-center">
+                  <span>{row.score}</span>
+                  {row.usedTiebreaker && (
+                    <span
+                      className="text-blue-700 ml-1 text-xs font-medium"
+                      title={`Back 9: ${row.back9}`}>
+                      (B9: {row.back9})
+                    </span>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 const formatDate = (dateString) => {
   if (!dateString) return "Date not available"
   const date = new Date(dateString)
@@ -95,8 +313,7 @@ const formatDate = (dateString) => {
 }
 
 const FurtherResultsPage = () => {
-  const [activeTab, setActiveTab] = useState("winners")
-  const [amateurSubTab, setAmateurSubTab] = useState("all")
+  const [activeTab, setActiveTab] = useState("amateur")
   const { clubName } = useParams()
 
   const query = queryBuilder(MODELS.events, QUERIES.resultsQuery)
@@ -126,211 +343,300 @@ const FurtherResultsPage = () => {
     return s[lastDigit] || "th"
   }
 
-  const sortedScores = [...event.scores].sort(
-    (a, b) => (b.golferEventScore || 0) - (a.golferEventScore || 0)
+  // Find groups of tied scores (players with identical scores)
+  const findTiedScores = (scores) => {
+    const scoreGroups = {}
+    scores.forEach((score) => {
+      const eventScore = score.golferEventScore || 0
+      if (!scoreGroups[eventScore]) {
+        scoreGroups[eventScore] = []
+      }
+      scoreGroups[eventScore].push(score)
+    })
+
+    // Return only the groups with more than one player (actual ties)
+    return Object.values(scoreGroups).filter((group) => group.length > 1)
+  }
+
+  // Modified to use back9Score for tiebreakers
+  const sortScoresWithTiebreaker = (scores) => {
+    // First find all tied scores
+    const tiedGroups = findTiedScores(scores)
+    const tiedScoreValues = new Set(
+      tiedGroups.map((group) => group[0].golferEventScore || 0)
+    )
+
+    return [...scores].sort((a, b) => {
+      // First compare by golferEventScore
+      const scoreA = a.golferEventScore || 0
+      const scoreB = b.golferEventScore || 0
+      const scoreDiff = scoreB - scoreA
+
+      if (scoreDiff !== 0) return scoreDiff
+
+      // If tied and this is a score that appears in our tied groups, use back9 as tiebreaker
+      if (tiedScoreValues.has(scoreA)) {
+        return (b.back9Score || 0) - (a.back9Score || 0)
+      }
+
+      // If not in a tied group, maintain original order
+      return 0
+    })
+  }
+
+  // Apply tiebreaker logic to mark rows where back9 determined position
+  const applyTiebreakerFlags = (sortedScores) => {
+    // Find all tied scores
+    const tiedGroups = findTiedScores(sortedScores)
+
+    // Process each tied group
+    tiedGroups.forEach((group) => {
+      // Skip if all back9 scores are identical (no tiebreaker needed)
+      const uniqueBack9Scores = new Set(
+        group.map((score) => score.back9Score || 0)
+      )
+      if (uniqueBack9Scores.size <= 1) return
+
+      // Sort the group by back9Score
+      const sortedGroup = [...group].sort(
+        (a, b) => (b.back9Score || 0) - (a.back9Score || 0)
+      )
+
+      // Mark players in this group as using tiebreaker
+      sortedGroup.forEach((score) => {
+        score.usedTiebreaker = true
+      })
+    })
+
+    return sortedScores
+  }
+
+  // Apply sorting with tiebreaker to all score collections
+  const sortedScores = applyTiebreakerFlags(
+    sortScoresWithTiebreaker(event.scores)
   )
 
+  // Filter for amateurs, professionals, and find top performers
   const amateurScores = sortedScores.filter(
     (score) => score.golfer && !score.golfer.isPro
   )
 
-  const scoresByClub = {}
-  event.scores.forEach((score) => {
-    if (!score.golfer) return
+  const topAmateur = amateurScores.length > 0 ? amateurScores[0] : null
 
-    const clubName = score.golfer?.golf_club?.clubName || "Unaffiliated"
-    if (!scoresByClub[clubName]) {
-      scoresByClub[clubName] = []
-    }
-    scoresByClub[clubName].push(score)
-  })
+  const professionalScores = sortedScores.filter((score) => score.golfer?.isPro)
 
-  const teamResults = Object.entries(scoresByClub)
-    .map(([clubName, scores]) => {
-      const topScores = scores
-        .sort((a, b) => (b.golferEventScore || 0) - (a.golferEventScore || 0))
-        .slice(0, 4)
-
-      const totalPoints = topScores.reduce(
-        (sum, score) => sum + (score.golferEventScore || 0),
-        0
-      )
-
-      return { clubName, totalPoints, scores: topScores }
-    })
-    .sort((a, b) => b.totalPoints - a.totalPoints)
-
-  const professionalScores = event.scores.filter((score) => score.golfer?.isPro)
-  const sortedProfessionalScores = [...professionalScores].sort(
-    (a, b) => (b.golferEventScore || 0) - (a.golferEventScore || 0)
+  // Find seniors (amateur with isSenior flag)
+  const seniorScores = amateurScores.filter(
+    (score) => score.golfer && score.golfer.isSenior
   )
 
-  const filteredAmateurScores = amateurScores.filter((score) => {
-    if (amateurSubTab === "all") return true
-    if (amateurSubTab === "amateur") return !score.golfer?.isSenior
-    if (amateurSubTab === "senior") return score.golfer?.isSenior
-    return true
+  const topSenior =
+    seniorScores.length > 0
+      ? [...seniorScores].sort(
+          (a, b) => (b.golferEventScore || 0) - (a.golferEventScore || 0)
+        )[0]
+      : null
+
+  // Group scores by club and identify winning teams
+  const clubScores = {}
+  amateurScores.forEach((score) => {
+    if (!score.golfer?.golf_club) return
+
+    const clubName = score.golfer.golf_club.clubName || "Unaffiliated"
+    if (!clubScores[clubName]) {
+      clubScores[clubName] = []
+    }
+    clubScores[clubName].push(score)
   })
 
-  const WinnersTab = () => {
-    const topAmateurs = amateurScores.slice(0, 3)
-
-    return (
-      <div>
-        <h2 className="section-title">Top Amateurs</h2>
-        {topAmateurs.length === 0 ? (
-          <p className="text-center py-4">No amateur results available</p>
-        ) : (
-          <ResultTable
-            headers={["Position", "Name", "Club", "Points"]}
-            data={topAmateurs.map((score, index) => [
-              `${index + 1}${getOrdinal(index + 1)}`,
-              <>
-                {score.golfer?.golferName || "Unknown"}
-                {score.golfer?.isSenior && (
-                  <span className="golfer-senior-tag">Senior</span>
-                )}
-              </>,
-              score.golfer?.golf_club?.clubName || "Unaffiliated",
-              score.golferEventScore?.toString() || "0",
-            ])}
-          />
-        )}
-
-        <div className="section-divider"></div>
-
-        <h2 className="section-title">All Amateur Scores</h2>
-        <div className="">
-          <AmateurTableButtons
-            activeCategory={amateurSubTab}
-            onCategoryChange={setAmateurSubTab}
-          />
-        </div>
-
-        {filteredAmateurScores.length === 0 ? (
-          <p className="text-center py-4">
-            No scores available for this category
-          </p>
-        ) : (
-          <ResultTable
-            headers={["Position", "Name", "Club", "Points"]}
-            data={filteredAmateurScores.map((score, index) => [
-              `${index + 1}${getOrdinal(index + 1)}`,
-              <>
-                {score.golfer?.golferName || "Unknown"}
-                {score.golfer?.isSenior && (
-                  <span className="golfer-senior-tag">Senior</span>
-                )}
-              </>,
-              score.golfer?.golf_club?.clubName || "Unaffiliated",
-              score.golferEventScore?.toString() || "0",
-            ])}
-          />
-        )}
-      </div>
+  // Calculate team scores
+  const teamScores = Object.entries(clubScores).map(([clubName, scores]) => {
+    // Sort players in each club by score
+    const sortedClubScores = [...scores].sort(
+      (a, b) => (b.golferEventScore || 0) - (a.golferEventScore || 0)
     )
-  }
 
-  const TeamsTab = () => {
-    if (teamResults.length === 0) {
-      return <p className="text-center py-4">No team results available</p>
+    // Take top 4 players (or all if less than 4)
+    const topScores = sortedClubScores.slice(0, 4)
+
+    const totalPoints = topScores.reduce(
+      (sum, score) => sum + (score.golferEventScore || 0),
+      0
+    )
+
+    const totalBack9 = topScores.reduce(
+      (sum, score) => sum + (score.back9Score || 0),
+      0
+    )
+
+    return {
+      clubName,
+      scores: topScores,
+      totalPoints,
+      totalBack9,
     }
+  })
 
-    return (
-      <div className="w-full">
-        <h2 className="section-title">Top Teams</h2>
-        <div className="flex flex-col md:flex-row md:justify-between md:gap-4">
-          {teamResults.slice(0, 3).map((team, teamIndex) => (
-            <div key={team.clubName} className="md:flex-1 mb-6 md:mb-0">
-              <h2 className="team-title text-center">
-                {`${teamIndex + 1}${getOrdinal(teamIndex + 1)}: ${
-                  team.clubName
-                }`}
-              </h2>
-              <p className="text-center mb-3">({team.totalPoints} Points)</p>
-              <ResultTable
-                headers={["Name", "Points"]}
-                data={team.scores.map((score) => [
-                  score.golfer?.golferName || "Unknown",
-                  score.golferEventScore?.toString() || "0",
-                ])}
-              />
-            </div>
-          ))}
-        </div>
+  // Sort teams by total points
+  const sortedTeams = [...teamScores].sort((a, b) => {
+    const pointsDiff = b.totalPoints - a.totalPoints
+    if (pointsDiff !== 0) return pointsDiff
+    return b.totalBack9 - a.totalBack9
+  })
 
-        <div className="section-divider"></div>
-
-        <h2 className="section-title">All Team Scores</h2>
-        <ResultTable
-          headers={["Position", "Club", "Total Points"]}
-          data={teamResults.map((team, index) => [
-            `${index + 1}${getOrdinal(index + 1)}`,
-            team.clubName,
-            team.totalPoints.toString(),
-          ])}
-        />
-      </div>
-    )
-  }
-
-  const ProfessionalsTab = () => {
-    if (sortedProfessionalScores.length === 0) {
-      return (
-        <p className="text-center py-4">No professional results available</p>
-      )
+  // Mark tied teams (same points, different back9)
+  const teamPointGroups = {}
+  sortedTeams.forEach((team) => {
+    if (!teamPointGroups[team.totalPoints]) {
+      teamPointGroups[team.totalPoints] = []
     }
+    teamPointGroups[team.totalPoints].push(team)
+  })
 
-    const topProfessionals = sortedProfessionalScores.slice(0, 5)
+  // Mark teams that require tiebreakers
+  Object.values(teamPointGroups)
+    .filter((group) => group.length > 1)
+    .forEach((group) => {
+      const uniqueBack9 = new Set(group.map((team) => team.totalBack9))
+      if (uniqueBack9.size <= 1) return // All same back9
 
-    return (
-      <div>
-        <h2 className="section-title">Top Professionals</h2>
-        <ResultTable
-          headers={["Position", "Name", "Club", "Points"]}
-          data={topProfessionals.map((score, index) => [
-            `${index + 1}${getOrdinal(index + 1)}`,
-            <>{score.golfer?.golferName || "Unknown"}</>,
-            score.golfer?.golf_club?.clubName || "Unaffiliated",
-            score.golferEventScore?.toString() || "0",
-          ])}
-        />
+      group.forEach((team) => {
+        team.usedTiebreaker = true
+      })
+    })
 
-        <div className="section-divider"></div>
+  // Get the top two teams
+  const winningTeam = sortedTeams.length > 0 ? sortedTeams[0] : null
+  const secondTeam = sortedTeams.length > 1 ? sortedTeams[1] : null
 
-        <h2 className="section-title">All Professional Scores</h2>
-        <ResultTable
-          headers={["Position", "Name", "Club", "Points"]}
-          data={sortedProfessionalScores.map((score, index) => [
-            `${index + 1}${getOrdinal(index + 1)}`,
-            <>{score.golfer?.golferName || "Unknown"}</>,
-            score.golfer?.golf_club?.clubName || "Unaffiliated",
-            score.golferEventScore?.toString() || "0",
-          ])}
-        />
-      </div>
-    )
+  // Find individual winners not in winning teams
+  const playersInWinningTeams = new Set()
+
+  // Add players from top two teams to the set
+  if (winningTeam) {
+    winningTeam.scores.forEach((score) => {
+      if (score.golfer) playersInWinningTeams.add(score.golfer.golferName)
+    })
   }
 
+  if (secondTeam) {
+    secondTeam.scores.forEach((score) => {
+      if (score.golfer) playersInWinningTeams.add(score.golfer.golferName)
+    })
+  }
+
+  // Filter amateur scores to find top players not in winning teams
+  const individualsNotInTeams = amateurScores.filter(
+    (score) =>
+      score.golfer && !playersInWinningTeams.has(score.golfer.golferName)
+  )
+
+  // Sort by score (with tiebreaker already applied)
+  const topIndividualsNotInTeams = individualsNotInTeams.slice(0, 2)
+  const firstIndividual =
+    topIndividualsNotInTeams.length > 0 ? topIndividualsNotInTeams[0] : null
+  const secondIndividual =
+    topIndividualsNotInTeams.length > 1 ? topIndividualsNotInTeams[1] : null
+
+  // Top amateur data for display
+  const topAmateurData = {
+    headerRow: ["Name", "Club", "Points"],
+    rows: topAmateur
+      ? [
+          [
+            topAmateur.golfer?.golferName || "Unknown",
+            topAmateur.golfer?.golf_club?.clubName || "Unknown",
+            {
+              content: topAmateur.golferEventScore || 0,
+              usedTiebreaker: topAmateur.usedTiebreaker,
+              back9Score: topAmateur.back9Score || 0,
+            },
+          ],
+        ]
+      : [["No Amateur Scores", "", ""]],
+  }
+
+  // All amateur data for the tabbed section
+  const allAmateurData = {
+    headers: ["Position", "Name", "Club", "Points"],
+    rows: amateurScores.map((score, index) => [
+      `${index + 1}${getOrdinal(index + 1)}`,
+      <>
+        {score.golfer?.golferName || "Unknown"}
+        {score.golfer?.isSenior && (
+          <span className="golfer-senior-tag">Senior</span>
+        )}
+      </>,
+      score.golfer?.golf_club?.clubName || "Unaffiliated",
+      {
+        content: score.golferEventScore?.toString() || "0",
+        usedTiebreaker: score.usedTiebreaker,
+        back9Score: score.back9Score || 0,
+      },
+    ]),
+  }
+
+  // All team data for the tabbed section
+  const allTeamData = {
+    headers: ["Position", "Club", "Total Points"],
+    rows: sortedTeams.map((team, index) => [
+      `${index + 1}${getOrdinal(index + 1)}`,
+      team.clubName,
+      {
+        content: team.totalPoints.toString(),
+        usedTiebreaker: team.usedTiebreaker,
+        back9Score: team.totalBack9,
+      },
+    ]),
+  }
+
+  // Define the tabs for the section at the bottom of the page
   const tabs = [
     {
-      id: "winners",
+      id: "amateur",
       label: "Amateur",
       icon: Trophy,
-      component: WinnersTab,
+      component: () => (
+        <ResultsTable
+          headers={allAmateurData.headers}
+          data={allAmateurData.rows}
+        />
+      ),
     },
-    { id: "clubs", label: "Team", icon: Users, component: TeamsTab },
     {
-      id: "professionals",
-      label: "Professionals",
+      id: "team",
+      label: "Team",
+      icon: Users,
+      component: () => (
+        <ResultsTable headers={allTeamData.headers} data={allTeamData.rows} />
+      ),
+    },
+    {
+      id: "professional",
+      label: "Professional",
       icon: User,
-      component: ProfessionalsTab,
+      component: () => (
+        <ResultsTable
+          headers={["Position", "Name", "Club", "Points"]}
+          data={professionalScores.map((score, index) => [
+            `${index + 1}${getOrdinal(index + 1)}`,
+            score.golfer?.golferName || "Unknown",
+            score.golfer?.golf_club?.clubName || "Unaffiliated",
+            {
+              content: score.golferEventScore?.toString() || "0",
+              usedTiebreaker: score.usedTiebreaker,
+              back9Score: score.back9Score || 0,
+            },
+          ])}
+        />
+      ),
     },
   ]
 
   return (
     <div className="page-container">
       <div className="content-card">
+        {/* Original header style */}
         <header className="event-header">
           <h1 className="event-title">
             {event.golf_club?.clubName || "Golf Event"}
@@ -339,8 +645,71 @@ const FurtherResultsPage = () => {
           <p className="event-date">Date: {formatDate(event.eventDate)}</p>
         </header>
 
-        {/* Use the new ExpandableText component here */}
-        <ExpandableText text={event.eventReview} />
+        {/* Optional review text */}
+        {event.eventReview && <ExpandableText text={event.eventReview} />}
+
+        {/* Divider between review and results tables */}
+        <div className="border-b border-gray-300 my-5"></div>
+
+        <div className="results-sections">
+          {/* TOP AMATEUR - First section */}
+          <TopWinnersTable data={topAmateurData} title="Amateur Winner" />
+
+          {/* PROFESSIONALS - Second section */}
+          {professionalScores.length > 0 && (
+            <ProfessionalsTable scores={professionalScores} />
+          )}
+
+          {/* TEAMS - Third section, side by side */}
+          <div className="flex flex-col md:flex-row md:gap-3">
+            {/* Winning Team */}
+            <div className="md:flex-1">
+              {winningTeam && (
+                <TeamScoresTable team={winningTeam} title="Winning Team" />
+              )}
+            </div>
+
+            {/* 2nd Team */}
+            <div className="md:flex-1">
+              {secondTeam && (
+                <TeamScoresTable team={secondTeam} position="2nd" />
+              )}
+            </div>
+          </div>
+
+          {/* INDIVIDUALS NOT IN WINNING TEAMS - Fourth section, side by side */}
+          <div className="flex flex-col md:flex-row md:gap-3">
+            {/* 1st Individual (not in winning teams) */}
+            <div className="md:flex-1">
+              {firstIndividual && (
+                <IndividualWinnerTable
+                  player={firstIndividual}
+                  position="1st"
+                />
+              )}
+            </div>
+
+            {/* 2nd Individual (not in winning teams) */}
+            <div className="md:flex-1">
+              {secondIndividual && (
+                <IndividualWinnerTable
+                  player={secondIndividual}
+                  position="2nd"
+                />
+              )}
+            </div>
+          </div>
+
+          {/* SENIOR - Fifth section */}
+          {topSenior && (
+            <IndividualWinnerTable player={topSenior} isSenior={true} />
+          )}
+        </div>
+
+        {/* Tabbed section for all scores */}
+        <div className="section-divider mt-2"></div>
+
+        <h2 className="section-title">All Scores</h2>
 
         <nav className="tabs-navigation">
           {tabs.map((tab) => (
