@@ -1,34 +1,39 @@
-import { useState, useEffect, useCallback, useMemo } from "react"
+import { useState, useEffect } from "react"
 import "./SearchFilter.css"
 
 const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
   const [searchQuery, setSearchQuery] = useState("")
   const [clubQuery, setClubQuery] = useState("")
 
-  const handleSearchChange = useCallback((event) => {
+  // Handle input changes
+  const handleSearchChange = (event) => {
     setSearchQuery(event.target.value.toLowerCase())
-  }, [])
+  }
 
-  const handleClubChange = useCallback((event) => {
+  const handleClubChange = (event) => {
     const selectedValue = event.target.value
     setClubQuery(selectedValue === "" ? "" : selectedValue.toLowerCase())
-  }, [])
+  }
 
-  const filteredData = useMemo(() => {
-    return data.filter((item) => {
+  // Run filtering ONLY when search terms or data changes
+  useEffect(() => {
+    // Filter data based on search criteria
+    const results = data.filter((item) => {
       const matchesName =
         item.name?.toLowerCase().includes(searchQuery) ?? false
       const matchesClub =
         (!clubQuery || item.club?.toLowerCase().includes(clubQuery)) ?? false
       return matchesName && matchesClub
     })
-  }, [searchQuery, clubQuery, data])
 
-  useEffect(() => {
-    if (filteredData !== data) {
-      onFilteredDataChange(filteredData)
-    }
-  }, [filteredData, onFilteredDataChange, data])
+    // Call the parent callback with filtered results
+    // This runs AFTER render, preventing the infinite loop
+    const timeoutId = setTimeout(() => {
+      onFilteredDataChange(results)
+    }, 0)
+
+    return () => clearTimeout(timeoutId)
+  }, [searchQuery, clubQuery, data]) // Intentionally exclude onFilteredDataChange
 
   return (
     <div className="filter-container">
