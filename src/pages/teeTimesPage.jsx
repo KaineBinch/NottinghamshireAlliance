@@ -45,56 +45,64 @@ const formatDateWithOrdinal = (dateString) => {
   return formattedDate
 }
 
-// Helper to find the next event date
-const getNextEventDate = (teeTimes) => {
+// Helper to find today's event and the next upcoming event
+const findRelevantEvents = (teeTimes) => {
   if (!teeTimes || !Array.isArray(teeTimes) || teeTimes.length === 0) {
-    return null
+    return { todayEvent: null, nextEvent: null }
   }
 
   const today = new Date()
   today.setHours(0, 0, 0, 0) // Set to beginning of day for proper comparison
 
-  // First look for future events
-  const upcomingEvents = teeTimes.filter((entry) => {
-    if (!entry.event?.eventDate) return false
-    const eventDate = new Date(entry.event.eventDate)
-    eventDate.setHours(0, 0, 0, 0)
-    return eventDate >= today
+  // Group tee times by event date
+  const eventsByDate = {}
+  teeTimes.forEach((teeTime) => {
+    if (teeTime.event?.eventDate) {
+      const dateStr = teeTime.event.eventDate
+      if (!eventsByDate[dateStr]) {
+        eventsByDate[dateStr] = []
+      }
+      eventsByDate[dateStr].push(teeTime)
+    }
   })
 
-  if (upcomingEvents.length > 0) {
-    // Sort ascending (nearest future date first)
-    const sortedUpcoming = upcomingEvents.sort(
-      (a, b) => new Date(a.event.eventDate) - new Date(b.event.eventDate)
-    )
-    return sortedUpcoming[0].event.eventDate
-  }
+  // Convert to array of [dateStr, teeTimes] pairs and sort by date
+  const sortedEvents = Object.entries(eventsByDate)
+    .map(([dateStr, times]) => ({
+      dateStr,
+      date: new Date(dateStr),
+      teeTimes: times,
+      event: times[0].event,
+    }))
+    .sort((a, b) => a.date - b.date)
 
-  // If no future events, get the most recent past event
-  const pastEvents = teeTimes.filter((entry) => {
-    if (!entry.event?.eventDate) return false
-    const eventDate = new Date(entry.event.eventDate)
+  // Find today's event
+  const todayEvent = sortedEvents.find((entry) => {
+    const eventDate = new Date(entry.dateStr)
     eventDate.setHours(0, 0, 0, 0)
-    return eventDate < today
+    return eventDate.getTime() === today.getTime()
   })
 
-  if (pastEvents.length > 0) {
-    // Sort descending (most recent past date first)
-    const sortedPast = pastEvents.sort(
-      (a, b) => new Date(b.event.eventDate) - new Date(a.event.eventDate)
-    )
-    return sortedPast[0].event.eventDate
-  }
+  // Find the next upcoming event
+  const nextEvent = sortedEvents.find((entry) => {
+    const eventDate = new Date(entry.dateStr)
+    eventDate.setHours(0, 0, 0, 0)
+    return eventDate > today
+  })
 
-  return null
+  return {
+    todayEvent: todayEvent || null,
+    nextEvent: nextEvent || null,
+  }
 }
 
 const TeeTimesPage = () => {
   const [isListView, setIsListView] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [currentEvent, setCurrentEvent] = useState(null)
+  const [currentEventTeeTimes, setCurrentEventTeeTimes] = useState([])
   const [nextEvent, setNextEvent] = useState(null)
-  const [nextEventTeeTimes, setNextEventTeeTimes] = useState([])
 
   // Direct fetch function that bypasses all caching
   const fetchDirectFromStrapi = useCallback(async () => {
@@ -114,19 +122,29 @@ const TeeTimesPage = () => {
         // Process the data
         const allTeeTimeData = response.data.data
 
-        // Find the next event date
-        const eventDate = getNextEventDate(allTeeTimeData)
+        // Find today's event and next event
+        const { todayEvent, nextEvent } = findRelevantEvents(allTeeTimeData)
 
-        // Filter tee times for the next event
-        const eventTeeTimes = allTeeTimeData.filter(
-          (teeTime) => teeTime.event?.eventDate === eventDate
-        )
+        if (todayEvent) {
+          setCurrentEvent(todayEvent.event)
+          setCurrentEventTeeTimes(todayEvent.teeTimes)
 
-        // Get the next event details
-        const event = eventTeeTimes.length > 0 ? eventTeeTimes[0].event : null
-
-        setNextEvent(event)
-        setNextEventTeeTimes(eventTeeTimes)
+          if (nextEvent) {
+            setNextEvent(nextEvent.event)
+          } else {
+            setNextEvent(null)
+          }
+        } else if (nextEvent) {
+          // If no today's event but we have a next event, show that
+          setCurrentEvent(nextEvent.event)
+          setCurrentEventTeeTimes(nextEvent.teeTimes)
+          setNextEvent(null)
+        } else {
+          // No today or future events
+          setCurrentEvent(null)
+          setCurrentEventTeeTimes([])
+          setNextEvent(null)
+        }
       } else {
         console.error("Received invalid data format:", response.data)
         setError("Received invalid data format from server")
@@ -151,11 +169,6 @@ const TeeTimesPage = () => {
     return () => clearInterval(refreshInterval)
   }, [fetchDirectFromStrapi])
 
-  // Manual refresh handler if needed
-  const handleRefresh = () => {
-    fetchDirectFromStrapi()
-  }
-
   if (isLoading) {
     return <TeeTimesPageSkeleton isListView={isListView} />
   }
@@ -166,7 +179,7 @@ const TeeTimesPage = () => {
         <p className="text-xl mb-4">Something went wrong loading the data.</p>
         <p className="text-gray-600 mb-4">{error}</p>
         <button
-          onClick={handleRefresh}
+          onClick={() => window.location.reload()}
           className="bg-[#214A27] text-white px-4 py-2 rounded flex items-center">
           <svg
             className="w-4 h-4 mr-2"
@@ -180,22 +193,43 @@ const TeeTimesPage = () => {
               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
             />
           </svg>
-          Try Again
+          Reload Page
         </button>
       </div>
     )
   }
 
-  const eventDate = nextEvent?.eventDate
-    ? formatDateWithOrdinal(nextEvent.eventDate)
+  const eventDate = currentEvent?.eventDate
+    ? formatDateWithOrdinal(currentEvent.eventDate)
     : "Upcoming Event"
 
-  const isPastEvent = nextEvent?.eventDate
-    ? new Date(nextEvent.eventDate) < new Date()
+  const isTodayEvent = currentEvent?.eventDate
+    ? new Date(currentEvent.eventDate).setHours(0, 0, 0, 0) ===
+      new Date().setHours(0, 0, 0, 0)
+    : false
+
+  const isPastEvent = currentEvent?.eventDate
+    ? new Date(currentEvent.eventDate) < new Date()
     : false
 
   const handleToggleView = () => {
     setIsListView(!isListView)
+  }
+
+  const renderNextEventNotice = () => {
+    if (!nextEvent || !nextEvent.eventDate) return null
+
+    const nextEventDate = formatDateWithOrdinal(nextEvent.eventDate)
+    return (
+      <div className="next-event-notice mt-6 p-4 bg-gray-100 rounded-lg text-center">
+        <h5 className="font-semibold text-lg">Next Event</h5>
+        <p>{nextEvent.golf_club?.clubName}</p>
+        <p>{nextEventDate}</p>
+        <p className="mt-2 text-gray-600">
+          Tee times are not yet available for this event.
+        </p>
+      </div>
+    )
   }
 
   return (
@@ -220,13 +254,15 @@ const TeeTimesPage = () => {
         <hr className="header-divider" />
       </div>
       <div className="page-content">
-        {nextEvent ? (
+        {currentEvent ? (
           <>
             <div className="justify-center items-center">
               <div>
-                <h4 className="club-name">{nextEvent?.golf_club?.clubName}</h4>
+                <h4 className="club-name">
+                  {currentEvent?.golf_club?.clubName}
+                </h4>
                 <h4 className="event-date">{eventDate}</h4>
-                {isPastEvent && (
+                {isPastEvent && !isTodayEvent && (
                   <p className="past-event-indicator">Past event</p>
                 )}
               </div>
@@ -246,30 +282,33 @@ const TeeTimesPage = () => {
       <div className="tee-times-container">
         <div className="tee-times-wrapper">
           <div className="tee-times-content">
-            {nextEventTeeTimes.length > 0 ? (
+            {currentEventTeeTimes.length > 0 ? (
               <>
                 {isListView ? (
                   <ListView
-                    teeTimes={nextEventTeeTimes}
-                    isPastEvent={isPastEvent}
+                    teeTimes={currentEventTeeTimes}
+                    isPastEvent={isPastEvent && !isTodayEvent}
                   />
                 ) : (
                   <TeeTimesTable
-                    teeTimes={nextEventTeeTimes}
-                    isPastEvent={isPastEvent}
+                    teeTimes={currentEventTeeTimes}
+                    isPastEvent={isPastEvent && !isTodayEvent}
                   />
                 )}
               </>
             ) : (
               <div className="text-center py-6">
                 <p className="text-lg">
-                  No tee times available for this event.
+                  No tee times available for the current event.
                 </p>
                 <p className="text-sm text-gray-600 mt-2">
                   Check back soon for updates.
                 </p>
               </div>
             )}
+
+            {/* Show notice about next event */}
+            {nextEvent && renderNextEventNotice()}
           </div>
         </div>
       </div>
