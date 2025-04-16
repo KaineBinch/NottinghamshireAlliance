@@ -5,7 +5,7 @@
 
 /* Logout button */
 .logout-button-container {
-  @apply relative;
+  @apply max-w-5xl mx-auto relative;
 }
 
 .logout-button {
