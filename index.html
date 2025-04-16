@@ -75,6 +75,30 @@
         },
       })
     </script>
+    <script>
+      window.addEventListener("error", function (event) {
+        if (
+          event.message &&
+          event.message.includes("Failed to load module script")
+        ) {
+          console.log("Detected module loading error, refreshing page...")
+          localStorage.setItem("moduleLoadError", "true")
+          window.location.reload(true)
+        }
+      })
+
+      if (localStorage.getItem("moduleLoadError") === "true") {
+        localStorage.removeItem("moduleLoadError")
+        console.log("Clearing application cache...")
+        if ("caches" in window) {
+          caches.keys().then(function (names) {
+            names.forEach(function (name) {
+              caches.delete(name)
+            })
+          })
+        }
+      }
+    </script>
     <script
       async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4222589402843701"
