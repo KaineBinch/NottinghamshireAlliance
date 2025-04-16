@@ -19,6 +19,32 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   const [errorLogs, setErrorLogs] = useState([])
   const [eventReview, setEventReview] = useState("")
 
+  const adjustTimeBackOneHour = (timeString) => {
+    if (
+      !timeString ||
+      typeof timeString !== "string" ||
+      !timeString.includes(":")
+    ) {
+      return timeString
+    }
+
+    const parts = timeString.split(":")
+    if (parts.length < 2) return timeString
+
+    let hours = parseInt(parts[0], 10)
+    let minutes = parts[1]
+
+    if (minutes.includes(".")) {
+      minutes = minutes.split(".")[0]
+    } else if (minutes.length > 2) {
+      minutes = minutes.substring(0, 2)
+    }
+
+    hours = (hours - 1 + 24) % 24
+
+    return `${String(hours).padStart(2, "0")}:${minutes}:00`
+  }
+
   const handleEventReviewChange = (review) => {
     setEventReview(review)
   }
@@ -93,9 +119,12 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
                 : cellValue || ""
             }
             if (cellIndex === 1) {
-              return cellValue && !isNaN(new Date(cellValue))
-                ? new Date(cellValue).toLocaleTimeString("en-GB")
-                : cellValue || ""
+              if (cellValue && !isNaN(new Date(cellValue))) {
+                let timeValue = new Date(cellValue).toLocaleTimeString("en-GB")
+
+                return adjustTimeBackOneHour(timeValue)
+              }
+              return cellValue || ""
             }
             return cellValue
           })
