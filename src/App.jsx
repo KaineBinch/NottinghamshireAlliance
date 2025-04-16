@@ -20,7 +20,6 @@ import Navbar from "./components/navbar"
 import MobFoot from "./components/footer/mobileFooter"
 import { PosthogPageViewTracker } from "./components/posthogPageViewTracker"
 import { Auth0Provider } from "@auth0/auth0-react"
-import { useEffect } from "react"
 
 const domain = import.meta.env.VITE_AUTH0_DOMAIN
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID
@@ -80,43 +79,6 @@ const router = createBrowserRouter(
 )
 
 function App() {
-  useEffect(() => {
-    // Listen for storage events (for cross-tab communication)
-    const handleStorageChange = (e) => {
-      if (e.key === "refresh_trigger") {
-        const refreshTimestamp = parseInt(e.newValue || "0")
-        const currentTime = Date.now()
-        const isRecent = currentTime - refreshTimestamp < 30000 // Within 30 seconds
-
-        if (isRecent) {
-          // Check if we're on a page that needs refreshing
-          const currentPath = window.location.pathname
-          const shouldRefresh =
-            currentPath.includes("/teetimes") ||
-            currentPath.includes("/results") ||
-            currentPath.includes("/oom") ||
-            currentPath === "/"
-
-          if (shouldRefresh) {
-            console.log(
-              `Refresh triggered from another tab at ${new Date(
-                refreshTimestamp
-              ).toLocaleTimeString()}. Reloading...`
-            )
-
-            // Force a full reload to clear all caches
-            window.location.reload()
-          }
-        }
-      }
-    }
-
-    window.addEventListener("storage", handleStorageChange)
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange)
-    }
-  }, [])
   return <RouterProvider router={router} />
 }
 

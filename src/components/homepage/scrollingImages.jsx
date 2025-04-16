@@ -4,133 +4,81 @@ import { motion as m, useMotionValue, useAnimationFrame } from "framer-motion"
 const ScrollingImages = ({ images, velocity = -10, isVisible = true }) => {
   const baseX = useMotionValue(0)
   const imageCount = images.length
-  // Only creating the duplicated array once
-  const duplicatedImages = useRef([...images, ...images, ...images]).current
+  const duplicatedImages = [...images, ...images, ...images]
   const mover = useRef(null)
   const [imagesReady, setImagesReady] = useState(false)
   const [loadedImages, setLoadedImages] = useState({})
-  const loadedImagesCount = useRef(0)
-  // Store the threshold in a ref to avoid recreating it on every render
-  const threshold = useRef(Math.min(3, Math.ceil(images.length / 2)))
+  const loadedCountRef = useRef(0)
 
-  // Image cache key
-  const LOGO_CACHE_KEY = "notts_alliance_logo_load_state"
-
-  // Handle initial setup and cache loading
   useEffect(() => {
-    if (images.length === 0) {
-      setImagesReady(true)
-      return
-    }
+    if (images.length === 0) return
 
-    // Update threshold based on image count
-    threshold.current = Math.min(3, Math.ceil(images.length / 2))
+    const imageStatus = {}
+    // Reset the loaded count when images change
+    loadedCountRef.current = 0
 
-    // Try to load cached state
-    try {
-      const cachedState = localStorage.getItem(LOGO_CACHE_KEY)
-      if (cachedState) {
-        const { loadState, timestamp } = JSON.parse(cachedState)
-        // Cache valid for 7 days
-        if (Date.now() - timestamp < 7 * 24 * 60 * 60 * 1000) {
-          // Find which images from our current set are in the cache
-          const validLoadState = {}
-          let loadedCount = 0
+    const markImageLoaded = (src) => {
+      if (!imageStatus[src]) {
+        imageStatus[src] = true
+        loadedCountRef.current++
 
-          images.forEach((img) => {
-            if (loadState[img]) {
-              validLoadState[img] = true
-              loadedCount++
-            }
-          })
+        // Update loadedImages state only once
+        setLoadedImages((prev) => ({ ...prev, [src]: true }))
 
-          if (loadedCount >= threshold.current) {
-            setLoadedImages(validLoadState)
-            loadedImagesCount.current = loadedCount
-            setImagesReady(true)
-          }
+        const threshold = Math.min(3, Math.ceil(images.length / 2))
+        if (loadedCountRef.current >= threshold && !imagesReady) {
+          setImagesReady(true)
         }
       }
-    } catch (e) {
-      console.warn("Error reading logo cache:", e.message)
     }
 
-    // Safety timeout to ensure we eventually show something
+    // Check if images are already loaded in state
+    const preloadedCount = images.filter((src) => loadedImages[src]).length
+    if (
+      preloadedCount >= Math.min(3, Math.ceil(images.length / 2)) &&
+      !imagesReady
+    ) {
+      setImagesReady(true)
+    }
+
+    // Only preload new images that aren't already loaded
+    duplicatedImages.forEach((src) => {
+      if (src && !loadedImages[src]) {
+        const img = new Image()
+        img.src = src
+        img.onload = () => markImageLoaded(src)
+        img.onerror = () => markImageLoaded(src)
+      } else if (src && loadedImages[src]) {
+        // Count already loaded images
+        loadedCountRef.current++
+      }
+    })
+
+    // Safety timeout to proceed even if images don't load
     const timeout = setTimeout(() => {
-      setImagesReady(true)
-    }, 2000)
-
-    return () => clearTimeout(timeout)
-  }, [images])
-
-  const handleImageLoad = (src) => {
-    if (!loadedImages[src]) {
-      const newLoadedState = {
-        ...loadedImages,
-        [src]: true,
-      }
-
-      setLoadedImages(newLoadedState)
-      loadedImagesCount.current += 1
-
-      // Save to cache
-      try {
-        // Get existing cache or create new one
-        let cacheObj = {}
-        try {
-          const existing = localStorage.getItem(LOGO_CACHE_KEY)
-          if (existing) {
-            const { loadState } = JSON.parse(existing)
-            cacheObj = { loadState }
-          }
-        } catch (e) {
-          console.warn("Error reading from logo cache:", e.message)
-        }
-
-        // Update and save cache
-        localStorage.setItem(
-          LOGO_CACHE_KEY,
-          JSON.stringify({
-            loadState: {
-              ...(cacheObj.loadState || {}),
-              [src]: true,
-            },
-            timestamp: Date.now(),
-          })
-        )
-      } catch (e) {
-        console.warn("Error saving to logo cache:", e.message)
-      }
-
-      // Check if we've loaded enough images to show
-      if (loadedImagesCount.current >= threshold.current) {
+      if (!imagesReady) {
         setImagesReady(true)
       }
-    }
-  }
+    }, 1500)
+
+    return () => clearTimeout(timeout)
+  }, [images, imagesReady]) // Only depend on images and imagesReady state
 
   const getContentWidth = () => {
     if (!mover?.current) return 100 * imageCount
     return mover.current.scrollWidth / 3
   }
 
-  // Animation frame for smooth scrolling
   useAnimationFrame((_, delta) => {
-    if (isVisible && mover.current) {
+    if (isVisible && imagesReady && mover.current) {
       const moveBy = velocity * (delta / 1000)
-      const currentX = baseX.get()
+      baseX.set(baseX.get() + moveBy)
       const contentWidth = getContentWidth()
-
-      if (currentX <= -contentWidth) {
-        // Reset position when scrolled through full width
-        baseX.set(0)
-      } else {
-        baseX.set(currentX + moveBy)
-      }
+      if (baseX.get() <= -contentWidth) baseX.set(0)
     }
   })
 
-  if (!imagesReady && images.length > 0) {
+  if (!imagesReady) {
     return (
       <div className="w-full h-full flex items-center justify-center">
         <div className="w-full h-[50px] bg-[#2D5E34] opacity-30 animate-pulse"></div>
@@ -150,7 +98,7 @@ const ScrollingImages = ({ images, velocity = -10, isVisible = true }) => {
         style={{ x: baseX }}>
         {duplicatedImages.map((src, index) => (
           <img
-            key={`${index}-${src}`}
+            key={index}
             src={src}
             alt={`Logo ${index}`}
             className="inline-block h-[50px] px-5"
@@ -159,8 +107,6 @@ const ScrollingImages = ({ images, velocity = -10, isVisible = true }) => {
               opacity: loadedImages[src] ? 1 : 0,
               transition: "opacity 0.3s ease-in-out",
             }}
-            onLoad={() => handleImageLoad(src)}
-            loading="lazy"
           />
         ))}
       </m.div>

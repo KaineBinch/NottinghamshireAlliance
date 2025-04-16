@@ -77,7 +77,6 @@ export const uploadToStrapi = async (
     const body = { blob, eventReview }
 
     const query = queryBuilder(MODELS.imports, QUERIES.csvImport)
-
     const response = await axios.post(query, body, {
       headers: { "Content-Type": "application/JSON" },
       onUploadProgress: (progressEvent) => {
@@ -92,8 +91,6 @@ export const uploadToStrapi = async (
     if (response.status === 200) {
       console.log("Upload successful ✅")
       setUploadStatus("Success! ✅")
-
-      clearCachesAfterPublish()
 
       if (response.data.logs && setProgressLogs) {
         const logTypeIcons = {
@@ -327,49 +324,6 @@ Issues Found:
         error.response?.data?.error?.message || error.message
       }`
     )
-  }
-}
-
-function clearCachesAfterPublish() {
-  try {
-    // Use a more aggressive approach to clear all API caches
-
-    // 1. Clear React Query cache by forcing a window reload on the current page
-    // This is the most reliable way to clear all in-memory caches
-    if (window.location.pathname.includes("/admin")) {
-      console.log("Admin page detected - skipping immediate reload")
-    } else {
-      window.location.reload()
-      return // Stop execution as we're reloading anyway
-    }
-
-    // 2. For all other tabs, broadcast a refresh message with a timestamp
-    localStorage.setItem("refresh_trigger", Date.now().toString())
-
-    // 3. Explicitly clear localStorage cache with a more thorough pattern matching
-    // This finds and clears all API cache entries
-    const cacheKeys = []
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      // Match any key related to our API cache
-      if (
-        key &&
-        (key.startsWith("notts_alliance_api_cache_") || key.includes("/api/"))
-      ) {
-        localStorage.removeItem(key)
-        cacheKeys.push(key)
-      }
-    }
-
-    console.log(`Cleared ${cacheKeys.length} cache entries:`, cacheKeys)
-
-    // 4. If we're in development mode, output more detailed logs
-    if (import.meta.env.DEV) {
-      console.log("Cache cleared in development mode")
-      console.log("Remaining localStorage items:", Object.keys(localStorage))
-    }
-  } catch (e) {
-    console.warn("Error clearing caches:", e)
   }
 }
 
