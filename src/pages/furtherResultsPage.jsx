@@ -6,6 +6,7 @@ import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
 import ExpandableText from "../components/expandableText"
 import SearchFilter from "../components/SearchFilter"
+import PrintButton from "../components/printButton"
 import "./furtherResultsPage.css"
 
 // TabButton component remained the same
@@ -138,7 +139,7 @@ const TeamScoresTable = ({ team, title, position }) => {
             <tr
               key={index}
               className={index % 2 === 0 ? "bg-[#d9d9d9]" : "bg-white"}>
-              <td className="border border-gray-300 p-1 font-semibold">
+              <td className="border border-gray-300 p-1">
                 {score.golfer?.golferName || "Unknown Player"}
               </td>
               <td className="border border-gray-300 p-1 text-center">
@@ -183,14 +184,14 @@ const IndividualWinnerTable = ({
     <table className="w-full border-collapse">
       <thead>
         <tr className="bg-[#214A27] text-white">
-          <th className="border border-gray-300 p-1">Golfer</th>
+          <th className="border border-gray-300 p-1">Golfer Name</th>
           <th className="border border-gray-300 p-1">Club</th>
           <th className="border border-gray-300 p-1 text-center">Points</th>
         </tr>
       </thead>
       <tbody>
         <tr className="bg-[#d9d9d9]">
-          <td className="border border-gray-300 p-1 font-semibold">
+          <td className="-seborder border-gray-300 p-1">
             {player.golfer?.golferName || "Unknown Player"}
           </td>
           <td className="border border-gray-300 p-1">
@@ -270,7 +271,7 @@ const ProfessionalsTable = ({ scores }) => {
         <thead>
           <tr className="bg-[#214A27] text-white">
             <th className="border border-gray-300 p-1 text-center">Position</th>
-            <th className="border border-gray-300 p-1">Name</th>
+            <th className="border border-gray-300 p-1">Golfer Name</th>
             <th className="border border-gray-300 p-1">Club</th>
             <th className="border border-gray-300 p-1 text-center">Points</th>
           </tr>
@@ -583,7 +584,7 @@ const FurtherResultsPage = () => {
 
     // Top amateur data for display
     const topAmateurData = {
-      headerRow: ["Name", "Club", "Points"],
+      headerRow: ["Golfer Name", "Club", "Points"],
       rows: topAmateur
         ? [
             [
@@ -601,7 +602,7 @@ const FurtherResultsPage = () => {
 
     // All amateur data for the tabbed section
     const allAmateurData = {
-      headers: ["Position", "Name", "Club", "Points"],
+      headers: ["Position", "Golfer Name", "Club", "Points"],
       rows: amateurScores.map((score, index) => [
         `${index + 1}${getOrdinal(index + 1)}`,
         <>
@@ -760,7 +761,7 @@ const FurtherResultsPage = () => {
       icon: User,
       component: () => (
         <ResultsTable
-          headers={["Position", "Name", "Club", "Points"]}
+          headers={["Position", "Golfer Name", "Club", "Points"]}
           data={processedData.professionalScores.map((score, index) => [
             `${index + 1}${getOrdinal(index + 1)}`,
             score.golfer?.golferName || "Unknown",
@@ -815,7 +816,7 @@ const FurtherResultsPage = () => {
         {/* Divider between review and results tables */}
         <div className="border-b border-gray-300 my-5"></div>
 
-        <div className="results-sections">
+        <div id="results-sections" className="results-sections">
           {/* TOP AMATEUR - First section */}
           <TopWinnersTable data={topAmateurData} title="Amateur Winner" />
 
@@ -870,8 +871,16 @@ const FurtherResultsPage = () => {
           )}
         </div>
 
+        {/* Add print button here */}
+        <div className="print-button-container">
+          <PrintButton contentId="results-sections" />
+        </div>
+
+        {/* Divider between results tables and all scores*/}
+        <div className="border-b border-gray-300"></div>
+
         {/* Tabbed section for all scores */}
-        <div className="section-divider mt-2"></div>
+        <div className="h-1 bg-[#e5e7eb]"></div>
 
         <h2 className="section-title">All Scores</h2>
 

@@ -1,0 +1,45 @@
+/* Print button styles */
+.print-button-container {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.print-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #214a27;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.print-button:hover {
+  background-color: #1a3920;
+}
+
+/* Hide print button when printing */
+@media print {
+  .print-button-container {
+    display: none;
+  }
+
+  /* Hide the All Scores section and everything below it */
+  .section-divider,
+  .section-title,
+  .tabs-navigation,
+  main {
+    display: none !important;
+  }
+
+  /* Add more space around the printed content */
+  .content-card {
+    padding: 0;
+    box-shadow: none;
+  }
+}
