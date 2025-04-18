@@ -5,6 +5,7 @@ import ActionButtons from "../import/actionButtons"
 import { uploadToStrapi } from "../import/uploadToStrapi"
 import Spinner from "../../helpers/spinner"
 import EventReviewInput from "./eventReviewInput"
+import { formatDataRow } from "../../../utils/nameFormatter"
 
 const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   const [fileName, setFileName] = useState("")
@@ -18,6 +19,7 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   const [view, setView] = useState("upload")
   const [errorLogs, setErrorLogs] = useState([])
   const [eventReview, setEventReview] = useState("")
+  // We'll detect name columns automatically based on headers
 
   const adjustTimeBackOneHour = (timeString) => {
     if (
@@ -89,6 +91,24 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
       .join("\n")
   }
 
+  // Helper function to determine if a header is a name field
+  const isNameField = (header) => {
+    const nameRelatedTerms = [
+      "name",
+      "player",
+      "golfer",
+      "participant",
+      "member",
+      "person",
+      "first",
+      "last",
+      "surname",
+    ]
+    if (!header || typeof header !== "string") return false
+    const lowercaseHeader = header.toLowerCase()
+    return nameRelatedTerms.some((term) => lowercaseHeader.includes(term))
+  }
+
   const handleFileUpload = async (event) => {
     const file = event.target.files[0]
     if (file) {
@@ -107,27 +127,51 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
           jsonData.push(rowValues)
         })
 
+        // First extract headers to identify name columns
+        const headers =
+          jsonData[0]?.map((cell) => safelyExtractCellValue(cell)) || []
+
+        // Determine which columns contain names based on headers
+        const nameColumns = []
+        headers.forEach((header, index) => {
+          if (isNameField(header)) {
+            nameColumns.push(index)
+          }
+        })
+
+        // We'll use nameColumns directly without storing in state
+
         const formattedData = jsonData.map((row, rowIndex) => {
-          if (rowIndex === 0)
+          if (rowIndex === 0) {
+            // Return headers as is
             return row.map((cell) => safelyExtractCellValue(cell))
-          return row.map((cell, cellIndex) => {
+          }
+
+          // Process each cell in the row
+          const processedRow = row.map((cell, cellIndex) => {
             const cellValue = safelyExtractCellValue(cell)
 
             if (cellIndex === 0) {
+              // Handle date column
               return cellValue && !isNaN(new Date(cellValue))
                 ? new Date(cellValue).toLocaleDateString("en-GB")
                 : cellValue || ""
             }
             if (cellIndex === 1) {
+              // Handle time column
               if (cellValue && !isNaN(new Date(cellValue))) {
                 let timeValue = new Date(cellValue).toLocaleTimeString("en-GB")
-
                 return adjustTimeBackOneHour(timeValue)
               }
               return cellValue || ""
             }
+
+            // Return other cells (including names that will be formatted later)
             return cellValue
           })
+
+          // Apply name formatting to the processed row
+          return formatDataRow(processedRow, nameColumns)
         })
 
         setCsvData(formattedData)
