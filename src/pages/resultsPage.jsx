@@ -1,4 +1,3 @@
-// Example of how to update ResultsPage.jsx
 import { useState, useEffect } from "react"
 import ResultsCard from "../components/results/resultsCard"
 import PageHeader from "../components/pageHeader"

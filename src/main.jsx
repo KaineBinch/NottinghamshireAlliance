@@ -16,7 +16,7 @@ library.add(fab, faPhone, faEnvelope, faSquareFacebook, faSquareInstagram)
 const posthog = window.posthog || null
 
 if (posthog && import.meta.env.DEV) {
-  posthog.debug(false) // Reduced debug noise
+  posthog.debug(false)
 }
 
 const queryClient = new QueryClient()

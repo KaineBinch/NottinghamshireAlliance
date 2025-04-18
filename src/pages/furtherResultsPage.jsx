@@ -9,7 +9,6 @@ import SearchFilter from "../components/SearchFilter"
 import PrintButton from "../components/printButton"
 import "./furtherResultsPage.css"
 
-// TabButton component remained the same
 const TabButton = ({ id, label, icon: Icon, activeTab, onClick }) => (
   <button
     onClick={() => onClick(id)}
@@ -21,7 +20,6 @@ const TabButton = ({ id, label, icon: Icon, activeTab, onClick }) => (
   </button>
 )
 
-// A general table component for most results
 const ResultsTable = ({ headers, data }) => (
   <div className="results-table-container">
     <table className="results-table">
@@ -68,7 +66,6 @@ const ResultsTable = ({ headers, data }) => (
   </div>
 )
 
-// Specialized table for the top winners section with extracted headers
 const TopWinnersTable = ({ data, title }) => (
   <div className="mb-5">
     <h3 className="text-[#214A27] font-bold text-sm mb-1">{title}</h3>
@@ -112,7 +109,6 @@ const TopWinnersTable = ({ data, title }) => (
   </div>
 )
 
-// Team scores table with extracted title and simplified columns
 const TeamScoresTable = ({ team, title, position }) => {
   const headerTitle = position
     ? `${position} Team - ${team.clubName} ${team.totalPoints} Points${
@@ -166,7 +162,6 @@ const TeamScoresTable = ({ team, title, position }) => {
   )
 }
 
-// Individual winner table with extracted title
 const IndividualWinnerTable = ({
   player,
   position,
@@ -219,9 +214,7 @@ const IndividualWinnerTable = ({
   </div>
 )
 
-// Professionals table with extracted title
 const ProfessionalsTable = ({ scores }) => {
-  // Group professionals by score to handle ties
   const scoreGroups = {}
   scores.forEach((score) => {
     const eventScore = score.golferEventScore || 0
@@ -231,22 +224,18 @@ const ProfessionalsTable = ({ scores }) => {
     scoreGroups[eventScore].push(score)
   })
 
-  // Sort scores in descending order
   const sortedScores = Object.keys(scoreGroups)
     .map(Number)
     .sort((a, b) => b - a)
 
-  // Build rows with position handling for ties
   let currentPosition = 1
   const proRows = []
 
   sortedScores.forEach((score) => {
     const playersWithScore = scoreGroups[score]
 
-    // Sort players with the same score by back9 (if applicable)
     playersWithScore.sort((a, b) => (b.back9Score || 0) - (a.back9Score || 0))
 
-    // Add each player to the rows array
     playersWithScore.forEach((player) => {
       proRows.push({
         position: currentPosition,
@@ -258,7 +247,6 @@ const ProfessionalsTable = ({ scores }) => {
       })
     })
 
-    // Move position counter forward based on number of players with this score
     currentPosition += playersWithScore.length
   })
 
@@ -315,21 +303,16 @@ const formatDate = (dateString) => {
 }
 
 const FurtherResultsPage = () => {
-  // Tab state
   const [activeTab, setActiveTab] = useState("amateur")
 
-  // Filter states - must be declared at the top
   const [filteredAmateurData, setFilteredAmateurData] = useState([])
   const [filteredTeamData, setFilteredTeamData] = useState([])
 
-  // Get URL parameter
   const { clubName } = useParams()
 
-  // Fetch data
   const query = queryBuilder(MODELS.events, QUERIES.resultsQuery)
   const { isLoading, data } = useFetch(query)
 
-  // Calculate memoized values based on current data
   const processedData = useMemo(() => {
     if (!data?.data || isLoading) {
       return {
@@ -352,7 +335,6 @@ const FurtherResultsPage = () => {
       }
     }
 
-    // Find the event for the given clubName
     const event = data?.data?.find((e) => e.id.toString() === clubName)
 
     if (!event) {
@@ -376,7 +358,6 @@ const FurtherResultsPage = () => {
       }
     }
 
-    // Helper function for ordinals
     const getOrdinal = (n) => {
       if (n <= 0) return ""
       const s = ["th", "st", "nd", "rd"]
@@ -386,7 +367,6 @@ const FurtherResultsPage = () => {
       return s[lastDigit] || "th"
     }
 
-    // Find groups of tied scores (players with identical scores)
     const findTiedScores = (scores) => {
       const scoreGroups = {}
       scores.forEach((score) => {
@@ -396,55 +376,43 @@ const FurtherResultsPage = () => {
         }
         scoreGroups[eventScore].push(score)
       })
-      // Return only the groups with more than one player (actual ties)
       return Object.values(scoreGroups).filter((group) => group.length > 1)
     }
 
-    // Modified to use back9Score for tiebreakers
     const sortScoresWithTiebreaker = (scores) => {
-      // First find all tied scores
       const tiedGroups = findTiedScores(scores)
       const tiedScoreValues = new Set(
         tiedGroups.map((group) => group[0].golferEventScore || 0)
       )
 
       return [...scores].sort((a, b) => {
-        // First compare by golferEventScore
         const scoreA = a.golferEventScore || 0
         const scoreB = b.golferEventScore || 0
         const scoreDiff = scoreB - scoreA
 
         if (scoreDiff !== 0) return scoreDiff
 
-        // If tied and this is a score that appears in our tied groups, use back9 as tiebreaker
         if (tiedScoreValues.has(scoreA)) {
           return (b.back9Score || 0) - (a.back9Score || 0)
         }
 
-        // If not in a tied group, maintain original order
         return 0
       })
     }
 
-    // Apply tiebreaker logic to mark rows where back9 determined position
     const applyTiebreakerFlags = (sortedScores) => {
-      // Find all tied scores
       const tiedGroups = findTiedScores(sortedScores)
 
-      // Process each tied group
       tiedGroups.forEach((group) => {
-        // Skip if all back9 scores are identical (no tiebreaker needed)
         const uniqueBack9Scores = new Set(
           group.map((score) => score.back9Score || 0)
         )
         if (uniqueBack9Scores.size <= 1) return
 
-        // Sort the group by back9Score
         const sortedGroup = [...group].sort(
           (a, b) => (b.back9Score || 0) - (a.back9Score || 0)
         )
 
-        // Mark players in this group as using tiebreaker
         sortedGroup.forEach((score) => {
           score.usedTiebreaker = true
         })
@@ -453,12 +421,10 @@ const FurtherResultsPage = () => {
       return sortedScores
     }
 
-    // Apply sorting with tiebreaker to all score collections
     const sortedScores = applyTiebreakerFlags(
       sortScoresWithTiebreaker(event.scores || [])
     )
 
-    // Filter for amateurs, professionals, and find top performers
     const amateurScores = sortedScores.filter(
       (score) => score.golfer && !score.golfer.isPro
     )
@@ -469,7 +435,6 @@ const FurtherResultsPage = () => {
       (score) => score.golfer?.isPro
     )
 
-    // Find seniors (amateur with isSenior flag)
     const seniorScores = amateurScores.filter(
       (score) => score.golfer && score.golfer.isSenior
     )
@@ -481,7 +446,6 @@ const FurtherResultsPage = () => {
           )[0]
         : null
 
-    // Group scores by club and identify winning teams
     const clubScores = {}
     amateurScores.forEach((score) => {
       if (!score.golfer?.golf_club) return
@@ -493,14 +457,11 @@ const FurtherResultsPage = () => {
       clubScores[clubName].push(score)
     })
 
-    // Calculate team scores
     const teamScores = Object.entries(clubScores).map(([clubName, scores]) => {
-      // Sort players in each club by score
       const sortedClubScores = [...scores].sort(
         (a, b) => (b.golferEventScore || 0) - (a.golferEventScore || 0)
       )
 
-      // Take top 4 players (or all if less than 4)
       const topScores = sortedClubScores.slice(0, 4)
 
       const totalPoints = topScores.reduce(
@@ -521,14 +482,12 @@ const FurtherResultsPage = () => {
       }
     })
 
-    // Sort teams by total points
     const sortedTeams = [...teamScores].sort((a, b) => {
       const pointsDiff = b.totalPoints - a.totalPoints
       if (pointsDiff !== 0) return pointsDiff
       return b.totalBack9 - a.totalBack9
     })
 
-    // Mark tied teams (same points, different back9)
     const teamPointGroups = {}
     sortedTeams.forEach((team) => {
       if (!teamPointGroups[team.totalPoints]) {
@@ -537,26 +496,22 @@ const FurtherResultsPage = () => {
       teamPointGroups[team.totalPoints].push(team)
     })
 
-    // Mark teams that require tiebreakers
     Object.values(teamPointGroups)
       .filter((group) => group.length > 1)
       .forEach((group) => {
         const uniqueBack9 = new Set(group.map((team) => team.totalBack9))
-        if (uniqueBack9.size <= 1) return // All same back9
+        if (uniqueBack9.size <= 1) return
 
         group.forEach((team) => {
           team.usedTiebreaker = true
         })
       })
 
-    // Get the top two teams
     const winningTeam = sortedTeams.length > 0 ? sortedTeams[0] : null
     const secondTeam = sortedTeams.length > 1 ? sortedTeams[1] : null
 
-    // Find individual winners not in winning teams
     const playersInWinningTeams = new Set()
 
-    // Add players from top two teams to the set
     if (winningTeam) {
       winningTeam.scores.forEach((score) => {
         if (score.golfer) playersInWinningTeams.add(score.golfer.golferName)
@@ -569,20 +524,17 @@ const FurtherResultsPage = () => {
       })
     }
 
-    // Filter amateur scores to find top players not in winning teams
     const individualsNotInTeams = amateurScores.filter(
       (score) =>
         score.golfer && !playersInWinningTeams.has(score.golfer.golferName)
     )
 
-    // Sort by score (with tiebreaker already applied)
     const topIndividualsNotInTeams = individualsNotInTeams.slice(0, 2)
     const firstIndividual =
       topIndividualsNotInTeams.length > 0 ? topIndividualsNotInTeams[0] : null
     const secondIndividual =
       topIndividualsNotInTeams.length > 1 ? topIndividualsNotInTeams[1] : null
 
-    // Top amateur data for display
     const topAmateurData = {
       headerRow: ["Golfer Name", "Club", "Points"],
       rows: topAmateur
@@ -600,7 +552,6 @@ const FurtherResultsPage = () => {
         : [["No Amateur Scores", "", ""]],
     }
 
-    // All amateur data for the tabbed section
     const allAmateurData = {
       headers: ["Position", "Golfer Name", "Club", "Points"],
       rows: amateurScores.map((score, index) => [
@@ -620,7 +571,6 @@ const FurtherResultsPage = () => {
       ]),
     }
 
-    // All team data for the tabbed section
     const allTeamData = {
       headers: ["Position", "Club", "Total Points"],
       rows: sortedTeams.map((team, index) => [
@@ -634,7 +584,6 @@ const FurtherResultsPage = () => {
       ]),
     }
 
-    // Get unique clubs for amateur filter
     const uniqueAmateurClubs = [
       ...new Set(
         amateurScores.map(
@@ -643,7 +592,6 @@ const FurtherResultsPage = () => {
       ),
     ].sort()
 
-    // Get unique clubs for team filter
     const uniqueTeamClubs = [
       ...new Set(sortedTeams.map((team) => team.clubName || "No Club")),
     ].sort()
@@ -668,7 +616,6 @@ const FurtherResultsPage = () => {
     }
   }, [data, clubName, isLoading])
 
-  // Update filtered data when raw data changes
   useMemo(() => {
     if (processedData.allAmateurData?.rows) {
       setFilteredAmateurData(processedData.allAmateurData.rows)
@@ -686,7 +633,6 @@ const FurtherResultsPage = () => {
     return null
   }
 
-  // Define the tabs for the section at the bottom of the page
   const tabs = [
     {
       id: "amateur",
@@ -737,7 +683,7 @@ const FurtherResultsPage = () => {
             <SearchFilter
               data={processedData.allTeamData.rows.map((row) => ({
                 name: row[1],
-                club: row[1], // For teams, name and club are the same
+                club: row[1],
               }))}
               onFilteredDataChange={(filteredData) => {
                 const newFilteredRows = processedData.allTeamData.rows.filter(
@@ -777,7 +723,6 @@ const FurtherResultsPage = () => {
     },
   ]
 
-  // Get the ordinal suffix for numbers (defined at render time to avoid hook issues)
   const getOrdinal = (n) => {
     if (n <= 0) return ""
     const s = ["th", "st", "nd", "rd"]

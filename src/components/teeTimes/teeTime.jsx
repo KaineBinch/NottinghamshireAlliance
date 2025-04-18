@@ -88,7 +88,6 @@ const TeeTimesTable = () => {
 
   const displayData = sortedTeeTimes.length >= 0 ? sortedTeeTimes : teeTimesData
 
-  // Component for rendering golfer information in the requested format
   const GolferInfo = ({ player }) => (
     <div className="golfer-info-container">
       {/* Golfer name on first line */}

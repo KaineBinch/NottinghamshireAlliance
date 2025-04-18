@@ -57,7 +57,6 @@ const ResultsHighlightCard = () => {
   const query = queryBuilder(MODELS.events, QUERIES.resultsQuery)
   const { isLoading, isError, data } = useFetch(query)
 
-  // Helper function to find tied scores (groups of players with identical scores)
   const findTiedScores = (scores) => {
     const scoreGroups = {}
     scores.forEach((score) => {
@@ -67,50 +66,39 @@ const ResultsHighlightCard = () => {
       }
       scoreGroups[eventScore].push(score)
     })
-    // Return only the groups with more than one player (actual ties)
     return Object.values(scoreGroups).filter((group) => group.length > 1)
   }
 
-  // Sort scores with tiebreaker
   const sortScoresWithTiebreaker = (scores) => {
-    // Find tied groups
     const tiedGroups = findTiedScores(scores)
     const tiedScoreValues = new Set(
       tiedGroups.map((group) => group[0].golferEventScore || 0)
     )
 
     return [...scores].sort((a, b) => {
-      // First compare by golferEventScore
       const scoreA = a.golferEventScore || 0
       const scoreB = b.golferEventScore || 0
       const scoreDiff = scoreB - scoreA
 
       if (scoreDiff !== 0) return scoreDiff
 
-      // If tied and this is a score that appears in our tied groups, use back9 as tiebreaker
       if (tiedScoreValues.has(scoreA)) {
         return (b.back9Score || 0) - (a.back9Score || 0)
       }
 
-      // If not in a tied group, maintain original order
       return 0
     })
   }
 
-  // Apply tiebreaker flags
   const applyTiebreakerFlags = (sortedScores) => {
-    // Find all tied scores
     const tiedGroups = findTiedScores(sortedScores)
 
-    // Process each tied group
     tiedGroups.forEach((group) => {
-      // Skip if all back9 scores are identical (no tiebreaker needed)
       const uniqueBack9Scores = new Set(
         group.map((score) => score.back9Score || 0)
       )
       if (uniqueBack9Scores.size <= 1) return
 
-      // Mark players in this group as using tiebreaker
       group.forEach((score) => {
         score.usedTiebreaker = true
       })
@@ -133,18 +121,15 @@ const ResultsHighlightCard = () => {
         const latest = pastEvents[0]
         setLatestEvent(latest)
 
-        // Apply tiebreaker logic to all scores
         const processedScores = applyTiebreakerFlags(
           sortScoresWithTiebreaker(latest.scores || [])
         )
 
-        // Filter and slice for amateurs - now using the processed scores with tiebreakers
         const amateurs = processedScores
           .filter((score) => score.golfer && !score.golfer.isPro)
           .slice(0, 3)
         setTopAmateurs(amateurs)
 
-        // Filter and slice for pros - now using the processed scores with tiebreakers
         const pros = processedScores
           .filter((score) => score.golfer && score.golfer.isPro)
           .slice(0, 3)
@@ -162,10 +147,8 @@ const ResultsHighlightCard = () => {
             scoresByClub[clubName].push(score)
           })
 
-          // Process club results using the same tiebreaker logic
           const clubResults = Object.entries(scoresByClub)
             .map(([clubName, scores]) => {
-              // Apply tiebreaker sorting to club member scores
               const topScores = sortScoresWithTiebreaker(scores).slice(0, 4)
 
               const totalPoints = topScores.reduce(
@@ -173,7 +156,6 @@ const ResultsHighlightCard = () => {
                 0
               )
 
-              // Calculate total back9 for possible club ties
               const totalBack9 = topScores.reduce(
                 (sum, score) => sum + (score.back9Score || 0),
                 0
@@ -188,16 +170,13 @@ const ResultsHighlightCard = () => {
               }
             })
             .sort((a, b) => {
-              // First sort by total points
               const pointsDiff = b.totalPoints - a.totalPoints
               if (pointsDiff !== 0) return pointsDiff
 
-              // If tied on points, use back9 scores
               return b.totalBack9 - a.totalBack9
             })
             .slice(0, 3)
 
-          // Mark clubs that used tiebreakers
           const clubPointGroups = {}
           clubResults.forEach((club) => {
             if (!clubPointGroups[club.totalPoints]) {
@@ -210,7 +189,7 @@ const ResultsHighlightCard = () => {
             .filter((group) => group.length > 1)
             .forEach((group) => {
               const uniqueBack9 = new Set(group.map((club) => club.totalBack9))
-              if (uniqueBack9.size <= 1) return // All same back9
+              if (uniqueBack9.size <= 1) return
 
               group.forEach((club) => {
                 club.usedTiebreaker = true

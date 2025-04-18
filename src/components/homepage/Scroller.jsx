@@ -21,12 +21,10 @@ const LogoScroller = () => {
 
         const data = await response.json()
 
-        // Filter files by looking for names that contain "ScrollLogo"
         const scrollLogos = data.filter(
           (file) => file.name && file.name.includes("ScrollLogo")
         )
 
-        // Map to full URLs
         const logoUrls = scrollLogos.map((file) => `${BASE_URL}${file.url}`)
 
         setClubLogos(logoUrls)

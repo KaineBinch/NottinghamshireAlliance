@@ -3,7 +3,7 @@ module.exports = {
   env: {
     browser: true,
     es2020: true,
-    node: true  // Add this line to recognize Node.js globals like process
+    node: true
   },
   extends: [
     'eslint:recommended',

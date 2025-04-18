@@ -3,7 +3,6 @@ import React from "react"
 const CSVPreview = ({ csvData, groupedData }) => {
   const times = Object.keys(groupedData)
 
-  // In CSVPreview.jsx
   console.log("csvData in CSVPreview:", csvData)
   console.log("groupedData in CSVPreview:", groupedData)
 

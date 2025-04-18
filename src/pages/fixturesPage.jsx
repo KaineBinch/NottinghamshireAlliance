@@ -1,4 +1,3 @@
-// Example of how to update FixturesPage.jsx
 import { useState, useEffect } from "react"
 import PageHeader from "../components/pageHeader"
 import FixtureCard from "../components/fixtures/fixtureCard"

@@ -8,7 +8,6 @@ import TeeTimesSection from "../components/homepage/teeTimeSection.jsx"
 import ResultsSection from "../components/homepage/resultsSection.jsx"
 import "./homePage.css"
 
-// Component that only appears when scrolled into view
 const ScrollRevealSection = ({ children, id }) => {
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef(null)
@@ -16,17 +15,13 @@ const ScrollRevealSection = ({ children, id }) => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // When section comes into view
         if (entry.isIntersecting) {
           setIsVisible(true)
-          // Once visible, no need to keep observing
           observer.unobserve(entry.target)
         }
       },
       {
-        // Section becomes visible when 20% of it enters the viewport
         threshold: 0.2,
-        // Start loading when element is 100px away from viewport
         rootMargin: "100px",
       }
     )
@@ -57,7 +52,6 @@ const ScrollRevealSection = ({ children, id }) => {
   )
 }
 
-// Component that loads in a cascading fashion at startup, then uses scroll reveal
 const HomePage = () => {
   const [initialLoadComplete, setInitialLoadComplete] = useState(false)
   const [visibleSections, setVisibleSections] = useState({
@@ -66,22 +60,16 @@ const HomePage = () => {
     teeTimes: false,
   })
 
-  // First load the above-the-fold content in cascade
   useEffect(() => {
-    // Start with a short delay
     setTimeout(() => {
-      // First show welcome
       setVisibleSections((prev) => ({ ...prev, welcome: true }))
 
-      // Then show scroller
       setTimeout(() => {
         setVisibleSections((prev) => ({ ...prev, scroller: true }))
 
-        // Then show tee times
         setTimeout(() => {
           setVisibleSections((prev) => ({ ...prev, teeTimes: true }))
 
-          // Mark initial load as complete
           setTimeout(() => {
             setInitialLoadComplete(true)
           }, 500)

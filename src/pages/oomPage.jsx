@@ -1,4 +1,3 @@
-// Example of how to update OrderOfMeritPage.jsx
 import PageHeader from "../components/pageHeader"
 import { results } from "../constants/results"
 import { transformResults } from "../utils/transformResults"
@@ -12,10 +11,9 @@ const OrderOfMeritPage = () => {
   const { rows, columns } = transformResults(results)
 
   useEffect(() => {
-    // Simulate data loading or wait for API calls to complete
     const timer = setTimeout(() => {
       setLoading(false)
-    }, 800) // Adjust as needed
+    }, 800)
 
     return () => clearTimeout(timer)
   }, [])

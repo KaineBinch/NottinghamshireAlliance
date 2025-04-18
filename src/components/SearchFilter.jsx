@@ -5,7 +5,6 @@ const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
   const [searchQuery, setSearchQuery] = useState("")
   const [clubQuery, setClubQuery] = useState("")
 
-  // Handle input changes
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value.toLowerCase())
   }
@@ -15,9 +14,7 @@ const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
     setClubQuery(selectedValue === "" ? "" : selectedValue.toLowerCase())
   }
 
-  // Run filtering ONLY when search terms or data changes
   useEffect(() => {
-    // Filter data based on search criteria
     const results = data.filter((item) => {
       const matchesName =
         item.name?.toLowerCase().includes(searchQuery) ?? false
@@ -26,14 +23,12 @@ const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
       return matchesName && matchesClub
     })
 
-    // Call the parent callback with filtered results
-    // This runs AFTER render, preventing the infinite loop
     const timeoutId = setTimeout(() => {
       onFilteredDataChange(results)
     }, 0)
 
     return () => clearTimeout(timeoutId)
-  }, [searchQuery, clubQuery, data]) // Intentionally exclude onFilteredDataChange
+  }, [searchQuery, clubQuery, data])
 
   return (
     <div className="filter-container">

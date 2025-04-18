@@ -1,6 +1,5 @@
 import { PageSkeleton, SkeletonText, SkeletonRect } from "./SkeletonElements"
 
-// Skeleton for table view
 const TeeTimesTableSkeleton = () => {
   return (
     <div className="teetimes-container">
@@ -42,7 +41,6 @@ const TeeTimesTableSkeleton = () => {
   )
 }
 
-// Skeleton for list view
 const TeeTimesListSkeleton = () => {
   return (
     <div className="list-view-container">

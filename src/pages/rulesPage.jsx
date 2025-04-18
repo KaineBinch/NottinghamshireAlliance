@@ -1,4 +1,3 @@
-// Example of how to update RulesPage.jsx
 import { useState } from "react"
 import PageHeader from "../components/pageHeader"
 import { MODELS, QUERIES } from "../constants/api"

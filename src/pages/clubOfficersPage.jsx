@@ -11,13 +11,10 @@ const ClubOfficersPage = () => {
   const { isLoading, isError, data, error } = useFetch(query)
   const [animatedItems, setAnimatedItems] = useState([])
 
-  // Gradually show officer items after data loads
   useEffect(() => {
     if (!isLoading && data?.data) {
-      // Reset animation state
       setAnimatedItems([])
 
-      // Animate items in one by one
       const officers = [...data.data]
       let index = 0
 
@@ -58,7 +55,6 @@ const ClubOfficersPage = () => {
     data?.data?.filter((officer) => officer.Positions === "Committee Member") ||
     []
 
-  // Animation classes
   const getAnimationClass = (officerId) => {
     return animatedItems.includes(officerId)
       ? "opacity-100 translate-y-0 transition-all duration-500 ease-in-out"

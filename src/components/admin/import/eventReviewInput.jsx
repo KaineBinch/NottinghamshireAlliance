@@ -3,7 +3,7 @@ import { useState, useEffect } from "react"
 const EventReviewInput = ({ onReviewChange, disabled = false }) => {
   const [eventReview, setEventReview] = useState("")
   const [charCount, setCharCount] = useState(0)
-  const MAX_CHARS = 1500 // Adjust as needed
+  const MAX_CHARS = 1500
 
   useEffect(() => {
     onReviewChange(eventReview)

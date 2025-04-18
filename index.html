@@ -8,7 +8,6 @@
       name="description"
       content="Official website of the Nottinghamshire Golf Alliance" />
     <title>Nottinghamshire Alliance</title>
-    <!-- Add environment variables via window -->
     <script>
       window.ENV = {
         POSTHOG_KEY: "%VITE_REACT_APP_PUBLIC_POSTHOG_KEY%",
@@ -66,7 +65,6 @@
           (e.__SV = 1))
       })(document, window.posthog || [])
 
-      // Use window.ENV instead of import.meta.env
       posthog.init(window.ENV.POSTHOG_KEY, {
         api_host: window.ENV.POSTHOG_HOST,
         person_profiles: "identified_only",

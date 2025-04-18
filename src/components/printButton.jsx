@@ -1,4 +1,3 @@
-// PrintButton component
 import { Printer } from "lucide-react"
 import "./printButton.css"
 
@@ -103,16 +102,12 @@ const PrintButton = ({ contentId }) => {
       </style>
     `
 
-    // Replace body content with just what we want to print
     document.body.innerHTML = printStyles + printContent
 
-    // Print
     window.print()
 
-    // Restore original content
     document.body.innerHTML = originalContent
 
-    // Reload to restore event handlers
     window.location.reload()
   }
 

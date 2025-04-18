@@ -7,27 +7,21 @@ import Spinner from "../../helpers/spinner"
 import EventReviewInput from "./eventReviewInput"
 import { formatDataRow } from "../../../utils/nameFormatter"
 
-// Proper date/time handling functions
 const formatExcelDate = (excelDate) => {
   if (!excelDate) return ""
 
-  // Handle Excel date format properly
   if (excelDate instanceof Date) {
-    // Format as DD/MM/YYYY
     const day = String(excelDate.getDate()).padStart(2, "0")
     const month = String(excelDate.getMonth() + 1).padStart(2, "0")
     const year = excelDate.getFullYear()
     return `${day}/${month}/${year}`
   }
 
-  // If it's already a string in correct format, return as is
   if (typeof excelDate === "string") {
-    // Check if it matches date pattern
     if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(excelDate)) {
       return excelDate
     }
 
-    // Try to convert if it's in another format
     try {
       const date = new Date(excelDate)
       if (!isNaN(date)) {
@@ -37,7 +31,6 @@ const formatExcelDate = (excelDate) => {
         return `${day}/${month}/${year}`
       }
     } catch (e) {
-      // If conversion fails, return original
       console.error("Date conversion error:", e)
     }
   }
@@ -48,17 +41,12 @@ const formatExcelDate = (excelDate) => {
 const formatExcelTime = (excelTime) => {
   if (!excelTime) return ""
 
-  // If it's a Date object
   if (excelTime instanceof Date) {
-    // Format as HH:MM:SS without any adjustments
     return excelTime.toTimeString().split(" ")[0]
   }
 
-  // If it's already a string in correct format
   if (typeof excelTime === "string") {
-    // If it already has proper format (HH:MM:SS), return as is
     if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(excelTime)) {
-      // Ensure the format has seconds
       if (!excelTime.includes(":")) return excelTime
 
       const parts = excelTime.split(":")
@@ -68,14 +56,12 @@ const formatExcelTime = (excelTime) => {
       return excelTime
     }
 
-    // Try to convert if it's in another format
     try {
       const time = new Date(excelTime)
       if (!isNaN(time)) {
         return time.toTimeString().split(" ")[0]
       }
     } catch (e) {
-      // If conversion fails, return original
       console.error("Time conversion error:", e)
     }
   }
@@ -142,7 +128,6 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
       .join("\n")
   }
 
-  // Helper function to determine if a header is a name field
   const isNameField = (header) => {
     const nameRelatedTerms = [
       "name",
@@ -185,11 +170,9 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
           jsonData.push(rowValues)
         })
 
-        // First extract headers to identify name columns
         const headers =
           jsonData[0]?.map((cell) => safelyExtractCellValue(cell)) || []
 
-        // Determine which columns contain names based on headers
         const nameColumns = []
         headers.forEach((header, index) => {
           if (isNameField(header)) {
@@ -199,28 +182,22 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
 
         const formattedData = jsonData.map((row, rowIndex) => {
           if (rowIndex === 0) {
-            // Return headers as is
             return row.map((cell) => safelyExtractCellValue(cell))
           }
 
-          // Process each cell in the row
           const processedRow = row.map((cell, cellIndex) => {
             const cellValue = safelyExtractCellValue(cell)
 
             if (cellIndex === 0) {
-              // Handle date column - use our new formatter
               return formatExcelDate(cellValue)
             }
             if (cellIndex === 1) {
-              // Handle time column - use our new formatter
               return formatExcelTime(cellValue)
             }
 
-            // Return other cells (including names that will be formatted later)
             return cellValue
           })
 
-          // Apply name formatting to the processed row
           console.log("Before formatDataRow:", processedRow)
           const formattedRow = formatDataRow(processedRow, nameColumns)
           console.log("After formatDataRow:", formattedRow)
@@ -346,14 +323,11 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
     }
   }
 
-  // Function to handle copying logs to clipboard
   const handleCopyLogs = () => {
-    // Determine which logs to copy based on current view
     const logsToCopy = showOnlyIssues ? errorLogs : progressLogs
 
     if (logsToCopy.length === 0) return
 
-    // Format logs for clipboard
     const formattedLogs = logsToCopy
       .map((log) => {
         const prefix =
@@ -369,14 +343,12 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
       })
       .join("\n\n")
 
-    // Add header to distinguish which logs were copied
     const header = showOnlyIssues
       ? `=== ERROR AND WARNING LOGS (${logsToCopy.length}) ===\n\n`
       : `=== ALL LOGS (${logsToCopy.length}) ===\n\n`
 
     const content = header + formattedLogs
 
-    // Copy to clipboard
     navigator.clipboard
       .writeText(content)
       .then(() => {
@@ -500,7 +472,6 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
       (log) => log.type === "warning"
     ).length
 
-    // This will hold the logs to display based on our filter settings
     const logsToDisplay = showOnlyIssues ? errorLogs : progressLogs
 
     return (

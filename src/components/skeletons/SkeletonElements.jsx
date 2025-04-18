@@ -1,4 +1,3 @@
-// Basic rectangular skeleton with wave animation
 export const SkeletonRect = ({ className = "", style = {} }) => {
   return (
     <div
@@ -9,7 +8,6 @@ export const SkeletonRect = ({ className = "", style = {} }) => {
   )
 }
 
-// Text line skeleton
 export const SkeletonText = ({
   width = "100%",
   height = "1rem",
@@ -23,7 +21,6 @@ export const SkeletonText = ({
   )
 }
 
-// Circle skeleton (for logos, avatars, etc.)
 export const SkeletonCircle = ({ size = "3rem", className = "" }) => {
   return (
     <SkeletonRect
@@ -33,7 +30,6 @@ export const SkeletonCircle = ({ size = "3rem", className = "" }) => {
   )
 }
 
-// Header skeleton with title and subtitle
 export const SkeletonHeader = () => {
   return (
     <div className="space-y-2 mb-6">
@@ -43,7 +39,6 @@ export const SkeletonHeader = () => {
   )
 }
 
-// Paragraph skeleton with multiple lines
 export const SkeletonParagraph = ({ lines = 3 }) => {
   return (
     <div className="space-y-2">
@@ -59,12 +54,10 @@ export const SkeletonParagraph = ({ lines = 3 }) => {
   )
 }
 
-// Button skeleton
 export const SkeletonButton = ({ width = "100px", height = "2.5rem" }) => {
   return <SkeletonRect className="rounded" style={{ width, height }} />
 }
 
-// Card skeleton (basic structure for cards)
 export const SkeletonCard = ({ height = "250px", className = "" }) => {
   return (
     <div className={`bg-white rounded-md overflow-hidden shadow ${className}`}>
@@ -78,7 +71,6 @@ export const SkeletonCard = ({ height = "250px", className = "" }) => {
   )
 }
 
-// Table skeleton
 export const SkeletonTable = ({ rows = 5, columns = 4 }) => {
   return (
     <div className="bg-white shadow rounded-md overflow-hidden">
@@ -116,7 +108,6 @@ export const SkeletonTable = ({ rows = 5, columns = 4 }) => {
   )
 }
 
-// Results table skeleton specifically for OOM
 export const SkeletonOOMTable = ({ rows = 10 }) => {
   return (
     <div className="w-full max-w-5xl mx-auto">
@@ -174,7 +165,6 @@ export const SkeletonOOMTable = ({ rows = 10 }) => {
   )
 }
 
-// Page skeleton with header and content
 export const PageSkeleton = ({ children }) => {
   return (
     <div className="pt-[85px]">

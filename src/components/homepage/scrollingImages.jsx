@@ -14,7 +14,6 @@ const ScrollingImages = ({ images, velocity = -10, isVisible = true }) => {
     if (images.length === 0) return
 
     const imageStatus = {}
-    // Reset the loaded count when images change
     loadedCountRef.current = 0
 
     const markImageLoaded = (src) => {
@@ -22,7 +21,6 @@ const ScrollingImages = ({ images, velocity = -10, isVisible = true }) => {
         imageStatus[src] = true
         loadedCountRef.current++
 
-        // Update loadedImages state only once
         setLoadedImages((prev) => ({ ...prev, [src]: true }))
 
         const threshold = Math.min(3, Math.ceil(images.length / 2))
@@ -32,7 +30,6 @@ const ScrollingImages = ({ images, velocity = -10, isVisible = true }) => {
       }
     }
 
-    // Check if images are already loaded in state
     const preloadedCount = images.filter((src) => loadedImages[src]).length
     if (
       preloadedCount >= Math.min(3, Math.ceil(images.length / 2)) &&
@@ -41,7 +38,6 @@ const ScrollingImages = ({ images, velocity = -10, isVisible = true }) => {
       setImagesReady(true)
     }
 
-    // Only preload new images that aren't already loaded
     duplicatedImages.forEach((src) => {
       if (src && !loadedImages[src]) {
         const img = new Image()
@@ -49,12 +45,10 @@ const ScrollingImages = ({ images, velocity = -10, isVisible = true }) => {
         img.onload = () => markImageLoaded(src)
         img.onerror = () => markImageLoaded(src)
       } else if (src && loadedImages[src]) {
-        // Count already loaded images
         loadedCountRef.current++
       }
     })
 
-    // Safety timeout to proceed even if images don't load
     const timeout = setTimeout(() => {
       if (!imagesReady) {
         setImagesReady(true)
@@ -62,7 +56,7 @@ const ScrollingImages = ({ images, velocity = -10, isVisible = true }) => {
     }, 1500)
 
     return () => clearTimeout(timeout)
-  }, [images, imagesReady]) // Only depend on images and imagesReady state
+  }, [images, imagesReady])
 
   const getContentWidth = () => {
     if (!mover?.current) return 100 * imageCount
