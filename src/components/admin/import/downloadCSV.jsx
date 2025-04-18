@@ -38,37 +38,6 @@ const formatExcelDate = (excelDate) => {
   return excelDate || ""
 }
 
-const formatExcelTime = (excelTime) => {
-  if (!excelTime) return ""
-
-  if (excelTime instanceof Date) {
-    return excelTime.toTimeString().split(" ")[0]
-  }
-
-  if (typeof excelTime === "string") {
-    if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(excelTime)) {
-      if (!excelTime.includes(":")) return excelTime
-
-      const parts = excelTime.split(":")
-      if (parts.length === 2) {
-        return `${parts[0]}:${parts[1]}:00`
-      }
-      return excelTime
-    }
-
-    try {
-      const time = new Date(excelTime)
-      if (!isNaN(time)) {
-        return time.toTimeString().split(" ")[0]
-      }
-    } catch (e) {
-      console.error("Time conversion error:", e)
-    }
-  }
-
-  return excelTime || ""
-}
-
 const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   const [fileName, setFileName] = useState("")
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -166,7 +135,27 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
         const jsonData = []
 
         worksheet.eachRow((row) => {
-          const rowValues = row.values.slice(1)
+          const rowValues = []
+          // Skip the row index which is at position 0
+          for (let i = 1; i <= row.cellCount; i++) {
+            const cell = row.getCell(i)
+            let value
+
+            // Special handling for time values in column 2 (index 1)
+            if (i === 2 && cell.value instanceof Date) {
+              // Format time directly from Excel using UTC to avoid timezone issues
+              const date = cell.value
+              value = [
+                date.getUTCHours().toString().padStart(2, "0"),
+                date.getUTCMinutes().toString().padStart(2, "0"),
+                (date.getUTCSeconds() || 0).toString().padStart(2, "0"),
+              ].join(":")
+            } else {
+              value = safelyExtractCellValue(cell)
+            }
+
+            rowValues.push(value)
+          }
           jsonData.push(rowValues)
         })
 
@@ -182,26 +171,14 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
 
         const formattedData = jsonData.map((row, rowIndex) => {
           if (rowIndex === 0) {
-            return row.map((cell) => safelyExtractCellValue(cell))
+            return row
           }
 
-          const processedRow = row.map((cell, cellIndex) => {
-            const cellValue = safelyExtractCellValue(cell)
+          if (row[0]) {
+            row[0] = formatExcelDate(row[0])
+          }
 
-            if (cellIndex === 0) {
-              return formatExcelDate(cellValue)
-            }
-            if (cellIndex === 1) {
-              return formatExcelTime(cellValue)
-            }
-
-            return cellValue
-          })
-
-          console.log("Before formatDataRow:", processedRow)
-          const formattedRow = formatDataRow(processedRow, nameColumns)
-          console.log("After formatDataRow:", formattedRow)
-          return formattedRow
+          return formatDataRow(row, nameColumns)
         })
 
         setCsvData(formattedData)
