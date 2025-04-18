@@ -9,8 +9,19 @@ export const formatName = (name) => {
   // Trim excess spaces and reduce multiple spaces to single
   const trimmed = name.trim().replace(/\s+/g, ' ');
 
-  // Convert to title case (capitalize first letter of each word)
-  return trimmed.split(' ')
+  // Special case for "Mac donald" variations
+  const words = trimmed.split(' ');
+  for (let i = 0; i < words.length - 1; i++) {
+    // Only combine Mac/Mc with "donald" specifically
+    if (/^(Mac|Mc)$/i.test(words[i]) &&
+      words[i + 1].toLowerCase() === "donald") {
+      words[i] = "Mc" + words[i + 1].charAt(0).toUpperCase() + words[i + 1].slice(1).toLowerCase();
+      words.splice(i + 1, 1); // Remove the next word since we merged it
+    }
+  }
+
+  // Process each word with the standard formatting rules
+  return words
     .map(word => {
       if (!word) return '';
 
@@ -21,12 +32,15 @@ export const formatName = (name) => {
           .join('-');
       }
 
-      // Handle Mc and Mac prefixes, standardizing both to Mc format
+      // Special handling for Mac/Mc prefixes
       if (/^(mc|mac)/i.test(word)) {
-        // Get the actual length of the prefix to properly extract the rest of the name
-        const prefixLength = word.toLowerCase().startsWith('mac') ? 3 : 2;
-        const rest = word.substring(prefixLength);
-        return "Mc" + rest.charAt(0).toUpperCase() + rest.slice(1).toLowerCase();
+        // Special case for McDonald/MacDonald - always standardize to McDonald
+        if (word.toLowerCase() === "macdonald" || word.toLowerCase() === "mcdonald") {
+          return "McDonald";
+        }
+
+        // For other Mac/Mc names, just capitalize normally without special treatment
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
       }
 
       // Special case for names with internal capitals like O'Reilly, D'Angelo
