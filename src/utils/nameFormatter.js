@@ -21,14 +21,12 @@ export const formatName = (name) => {
           .join('-');
       }
 
-      // Handle Mc and Mac prefixes specially (e.g., McDonald, MacIntosh)
+      // Handle Mc and Mac prefixes, standardizing both to Mc format
       if (/^(mc|mac)/i.test(word)) {
-        const prefix = word.substring(0, word.startsWith('Mac') ? 3 : 2);
-        const rest = word.substring(word.startsWith('Mac') ? 3 : 2);
-        return prefix.charAt(0).toUpperCase() +
-          prefix.slice(1).toLowerCase() +
-          rest.charAt(0).toUpperCase() +
-          rest.slice(1).toLowerCase();
+        // Get the actual length of the prefix to properly extract the rest of the name
+        const prefixLength = word.toLowerCase().startsWith('mac') ? 3 : 2;
+        const rest = word.substring(prefixLength);
+        return "Mc" + rest.charAt(0).toUpperCase() + rest.slice(1).toLowerCase();
       }
 
       // Special case for names with internal capitals like O'Reilly, D'Angelo
@@ -41,8 +39,8 @@ export const formatName = (name) => {
           parts[1].slice(1).toLowerCase();
       }
 
-      // Handle Roman numerals (II, III, IV, etc.)
-      if (/^(IX|IV|V?I{0,3})$/i.test(word)) {
+      // Handle Roman numerals (II, III, IV, etc.) and honors/titles like MBE
+      if (/^(IX|IV|V?I{0,3})$/i.test(word) || /^MBE$/i.test(word)) {
         return word.toUpperCase();
       }
 
