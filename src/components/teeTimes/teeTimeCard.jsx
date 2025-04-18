@@ -106,38 +106,38 @@ const TeeTimeCard = ({
       <div className="flex flex-col items-start text-base">
         <p className="font-semibold text-black mb-2">Golfers:</p>
         {golfers.length > 0 ? (
-          golfers.map((golfer) => (
-            <div key={golfer.id} className="ml-2 mb-3 flex flex-col">
-              {/* Golfer name on first line */}
-              <p className="golfer-name font-medium text-black">
-                {golfer.golferName || "Unnamed Player"}
-              </p>
+          <div className="grid grid-cols-2 gap-3 w-full">
+            {golfers.map((golfer) => (
+              <div key={golfer.id} className="golfer-item text-center">
+                {/* First line: Name and status side by side */}
+                <div className="flex items-center justify-center gap-2">
+                  <p className="golfer-name font-medium text-black">
+                    {golfer.golferName || "Unnamed Player"}
+                  </p>
 
-              {/* Club name on second line */}
-              <p className="golfer-club text-sm text-gray-700">
-                {golfer?.golf_club?.clubName || "No Club"}
-                {golfer?.golf_club?.clubID
-                  ? ` (${golfer.golf_club.clubID})`
-                  : ""}
-              </p>
-
-              {/* Pro/Senior status on third line if applicable */}
-              {(golfer.isSenior || golfer.isPro) && (
-                <div className="golfer-status flex mt-1">
-                  {golfer.isSenior && (
-                    <p className="text-sm font-semibold mr-2 text-red-500">
-                      Senior
-                    </p>
-                  )}
+                  {/* Status indicators on same line as name with no background */}
                   {golfer.isPro && (
-                    <p className="text-sm font-semibold text-blue-700">
-                      Professional
-                    </p>
+                    <span className="text-sm font-semibold text-blue-700">
+                      Pro
+                    </span>
+                  )}
+                  {golfer.isSenior && (
+                    <span className="text-sm font-semibold text-red-500">
+                      Senior
+                    </span>
                   )}
                 </div>
-              )}
-            </div>
-          ))
+
+                {/* Second line: Club name */}
+                <p className="golfer-club text-sm text-gray-700">
+                  {golfer?.golf_club?.clubName || "No Club"}
+                  {golfer?.golf_club?.clubID
+                    ? ` (${golfer.golf_club.clubID})`
+                    : ""}
+                </p>
+              </div>
+            ))}
+          </div>
         ) : (
           <p>No golfers found</p>
         )}
