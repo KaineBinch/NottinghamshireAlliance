@@ -5,9 +5,16 @@
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
-      name="Nottinghamshire Alliance"
+      name="description"
       content="Official website of the Nottinghamshire Golf Alliance" />
     <title>Nottinghamshire Alliance</title>
+    <!-- Add environment variables via window -->
+    <script>
+      window.ENV = {
+        POSTHOG_KEY: "%VITE_REACT_APP_PUBLIC_POSTHOG_KEY%",
+        POSTHOG_HOST: "%VITE_REACT_APP_POSTHOG_HOST%",
+      }
+    </script>
     <script>
       !(function (t, e) {
         var o, n, p, r
@@ -58,8 +65,10 @@
           }),
           (e.__SV = 1))
       })(document, window.posthog || [])
-      posthog.init(import.meta.env.VITE_REACT_APP_PUBLIC_POSTHOG_KEY, {
-        api_host: import.meta.env.VITE_REACT_APP_PUBLIC_POSTHOG_HOST,
+
+      // Use window.ENV instead of import.meta.env
+      posthog.init(window.ENV.POSTHOG_KEY, {
+        api_host: window.ENV.POSTHOG_HOST,
         person_profiles: "identified_only",
         capture_pageview: true,
         persistence: "localStorage",
