@@ -7,6 +7,82 @@ import Spinner from "../../helpers/spinner"
 import EventReviewInput from "./eventReviewInput"
 import { formatDataRow } from "../../../utils/nameFormatter"
 
+// Proper date/time handling functions
+const formatExcelDate = (excelDate) => {
+  if (!excelDate) return ""
+
+  // Handle Excel date format properly
+  if (excelDate instanceof Date) {
+    // Format as DD/MM/YYYY
+    const day = String(excelDate.getDate()).padStart(2, "0")
+    const month = String(excelDate.getMonth() + 1).padStart(2, "0")
+    const year = excelDate.getFullYear()
+    return `${day}/${month}/${year}`
+  }
+
+  // If it's already a string in correct format, return as is
+  if (typeof excelDate === "string") {
+    // Check if it matches date pattern
+    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(excelDate)) {
+      return excelDate
+    }
+
+    // Try to convert if it's in another format
+    try {
+      const date = new Date(excelDate)
+      if (!isNaN(date)) {
+        const day = String(date.getDate()).padStart(2, "0")
+        const month = String(date.getMonth() + 1).padStart(2, "0")
+        const year = date.getFullYear()
+        return `${day}/${month}/${year}`
+      }
+    } catch (e) {
+      // If conversion fails, return original
+      console.error("Date conversion error:", e)
+    }
+  }
+
+  return excelDate || ""
+}
+
+const formatExcelTime = (excelTime) => {
+  if (!excelTime) return ""
+
+  // If it's a Date object
+  if (excelTime instanceof Date) {
+    // Format as HH:MM:SS without any adjustments
+    return excelTime.toTimeString().split(" ")[0]
+  }
+
+  // If it's already a string in correct format
+  if (typeof excelTime === "string") {
+    // If it already has proper format (HH:MM:SS), return as is
+    if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(excelTime)) {
+      // Ensure the format has seconds
+      if (!excelTime.includes(":")) return excelTime
+
+      const parts = excelTime.split(":")
+      if (parts.length === 2) {
+        return `${parts[0]}:${parts[1]}:00`
+      }
+      return excelTime
+    }
+
+    // Try to convert if it's in another format
+    try {
+      const time = new Date(excelTime)
+      if (!isNaN(time)) {
+        return time.toTimeString().split(" ")[0]
+      }
+    } catch (e) {
+      // If conversion fails, return original
+      console.error("Time conversion error:", e)
+    }
+  }
+
+  return excelTime || ""
+}
+
 const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   const [fileName, setFileName] = useState("")
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -15,39 +91,12 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   const [progressLogs, setProgressLogs] = useState([])
   const [summaryMessage, setSummaryMessage] = useState("")
   const [showLogs, setShowLogs] = useState(false)
-  const [showOnlyIssues, setShowOnlyIssues] = useState(false) // New state to track whether to show only issues
+  const [showOnlyIssues, setShowOnlyIssues] = useState(false)
   const [fileInputKey, setFileInputKey] = useState(Date.now())
   const [view, setView] = useState("upload")
   const [errorLogs, setErrorLogs] = useState([])
   const [eventReview, setEventReview] = useState("")
-  const [copyStatus, setCopyStatus] = useState("") // State to show copy feedback
-  // We'll detect name columns automatically based on headers
-
-  const adjustTimeBackOneHour = (timeString) => {
-    if (
-      !timeString ||
-      typeof timeString !== "string" ||
-      !timeString.includes(":")
-    ) {
-      return timeString
-    }
-
-    const parts = timeString.split(":")
-    if (parts.length < 2) return timeString
-
-    let hours = parseInt(parts[0], 10)
-    let minutes = parts[1]
-
-    if (minutes.includes(".")) {
-      minutes = minutes.split(".")[0]
-    } else if (minutes.length > 2) {
-      minutes = minutes.substring(0, 2)
-    }
-
-    hours = (hours - 1 + 24) % 24
-
-    return `${String(hours).padStart(2, "0")}:${minutes}:00`
-  }
+  const [copyStatus, setCopyStatus] = useState("")
 
   const handleEventReviewChange = (review) => {
     setEventReview(review)
@@ -141,8 +190,6 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
           }
         })
 
-        // We'll use nameColumns directly without storing in state
-
         const formattedData = jsonData.map((row, rowIndex) => {
           if (rowIndex === 0) {
             // Return headers as is
@@ -154,18 +201,12 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
             const cellValue = safelyExtractCellValue(cell)
 
             if (cellIndex === 0) {
-              // Handle date column
-              return cellValue && !isNaN(new Date(cellValue))
-                ? new Date(cellValue).toLocaleDateString("en-GB")
-                : cellValue || ""
+              // Handle date column - use our new formatter
+              return formatExcelDate(cellValue)
             }
             if (cellIndex === 1) {
-              // Handle time column
-              if (cellValue && !isNaN(new Date(cellValue))) {
-                let timeValue = new Date(cellValue).toLocaleTimeString("en-GB")
-                return adjustTimeBackOneHour(timeValue)
-              }
-              return cellValue || ""
+              // Handle time column - use our new formatter
+              return formatExcelTime(cellValue)
             }
 
             // Return other cells (including names that will be formatted later)
@@ -271,13 +312,13 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
       setErrorLogs([])
       setSummaryMessage("")
       setShowLogs(false)
-      setShowOnlyIssues(false) // Reset this state
-      setCopyStatus("Copy Logs") // Reset copy status
+      setShowOnlyIssues(false)
+      setCopyStatus("Copy Logs")
       setView("processing")
 
       await uploadToStrapi(
         csvData,
-        eventReview, // Pass the event review text
+        eventReview,
         setUploadProgress,
         setUploadStatus,
         setUploadMessage,
@@ -348,8 +389,8 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
     setProgressLogs([])
     setErrorLogs([])
     setSummaryMessage("")
-    setShowOnlyIssues(false) // Reset this state
-    setCopyStatus("Copy Logs") // Reset copy status
+    setShowOnlyIssues(false)
+    setCopyStatus("Copy Logs")
     setFileInputKey(Date.now())
   }
 
@@ -450,9 +491,7 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
     ).length
 
     // This will hold the logs to display based on our filter settings
-    const logsToDisplay = showOnlyIssues
-      ? errorLogs // Only show error logs if showOnlyIssues is true
-      : progressLogs // Otherwise show all logs
+    const logsToDisplay = showOnlyIssues ? errorLogs : progressLogs
 
     return (
       <div className="py-4">
@@ -524,7 +563,7 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
               <button
                 onClick={() => {
                   setShowLogs(!showLogs)
-                  setShowOnlyIssues(false) // When toggling all logs, we want to show all logs
+                  setShowOnlyIssues(false)
                 }}
                 className="text-[#214A27] underline font-semibold">
                 {showLogs && !showOnlyIssues
@@ -536,7 +575,7 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
               <button
                 onClick={() => {
                   setShowLogs(true)
-                  setShowOnlyIssues(true) // When viewing issues, we only want to show error logs
+                  setShowOnlyIssues(true)
                 }}
                 className={`text-red-600 hover:text-red-800 underline text-sm ${
                   showLogs && showOnlyIssues ? "font-bold" : ""
