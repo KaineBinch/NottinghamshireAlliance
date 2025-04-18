@@ -154,6 +154,13 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
       "first",
       "last",
       "surname",
+      "player",
+      "competitor",
+      "amateur",
+      "pro",
+      "professional",
+      "individual",
+      "entrant",
     ]
     if (!header || typeof header !== "string") return false
     const lowercaseHeader = header.toLowerCase()
@@ -214,7 +221,10 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
           })
 
           // Apply name formatting to the processed row
-          return formatDataRow(processedRow, nameColumns)
+          console.log("Before formatDataRow:", processedRow)
+          const formattedRow = formatDataRow(processedRow, nameColumns)
+          console.log("After formatDataRow:", formattedRow)
+          return formattedRow
         })
 
         setCsvData(formattedData)

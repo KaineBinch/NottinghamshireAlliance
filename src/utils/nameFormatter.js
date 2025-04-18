@@ -12,9 +12,9 @@ export const formatName = (name) => {
   // Special case for "Mac donald" variations
   const words = trimmed.split(' ');
   for (let i = 0; i < words.length - 1; i++) {
-    // Only combine Mac/Mc with "donald" specifically
+    // Only combine Mac/Mc with "donald" specifically (case insensitive)
     if (/^(Mac|Mc)$/i.test(words[i]) &&
-      words[i + 1].toLowerCase() === "donald") {
+      /^donald$/i.test(words[i + 1])) {
       words[i] = "Mc" + words[i + 1].charAt(0).toUpperCase() + words[i + 1].slice(1).toLowerCase();
       words.splice(i + 1, 1); // Remove the next word since we merged it
     }
@@ -35,7 +35,7 @@ export const formatName = (name) => {
       // Special handling for Mac/Mc prefixes
       if (/^(mc|mac)/i.test(word)) {
         // Special case for McDonald/MacDonald - always standardize to McDonald
-        if (word.toLowerCase() === "macdonald" || word.toLowerCase() === "mcdonald") {
+        if (/^macdonald$/i.test(word) || /^mcdonald$/i.test(word)) {
           return "McDonald";
         }
 
@@ -73,16 +73,27 @@ export const formatName = (name) => {
 
       // Handle names with periods (St., Jr., Sr., etc.)
       if (word.includes('.')) {
-        const parts = word.split('.');
-        return parts.map((part, index) => {
-          if (part === '') return '.';
-          // If it's a single letter followed by a period (like A.B.C.)
-          if (part.length === 1 && index < parts.length - 1) {
-            return part.toUpperCase() + '.';
+        // Special cases for common abbreviations
+        if (/^(jr|sr|st|mr|ms|dr|prof)\.$/i.test(word)) {
+          return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        }
+
+        // Handle initials (A.B., J.R., etc.)
+        if (/^([A-Za-z]\.)+$/.test(word) || /^([A-Za-z]\.)+[A-Za-z]$/.test(word)) {
+          return word.toUpperCase();
+        }
+
+        // Handle Ph.D. and similar
+        if (/^[A-Za-z]+\.[A-Za-z]+\.$/i.test(word)) {
+          // Special case for Ph.D. and similar
+          if (/^ph\.d\.$/i.test(word)) {
+            return "Ph.D.";
           }
-          return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase() +
-            (index < parts.length - 1 ? '.' : '');
-        }).join('');
+          return word.toUpperCase();
+        }
+
+        // Standard case
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
       }
 
       // Default case: capitalize first letter, lowercase the rest
@@ -119,7 +130,8 @@ export const isNameColumn = (header) => {
   const nameRelatedTerms = [
     'name', 'player', 'golfer', 'participant',
     'member', 'person', 'first', 'last',
-    'surname', 'player', 'competitor'
+    'surname', 'player', 'competitor', 'amateur',
+    'pro', 'professional', 'individual', 'entrant',
   ];
 
   const lowercaseHeader = header.toLowerCase();
