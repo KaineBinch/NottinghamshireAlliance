@@ -40,6 +40,10 @@ const fontStyles = {
   message: {
     fontSize: "clamp(0.75rem, 1vw + 0.3rem, 0.875rem)",
   },
+  back9: {
+    fontSize: "0.65rem",
+    marginTop: "-3px",
+  },
 }
 
 const ResultsHighlightCard = () => {
@@ -52,6 +56,68 @@ const ResultsHighlightCard = () => {
 
   const query = queryBuilder(MODELS.events, QUERIES.resultsQuery)
   const { isLoading, isError, data } = useFetch(query)
+
+  // Helper function to find tied scores (groups of players with identical scores)
+  const findTiedScores = (scores) => {
+    const scoreGroups = {}
+    scores.forEach((score) => {
+      const eventScore = score.golferEventScore || 0
+      if (!scoreGroups[eventScore]) {
+        scoreGroups[eventScore] = []
+      }
+      scoreGroups[eventScore].push(score)
+    })
+    // Return only the groups with more than one player (actual ties)
+    return Object.values(scoreGroups).filter((group) => group.length > 1)
+  }
+
+  // Sort scores with tiebreaker
+  const sortScoresWithTiebreaker = (scores) => {
+    // Find tied groups
+    const tiedGroups = findTiedScores(scores)
+    const tiedScoreValues = new Set(
+      tiedGroups.map((group) => group[0].golferEventScore || 0)
+    )
+
+    return [...scores].sort((a, b) => {
+      // First compare by golferEventScore
+      const scoreA = a.golferEventScore || 0
+      const scoreB = b.golferEventScore || 0
+      const scoreDiff = scoreB - scoreA
+
+      if (scoreDiff !== 0) return scoreDiff
+
+      // If tied and this is a score that appears in our tied groups, use back9 as tiebreaker
+      if (tiedScoreValues.has(scoreA)) {
+        return (b.back9Score || 0) - (a.back9Score || 0)
+      }
+
+      // If not in a tied group, maintain original order
+      return 0
+    })
+  }
+
+  // Apply tiebreaker flags
+  const applyTiebreakerFlags = (sortedScores) => {
+    // Find all tied scores
+    const tiedGroups = findTiedScores(sortedScores)
+
+    // Process each tied group
+    tiedGroups.forEach((group) => {
+      // Skip if all back9 scores are identical (no tiebreaker needed)
+      const uniqueBack9Scores = new Set(
+        group.map((score) => score.back9Score || 0)
+      )
+      if (uniqueBack9Scores.size <= 1) return
+
+      // Mark players in this group as using tiebreaker
+      group.forEach((score) => {
+        score.usedTiebreaker = true
+      })
+    })
+
+    return sortedScores
+  }
 
   useEffect(() => {
     if (!isLoading && data?.data && data.data.length > 0) {
@@ -67,15 +133,20 @@ const ResultsHighlightCard = () => {
         const latest = pastEvents[0]
         setLatestEvent(latest)
 
-        const amateurs = latest.scores
+        // Apply tiebreaker logic to all scores
+        const processedScores = applyTiebreakerFlags(
+          sortScoresWithTiebreaker(latest.scores || [])
+        )
+
+        // Filter and slice for amateurs - now using the processed scores with tiebreakers
+        const amateurs = processedScores
           .filter((score) => score.golfer && !score.golfer.isPro)
-          .sort((a, b) => (b.golferEventScore || 0) - (a.golferEventScore || 0))
           .slice(0, 3)
         setTopAmateurs(amateurs)
 
-        const pros = latest.scores
+        // Filter and slice for pros - now using the processed scores with tiebreakers
+        const pros = processedScores
           .filter((score) => score.golfer && score.golfer.isPro)
-          .sort((a, b) => (b.golferEventScore || 0) - (a.golferEventScore || 0))
           .slice(0, 3)
         setTopPros(pros)
 
@@ -91,29 +162,60 @@ const ResultsHighlightCard = () => {
             scoresByClub[clubName].push(score)
           })
 
+          // Process club results using the same tiebreaker logic
           const clubResults = Object.entries(scoresByClub)
             .map(([clubName, scores]) => {
-              const topScores = scores
-                .sort(
-                  (a, b) =>
-                    (b.golferEventScore || 0) - (a.golferEventScore || 0)
-                )
-                .slice(0, 4)
+              // Apply tiebreaker sorting to club member scores
+              const topScores = sortScoresWithTiebreaker(scores).slice(0, 4)
 
               const totalPoints = topScores.reduce(
                 (sum, score) => sum + (score.golferEventScore || 0),
                 0
               )
 
+              // Calculate total back9 for possible club ties
+              const totalBack9 = topScores.reduce(
+                (sum, score) => sum + (score.back9Score || 0),
+                0
+              )
+
               return {
                 clubName,
                 totalPoints,
+                totalBack9,
                 scores: topScores,
                 memberCount: topScores.length,
               }
             })
-            .sort((a, b) => b.totalPoints - a.totalPoints)
+            .sort((a, b) => {
+              // First sort by total points
+              const pointsDiff = b.totalPoints - a.totalPoints
+              if (pointsDiff !== 0) return pointsDiff
+
+              // If tied on points, use back9 scores
+              return b.totalBack9 - a.totalBack9
+            })
             .slice(0, 3)
+
+          // Mark clubs that used tiebreakers
+          const clubPointGroups = {}
+          clubResults.forEach((club) => {
+            if (!clubPointGroups[club.totalPoints]) {
+              clubPointGroups[club.totalPoints] = []
+            }
+            clubPointGroups[club.totalPoints].push(club)
+          })
+
+          Object.values(clubPointGroups)
+            .filter((group) => group.length > 1)
+            .forEach((group) => {
+              const uniqueBack9 = new Set(group.map((club) => club.totalBack9))
+              if (uniqueBack9.size <= 1) return // All same back9
+
+              group.forEach((club) => {
+                club.usedTiebreaker = true
+              })
+            })
 
           setTopClubs(clubResults)
         }
@@ -242,7 +344,7 @@ const ResultsHighlightCard = () => {
                         )}
                       </p>
                     </div>
-                    <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full md:w-14 md:h-14 w-12 h-12 flex items-center justify-center">
+                    <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full md:w-14 md:h-14 w-12 h-12 flex flex-col items-center justify-center">
                       <div>
                         <span className="font-bold" style={fontStyles.score}>
                           {score.golferEventScore || 0}
@@ -251,6 +353,11 @@ const ResultsHighlightCard = () => {
                           pts
                         </span>
                       </div>
+                      {score.usedTiebreaker && (
+                        <div style={fontStyles.back9}>
+                          B9: {score.back9Score || 0}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -288,7 +395,7 @@ const ResultsHighlightCard = () => {
                         {score.golfer?.golf_club?.clubName || "No Club"}
                       </p>
                     </div>
-                    <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full md:w-14 md:h-14 w-12 h-12 flex items-center justify-center">
+                    <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full md:w-14 md:h-14 w-12 h-12 flex flex-col items-center justify-center">
                       <div>
                         <span className="font-bold" style={fontStyles.score}>
                           {score.golferEventScore || 0}
@@ -297,6 +404,11 @@ const ResultsHighlightCard = () => {
                           pts
                         </span>
                       </div>
+                      {score.usedTiebreaker && (
+                        <div style={fontStyles.back9}>
+                          B9: {score.back9Score || 0}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -335,7 +447,7 @@ const ResultsHighlightCard = () => {
                         {club.memberCount === 1 ? "player" : "players"}
                       </p>
                     </div>
-                    <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full md:w-14 md:h-14 w-12 h-12 flex items-center justify-center">
+                    <div className="flex-shrink-0 bg-[#214A27] text-white text-center rounded-full md:w-14 md:h-14 w-12 h-12 flex flex-col items-center justify-center">
                       <div>
                         <span className="font-bold" style={fontStyles.score}>
                           {club.totalPoints}
@@ -344,6 +456,11 @@ const ResultsHighlightCard = () => {
                           pts
                         </span>
                       </div>
+                      {club.usedTiebreaker && (
+                        <div style={fontStyles.back9}>
+                          B9: {club.totalBack9 || 0}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
