@@ -76,6 +76,27 @@
       })
     </script>
     <script>
+      if ("serviceWorker" in navigator) {
+        console.log("Checking for service workers...")
+        navigator.serviceWorker
+          .getRegistrations()
+          .then(function (registrations) {
+            if (registrations.length > 0) {
+              console.log(
+                "Found service workers to unregister:",
+                registrations.length
+              )
+              Promise.all(registrations.map((r) => r.unregister())).then(() => {
+                console.log("All service workers unregistered")
+                // Only reload if we actually unregistered something
+                window.location.reload(true)
+              })
+            } else {
+              console.log("No service workers found")
+            }
+          })
+      }
+
       window.addEventListener("error", function (event) {
         if (
           event.message &&
