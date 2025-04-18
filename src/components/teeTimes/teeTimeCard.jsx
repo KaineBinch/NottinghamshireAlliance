@@ -107,22 +107,35 @@ const TeeTimeCard = ({
         <p className="font-semibold text-black mb-2">Golfers:</p>
         {golfers.length > 0 ? (
           golfers.map((golfer) => (
-            <div key={golfer.id} className="ml-2 flex items-center">
-              <p className={`${golfer.isSenior ? "text-black" : "text-black"}`}>
-                {golfer.golferName} - {golfer?.golf_club?.clubID}
+            <div key={golfer.id} className="ml-2 mb-3 flex flex-col">
+              {/* Golfer name on first line */}
+              <p className="golfer-name font-medium text-black">
+                {golfer.golferName || "Unnamed Player"}
               </p>
-              <div className="flex">
-                {golfer.isSenior && (
-                  <p className="text-sm font-semibold ml-2 text-red-500">
-                    Senior
-                  </p>
-                )}
-                {golfer.isPro && (
-                  <p className="text-sm font-semibold ml-2 text-blue-700">
-                    Professional
-                  </p>
-                )}
-              </div>
+
+              {/* Club name on second line */}
+              <p className="golfer-club text-sm text-gray-700">
+                {golfer?.golf_club?.clubName || "No Club"}
+                {golfer?.golf_club?.clubID
+                  ? ` (${golfer.golf_club.clubID})`
+                  : ""}
+              </p>
+
+              {/* Pro/Senior status on third line if applicable */}
+              {(golfer.isSenior || golfer.isPro) && (
+                <div className="golfer-status flex mt-1">
+                  {golfer.isSenior && (
+                    <p className="text-sm font-semibold mr-2 text-red-500">
+                      Senior
+                    </p>
+                  )}
+                  {golfer.isPro && (
+                    <p className="text-sm font-semibold text-blue-700">
+                      Professional
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           ))
         ) : (

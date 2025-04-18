@@ -88,6 +88,29 @@ const TeeTimesTable = () => {
 
   const displayData = sortedTeeTimes.length >= 0 ? sortedTeeTimes : teeTimesData
 
+  // Component for rendering golfer information in the requested format
+  const GolferInfo = ({ player }) => (
+    <div className="golfer-info-container">
+      {/* Golfer name on first line */}
+      <p className="golfer-name">{player?.golferName || "Unnamed Player"}</p>
+
+      {/* Club name on second line */}
+      <p className="golfer-club">{player?.golf_club?.clubName || "No Club"}</p>
+
+      {/* Status indicators on third line if applicable */}
+      {(player?.isSenior || player?.isPro) && (
+        <div className="golfer-status">
+          {player?.isSenior && (
+            <span className="player-senior-tag">Senior</span>
+          )}
+          {player?.isPro && (
+            <span className="player-pro-tag">Professional</span>
+          )}
+        </div>
+      )}
+    </div>
+  )
+
   return (
     <div className="teetimes-container">
       {/* Search Filter */}
@@ -119,20 +142,7 @@ const TeeTimesTable = () => {
                 <div className="players-grid">
                   {teeTime.golfers?.map((player, playerIndex) => (
                     <div key={playerIndex} className="player-container">
-                      <p>
-                        <span>{player?.golferName || "Unnamed Player"}</span>
-                        <span> </span>
-                        <span className="player-club">
-                          {player?.golf_club?.clubName || "No Club"}
-                        </span>
-                      </p>
-
-                      {player?.isSenior && (
-                        <p className="player-senior-tag">Senior</p>
-                      )}
-                      {player?.isPro && (
-                        <p className="player-pro-tag">Professional</p>
-                      )}
+                      <GolferInfo player={player} />
                     </div>
                   ))}
                 </div>

@@ -7,7 +7,6 @@
 }
 
 .no-results-container {
-  /* Empty class was causing syntax error - adding a default property */
   @apply block;
 }
 
@@ -47,16 +46,29 @@
   @apply p-2;
 }
 
-.player-club {
+/* New golfer info styles */
+.golfer-info-container {
+  @apply flex flex-col gap-1;
+}
+
+.golfer-name {
+  @apply font-medium text-gray-900;
+}
+
+.golfer-club {
   @apply text-sm text-gray-500;
 }
 
+.golfer-status {
+  @apply flex gap-2 mt-1 justify-center;
+}
+
 .player-senior-tag {
-  @apply text-sm text-red-500;
+  @apply text-xs font-medium text-red-700 px-1;
 }
 
 .player-pro-tag {
-  @apply text-sm text-blue-700;
+  @apply text-xs font-medium text-blue-700 px-1;
 }
 
 .loading-container {
