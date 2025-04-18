@@ -15,10 +15,12 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   const [progressLogs, setProgressLogs] = useState([])
   const [summaryMessage, setSummaryMessage] = useState("")
   const [showLogs, setShowLogs] = useState(false)
+  const [showOnlyIssues, setShowOnlyIssues] = useState(false) // New state to track whether to show only issues
   const [fileInputKey, setFileInputKey] = useState(Date.now())
   const [view, setView] = useState("upload")
   const [errorLogs, setErrorLogs] = useState([])
   const [eventReview, setEventReview] = useState("")
+  const [copyStatus, setCopyStatus] = useState("") // State to show copy feedback
   // We'll detect name columns automatically based on headers
 
   const adjustTimeBackOneHour = (timeString) => {
@@ -269,6 +271,8 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
       setErrorLogs([])
       setSummaryMessage("")
       setShowLogs(false)
+      setShowOnlyIssues(false) // Reset this state
+      setCopyStatus("Copy Logs") // Reset copy status
       setView("processing")
 
       await uploadToStrapi(
@@ -291,6 +295,50 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
     }
   }
 
+  // Function to handle copying logs to clipboard
+  const handleCopyLogs = () => {
+    // Determine which logs to copy based on current view
+    const logsToCopy = showOnlyIssues ? errorLogs : progressLogs
+
+    if (logsToCopy.length === 0) return
+
+    // Format logs for clipboard
+    const formattedLogs = logsToCopy
+      .map((log) => {
+        const prefix =
+          log.type === "error"
+            ? "❌ ERROR: "
+            : log.type === "warning"
+            ? "⚠️ WARNING: "
+            : log.type === "success"
+            ? "✅ SUCCESS: "
+            : "INFO: "
+
+        return `${prefix}${log.message}${log.detail ? ` - ${log.detail}` : ""}`
+      })
+      .join("\n\n")
+
+    // Add header to distinguish which logs were copied
+    const header = showOnlyIssues
+      ? `=== ERROR AND WARNING LOGS (${logsToCopy.length}) ===\n\n`
+      : `=== ALL LOGS (${logsToCopy.length}) ===\n\n`
+
+    const content = header + formattedLogs
+
+    // Copy to clipboard
+    navigator.clipboard
+      .writeText(content)
+      .then(() => {
+        setCopyStatus("Copied!")
+        setTimeout(() => setCopyStatus("Copy Logs"), 2000)
+      })
+      .catch((err) => {
+        console.error("Failed to copy logs: ", err)
+        setCopyStatus("Copy failed")
+        setTimeout(() => setCopyStatus("Copy Logs"), 2000)
+      })
+  }
+
   const handleReset = () => {
     setView("upload")
     setUploadProgress(0)
@@ -300,6 +348,8 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
     setProgressLogs([])
     setErrorLogs([])
     setSummaryMessage("")
+    setShowOnlyIssues(false) // Reset this state
+    setCopyStatus("Copy Logs") // Reset copy status
     setFileInputKey(Date.now())
   }
 
@@ -399,6 +449,11 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
       (log) => log.type === "warning"
     ).length
 
+    // This will hold the logs to display based on our filter settings
+    const logsToDisplay = showOnlyIssues
+      ? errorLogs // Only show error logs if showOnlyIssues is true
+      : progressLogs // Otherwise show all logs
+
     return (
       <div className="py-4">
         <div className="text-center">
@@ -467,24 +522,43 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
           <div className="mt-5 space-x-4">
             {progressLogs.length > 0 && (
               <button
-                onClick={() => setShowLogs(!showLogs)}
+                onClick={() => {
+                  setShowLogs(!showLogs)
+                  setShowOnlyIssues(false) // When toggling all logs, we want to show all logs
+                }}
                 className="text-[#214A27] underline font-semibold">
-                {showLogs ? "Hide All Logs" : "Show All Logs"}
+                {showLogs && !showOnlyIssues
+                  ? "Hide All Logs"
+                  : "Show All Logs"}
               </button>
             )}
             {errorLogs.length > 0 && (
               <button
-                onClick={() => setShowLogs(true)}
-                className="text-red-600 hover:text-red-800 underline text-sm">
-                View Issues ({errorLogs.length})
+                onClick={() => {
+                  setShowLogs(true)
+                  setShowOnlyIssues(true) // When viewing issues, we only want to show error logs
+                }}
+                className={`text-red-600 hover:text-red-800 underline text-sm ${
+                  showLogs && showOnlyIssues ? "font-bold" : ""
+                }`}>
+                {showLogs && showOnlyIssues
+                  ? "Currently Viewing Issues"
+                  : `View Issues (${errorLogs.length})`}
+              </button>
+            )}
+            {progressLogs.length > 0 && (
+              <button
+                onClick={handleCopyLogs}
+                className="inline-flex items-center text-blue-600 hover:text-blue-800 underline text-sm">
+                <span>{copyStatus || "Copy Logs"}</span>
               </button>
             )}
           </div>
 
           {/* Display logs if enabled */}
-          {showLogs && progressLogs.length > 0 && (
+          {showLogs && logsToDisplay.length > 0 && (
             <div className="mt-4 bg-[#D9D9D9] p-4 rounded-md overflow-y-auto max-h-80 max-w-4xl mx-auto">
-              {progressLogs.map((log, index) => {
+              {logsToDisplay.map((log, index) => {
                 const isSectionHeader = log.message?.includes("===")
                 const isError = log.type === "error"
                 const isWarning = log.type === "warning"
