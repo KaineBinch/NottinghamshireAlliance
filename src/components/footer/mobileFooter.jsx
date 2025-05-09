@@ -3,6 +3,7 @@ import Socials from "./socials"
 import { MODELS, QUERIES } from "../../constants/api"
 import useFetch from "../../utils/hooks/useFetch"
 import { queryBuilder } from "../../utils/queryBuilder"
+import AdSense from "../adSense"
 
 const MobFoot = () => {
   const contactQuery = queryBuilder(MODELS.contact, QUERIES.contactQuery)
@@ -118,6 +119,7 @@ const MobFoot = () => {
           </a>
         </div>
       </div>
+      <AdSense />
     </>
   )
 }

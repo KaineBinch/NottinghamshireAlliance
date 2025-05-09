@@ -13,6 +13,7 @@
         POSTHOG_KEY: "%VITE_REACT_APP_PUBLIC_POSTHOG_KEY%",
         POSTHOG_HOST: "%VITE_REACT_APP_POSTHOG_HOST%",
       }
+      const ADSENSE_CLIENT_ID = "%VITE_ADSENSE_CLIENT_ID%"
     </script>
     <script>
       !(function (t, e) {
@@ -127,7 +128,7 @@
     </script>
     <script
       async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4222589402843701"
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=%VITE_ADSENSE_CLIENT_ID%"
       crossorigin="anonymous"></script>
   </head>
   <body>
