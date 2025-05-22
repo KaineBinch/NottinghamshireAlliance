@@ -22,7 +22,7 @@
 
 /* Content card */
 .content-card {
-  @apply bg-white rounded-lg;
+  @apply bg-white rounded-lg mb-5;
   padding: clamp(1rem, 3vw, 2rem);
 }
 

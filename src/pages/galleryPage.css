@@ -3,7 +3,7 @@
 }
 
 .gallery-container {
-  @apply max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-start;
+  @apply max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-start mb-10;
 }
 
 .gallery-ease-in {

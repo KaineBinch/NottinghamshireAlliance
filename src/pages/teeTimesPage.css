@@ -62,5 +62,5 @@
 }
 
 .tee-times-content {
-  @apply mx-5 mb-5 mt-3;
+  @apply mx-5 mb-10 mt-3;
 }

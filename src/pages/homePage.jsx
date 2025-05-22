@@ -125,7 +125,6 @@ const HomePage = () => {
           </ScrollRevealSection>
 
           <hr className="border-black" />
-
           <ScrollRevealSection id="oom-section">
             <OOMSection />
           </ScrollRevealSection>
@@ -135,13 +134,13 @@ const HomePage = () => {
             <CoursesSection />
           </ScrollRevealSection>
 
+          <hr className="border-black" />
           <ScrollRevealSection id="fixtures-section">
             <FixturesSection />
           </ScrollRevealSection>
 
           <hr className="border-black" />
           <AdSense height="200px" />
-          <hr className="border-black" />
         </>
       )}
     </div>

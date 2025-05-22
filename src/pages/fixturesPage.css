@@ -36,7 +36,7 @@
 
 /* Card view container */
 .card-view-container {
-  @apply w-full pt-4;
+  @apply w-full pt-4 mb-10;
 }
 
 .cards-container {

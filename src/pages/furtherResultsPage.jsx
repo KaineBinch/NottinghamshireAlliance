@@ -137,6 +137,11 @@ const TeamScoresTable = ({ team, title, position }) => {
               className={index % 2 === 0 ? "bg-[#d9d9d9]" : "bg-white"}>
               <td className="border border-gray-300 p-1">
                 {score.golfer?.golferName || "Unknown Player"}
+                {score.golfer?.isPro && (
+                  <span className="text-blue-600 ml-1 text-xs font-medium">
+                    (Pro)
+                  </span>
+                )}
               </td>
               <td className="border border-gray-300 p-1 text-center">
                 {typeof score.golferEventScore === "number" ? (
@@ -186,7 +191,7 @@ const IndividualWinnerTable = ({
       </thead>
       <tbody>
         <tr className="bg-[#d9d9d9]">
-          <td className="-seborder border-gray-300 p-1">
+          <td className="border border-gray-300 p-1">
             {player.golfer?.golferName || "Unknown Player"}
           </td>
           <td className="border border-gray-300 p-1">
@@ -230,22 +235,30 @@ const ProfessionalsTable = ({ scores }) => {
 
   let currentPosition = 1
   const proRows = []
+  let displayedCount = 0
 
   sortedScores.forEach((score) => {
     const playersWithScore = scoreGroups[score]
 
     playersWithScore.sort((a, b) => (b.back9Score || 0) - (a.back9Score || 0))
 
-    playersWithScore.forEach((player) => {
-      proRows.push({
-        position: currentPosition,
-        player: player,
-        club: player.golfer?.golf_club?.clubName || "Unknown Club",
-        score: player.golferEventScore || 0,
-        back9: player.back9Score || 0,
-        usedTiebreaker: player.usedTiebreaker,
+    // Check if we should include this score group
+    // Include if we haven't reached 5 players yet, or if this ties for 5th position
+    const shouldInclude = displayedCount < 5 || currentPosition <= 5
+
+    if (shouldInclude) {
+      playersWithScore.forEach((player) => {
+        proRows.push({
+          position: currentPosition,
+          player: player,
+          club: player.golfer?.golf_club?.clubName || "Unknown Club",
+          score: player.golferEventScore || 0,
+          back9: player.back9Score || 0,
+          usedTiebreaker: player.usedTiebreaker,
+        })
+        displayedCount++
       })
-    })
+    }
 
     currentPosition += playersWithScore.length
   })
@@ -265,7 +278,7 @@ const ProfessionalsTable = ({ scores }) => {
           </tr>
         </thead>
         <tbody>
-          {proRows.slice(0, 5).map((row, index) => (
+          {proRows.map((row, index) => (
             <tr
               key={index}
               className={index % 2 === 0 ? "bg-[#d9d9d9]" : "bg-white"}>
@@ -439,15 +452,9 @@ const FurtherResultsPage = () => {
       (score) => score.golfer && score.golfer.isSenior
     )
 
-    const topSenior =
-      seniorScores.length > 0
-        ? [...seniorScores].sort(
-            (a, b) => (b.golferEventScore || 0) - (a.golferEventScore || 0)
-          )[0]
-        : null
-
+    // Group all players (both amateurs and professionals) by club for teams
     const clubScores = {}
-    amateurScores.forEach((score) => {
+    sortedScores.forEach((score) => {
       if (!score.golfer?.golf_club) return
 
       const clubName = score.golfer.golf_club.clubName || "Unaffiliated"
@@ -510,6 +517,7 @@ const FurtherResultsPage = () => {
     const winningTeam = sortedTeams.length > 0 ? sortedTeams[0] : null
     const secondTeam = sortedTeams.length > 1 ? sortedTeams[1] : null
 
+    // Get all players who are in winning teams (both amateurs and professionals)
     const playersInWinningTeams = new Set()
 
     if (winningTeam) {
@@ -524,16 +532,35 @@ const FurtherResultsPage = () => {
       })
     }
 
-    const individualsNotInTeams = amateurScores.filter(
+    // Individual winners must be amateurs not in winning teams and not the overall amateur winner
+    const eligibleIndividuals = amateurScores.filter(
       (score) =>
-        score.golfer && !playersInWinningTeams.has(score.golfer.golferName)
+        score.golfer &&
+        !playersInWinningTeams.has(score.golfer.golferName) &&
+        score !== topAmateur // Exclude the overall amateur winner
     )
 
-    const topIndividualsNotInTeams = individualsNotInTeams.slice(0, 2)
     const firstIndividual =
-      topIndividualsNotInTeams.length > 0 ? topIndividualsNotInTeams[0] : null
+      eligibleIndividuals.length > 0 ? eligibleIndividuals[0] : null
     const secondIndividual =
-      topIndividualsNotInTeams.length > 1 ? topIndividualsNotInTeams[1] : null
+      eligibleIndividuals.length > 1 ? eligibleIndividuals[1] : null
+
+    // Senior winner must be amateur senior who hasn't won anything else (lowest priority)
+    const eligibleSeniors = seniorScores.filter(
+      (score) =>
+        score.golfer &&
+        !playersInWinningTeams.has(score.golfer.golferName) &&
+        score !== topAmateur && // Not the overall amateur winner
+        score !== firstIndividual && // Not the 1st individual winner
+        score !== secondIndividual // Not the 2nd individual winner
+    )
+
+    const topSenior =
+      eligibleSeniors.length > 0
+        ? [...eligibleSeniors].sort(
+            (a, b) => (b.golferEventScore || 0) - (a.golferEventScore || 0)
+          )[0]
+        : null
 
     const topAmateurData = {
       headerRow: ["Golfer Name", "Club", "Points"],
