@@ -97,7 +97,7 @@ const ExpandedRowDetails = ({ result, isClubView }) => {
       .sort((a, b) => {
         const dateA = new Date(a.date)
         const dateB = new Date(b.date)
-        return dateB - dateA
+        return dateA - dateB
       })
       .slice(0, 15)
 
