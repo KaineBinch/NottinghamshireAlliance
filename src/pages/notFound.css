@@ -1,0 +1,35 @@
+.not-found-hero {
+  @apply hero min-h-screen;
+}
+
+.hero-background-overlay {
+  @apply absolute inset-0 bg-black opacity-30;
+}
+
+.hero-content-wrapper {
+  @apply hero-content text-center text-neutral-content;
+}
+
+.not-found-content {
+  @apply max-w-md;
+}
+
+.page-title {
+  @apply text-8xl font-bold;
+}
+
+.page-subtitle {
+  @apply mb-10;
+}
+
+.countdown-container {
+  @apply h-16 w-[245px] relative bg-black p-1 border-double border-4 border-secondary bg-opacity-60;
+}
+
+.countdown-text {
+  @apply countdown mt-1;
+}
+
+.home-button {
+  @apply btn mt-8;
+}

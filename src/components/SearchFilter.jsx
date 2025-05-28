@@ -1,44 +1,45 @@
-import { useState, useEffect, useCallback, useMemo } from "react"
+import { useState, useEffect } from "react"
+import "./SearchFilter.css"
 
 const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
   const [searchQuery, setSearchQuery] = useState("")
   const [clubQuery, setClubQuery] = useState("")
 
-  const handleSearchChange = useCallback((event) => {
+  const handleSearchChange = (event) => {
     setSearchQuery(event.target.value.toLowerCase())
-  }, [])
+  }
 
-  const handleClubChange = useCallback((event) => {
+  const handleClubChange = (event) => {
     const selectedValue = event.target.value
     setClubQuery(selectedValue === "" ? "" : selectedValue.toLowerCase())
-  }, [])
+  }
 
-  const filteredData = useMemo(() => {
-    return data.filter((item) => {
+  useEffect(() => {
+    const results = data.filter((item) => {
       const matchesName =
         item.name?.toLowerCase().includes(searchQuery) ?? false
       const matchesClub =
         (!clubQuery || item.club?.toLowerCase().includes(clubQuery)) ?? false
       return matchesName && matchesClub
     })
+
+    const timeoutId = setTimeout(() => {
+      onFilteredDataChange(results)
+    }, 0)
+
+    return () => clearTimeout(timeoutId)
   }, [searchQuery, clubQuery, data])
 
-  useEffect(() => {
-    if (filteredData !== data) {
-      onFilteredDataChange(filteredData)
-    }
-  }, [filteredData, onFilteredDataChange, data])
-
   return (
-    <div className="flex flex-col mb-4 p-4 border border-gray-300">
+    <div className="filter-container">
       {/* Search by Name */}
-      <div className="mb-4">
+      <div className="search-group">
         <input
           type="text"
           placeholder="Search for a name..."
           value={searchQuery}
           onChange={handleSearchChange}
-          className="p-2 border border-gray-300 w-full placeholder-gray-500 text-base h-12 rounded-none"
+          className="input-field"
         />
       </div>
 
@@ -47,7 +48,7 @@ const SearchFilter = ({ data, onFilteredDataChange, uniqueClubs }) => {
         <select
           value={clubQuery}
           onChange={handleClubChange}
-          className="p-2 border border-gray-300 w-full placeholder-gray-500 text-base h-12 rounded-none">
+          className="select-field">
           <option value="">Select a club...</option>
           {uniqueClubs.map((club, index) => (
             <option key={index} value={club.toLowerCase()}>

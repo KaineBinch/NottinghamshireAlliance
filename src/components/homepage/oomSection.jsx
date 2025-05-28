@@ -2,9 +2,23 @@ import HomePageHeader from "./homepageHeader"
 import ResultsTable from "../results/resultsTable/resultsTable"
 import { results } from "../../constants/results"
 import { transformResults } from "../../utils/transformResults"
+import OOMSectionSkeleton from "./oomSectionSkeleton"
+import { useState, useEffect } from "react"
 
 const OOMSection = () => {
+  const [isLoading, setIsLoading] = useState(true)
   const { rows, columns } = transformResults(results)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 800)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (isLoading) {
+    return <OOMSectionSkeleton />
+  }
 
   return (
     <>

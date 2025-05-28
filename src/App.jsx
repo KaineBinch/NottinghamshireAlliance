@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from "react-router-dom"
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom"
 import "./App.css"
 import {
   HomePage,
@@ -17,56 +17,69 @@ import {
 import { appRoutes } from "./constants/appRoutes"
 import ScrollToTop from "./utils/scrollToTop"
 import Navbar from "./components/navbar"
-import MobFoot from "./components/mobileFooter"
+import MobFoot from "./components/footer/mobileFooter"
+import { PosthogPageViewTracker } from "./components/posthogPageViewTracker"
 import { Auth0Provider } from "@auth0/auth0-react"
 
-// Auth0 Configuration
-const domain = "alliance-admin.uk.auth0.com"
-const clientId = "yIwh6Lg7VkPxKsmDXcc4H84Or3oZaIHA"
+const domain = import.meta.env.VITE_AUTH0_DOMAIN
+const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID
 
-function App() {
-  const location = useLocation()
-
-  return (
-    <>
-      <ScrollToTop />
-      <Navbar />
-      <Routes location={location} key={location.pathname}>
-        <Route exact path={appRoutes.home} element={<HomePage />} />
-        <Route exact path={appRoutes.courses} element={<CoursesPage />} />
-        <Route exact path={appRoutes.fixtures} element={<FixturesPage />} />
-        <Route exact path={appRoutes.gallery} element={<GalleryPage />} />
-        <Route exact path={appRoutes.oom} element={<OrderOfMeritPage />} />
-        <Route exact path={appRoutes.results} element={<ResultsPage />} />
-        <Route exact path={appRoutes.rules} element={<RulesPage />} />
-        <Route
-          exact
-          path={appRoutes.clubofficers}
-          element={<ClubOfficersPage />}
-        />
-        <Route exact path={appRoutes.teeTimes} element={<TeeTimesPage />} />
-
-        {/* Wrapping AdminPage in Auth0Provider */}
-        <Route
-          exact
-          path={appRoutes.admin}
-          element={
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: (
+        <>
+          <PosthogPageViewTracker />
+          <ScrollToTop />
+          <Navbar />
+          <div id="content">
+            <Outlet />
+          </div>
+          <MobFoot />
+        </>
+      ),
+      children: [
+        { path: appRoutes.home, element: <HomePage /> },
+        { path: appRoutes.courses, element: <CoursesPage /> },
+        { path: appRoutes.fixtures, element: <FixturesPage /> },
+        { path: appRoutes.gallery, element: <GalleryPage /> },
+        { path: appRoutes.oom, element: <OrderOfMeritPage /> },
+        { path: appRoutes.results, element: <ResultsPage /> },
+        { path: appRoutes.rules, element: <RulesPage /> },
+        { path: appRoutes.clubofficers, element: <ClubOfficersPage /> },
+        { path: appRoutes.teeTimes, element: <TeeTimesPage /> },
+        {
+          path: appRoutes.admin,
+          element: (
             <Auth0Provider
               domain={domain}
               clientId={clientId}
               authorizationParams={{
                 redirect_uri: window.location.origin,
+                audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+                scope: "openid profile email",
               }}>
               <AdminPage />
             </Auth0Provider>
-          }
-        />
-        <Route path="/results/:clubName" element={<FurtherResultsPage />} />
-        <Route path={appRoutes.notFound} element={<NotFound />} />
-      </Routes>
-      <MobFoot />
-    </>
-  )
+          ),
+        },
+        { path: "/results/:clubName", element: <FurtherResultsPage /> },
+        { path: appRoutes.notFound, element: <NotFound /> },
+        { path: "*", element: <NotFound /> },
+      ],
+    },
+  ],
+  {
+    future: {
+      v7_startTransition: true,
+      v7_relativeSplatPath: true,
+    },
+  }
+)
+
+function App() {
+  return <RouterProvider router={router} />
 }
 
 export default App

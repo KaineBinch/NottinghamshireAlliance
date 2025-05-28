@@ -1,7 +1,11 @@
 const ExpandedRowDetails = ({ result, isClubView }) => {
   const formatDate = (dateString) => {
     if (!dateString) return ""
+
     const date = new Date(dateString)
+
+    if (isNaN(date.getTime())) return "Invalid Date"
+
     const day = date.getDate()
     const month = date.toLocaleString("default", { month: "short" })
 
@@ -18,8 +22,16 @@ const ExpandedRowDetails = ({ result, isClubView }) => {
   }
 
   if (isClubView) {
+    if (!result || !Array.isArray(result) || result.length === 0) {
+      return <div className="p-4 bg-[#FFFFFF]">No club data available.</div>
+    }
+
     const dateScores = result.reduce((acc, player) => {
+      if (!player || !player.scores || !Array.isArray(player.scores)) return acc
+
       player.scores.forEach(({ date, score }) => {
+        if (!date || score === undefined || score === null) return
+
         if (!acc[date]) {
           acc[date] = []
         }
@@ -35,53 +47,94 @@ const ExpandedRowDetails = ({ result, isClubView }) => {
       top4DateScores[date] = top4Scores.reduce((sum, score) => sum + score, 0)
     }
 
-    const sortedDates = Object.keys(top4DateScores).sort()
+    const sortedDates = Object.keys(top4DateScores).sort((a, b) => {
+      return new Date(a) - new Date(b)
+    })
+
+    if (sortedDates.length === 0) {
+      return <div className="p-4 bg-[#FFFFFF]">No date scores available.</div>
+    }
 
     return (
       <div className="bg-[#D9D9D9] p-2">
         <div className="flex flex-wrap justify-center">
-          {sortedDates.map((date, index) => (
-            <div
-              key={index}
-              className="flex flex-col w-1/2 sm:w-1/4 md:w-1/6 lg:w-1/12 border border-gray-300 p-1 text-center bg-[#FFFFFF]">
-              <div className="font-semibold">{formatDate(date)}</div>{" "}
-              {/* Format date */}
-              <div>{top4DateScores[date]}</div>
-            </div>
-          ))}
+          {sortedDates.map((date, index) => {
+            const formattedDate = formatDate(date)
+            if (!formattedDate) return null
+
+            return (
+              <div
+                key={index}
+                className="flex flex-col w-1/2 sm:w-1/4 md:w-1/6 lg:w-1/12 border border-gray-300 p-1 text-center bg-[#FFFFFF]">
+                <div className="font-semibold">{formattedDate}</div>
+                <div>{top4DateScores[date]}</div>
+              </div>
+            )
+          })}
         </div>
       </div>
     )
   } else {
-    if (!result || !result.scores) {
+    if (
+      !result ||
+      !result.scores ||
+      !Array.isArray(result.scores) ||
+      result.scores.length === 0
+    ) {
       return <div className="p-4 bg-[#FFFFFF]">No scores available.</div>
     }
-    const sortedScores = result.scores
-      .map((item) => parseInt(item.score, 10))
-      .sort((a, b) => b - a)
-      .slice(0, 10)
 
-    const highlightScores = [...sortedScores]
+    const validScores = result.scores.filter(
+      (item) =>
+        item && item.score !== undefined && item.score !== null && item.date
+    )
+
+    if (validScores.length === 0) {
+      return <div className="p-4 bg-[#FFFFFF]">No valid scores available.</div>
+    }
+
+    const sortedByDate = [...validScores]
+      .sort((a, b) => {
+        const dateA = new Date(a.date)
+        const dateB = new Date(b.date)
+        return dateA - dateB
+      })
+      .slice(0, 15)
+
+    const MAX_HIGHLIGHT_SCORES = 9
+    const topScores = [...validScores]
+      .map((item) => parseInt(item.score, 10))
+      .filter((score) => !isNaN(score))
+      .sort((a, b) => b - a)
+      .slice(0, MAX_HIGHLIGHT_SCORES)
+
+    const highlightScoresTracker = [...topScores]
 
     return (
       <div className="bg-[#D9D9D9] p-2">
         <div className="flex flex-wrap justify-center">
-          {result.scores.map((res, index) => {
+          {sortedByDate.map((res, index) => {
             const score = parseInt(res.score, 10)
-            const isTopScore = highlightScores.includes(score)
+            if (isNaN(score)) return null
+
+            const formattedDate = formatDate(res.date)
+            if (!formattedDate) return null
+
+            const scoreIndex = highlightScoresTracker.indexOf(score)
+            const isTopScore = scoreIndex !== -1
+
             if (isTopScore) {
-              highlightScores.splice(highlightScores.indexOf(score), 1)
+              highlightScoresTracker.splice(scoreIndex, 1)
             }
 
             return (
               <div
                 key={index}
-                className={`flex flex-col w-1/2 sm:w-1/4 md:w-1/6 lg:w-1/12 border border-gray-300 p-1 text-center ${
+                className={`flex flex-col w-1/2 sm:w-1/4 md:w-1/6 lg:w-1/10 border border-gray-300 p-1 text-center ${
                   isTopScore ? "bg-[#214A27] text-white" : "bg-white"
                 }`}>
-                <div className="font-semibold">{formatDate(res.date)}</div>{" "}
-                {/* Format date */}
-                <div>{res.score}</div>
+                <div className="font-semibold">{formattedDate}</div>
+                <div>{score}</div>
               </div>
             )
           })}

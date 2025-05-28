@@ -1,0 +1,368 @@
+/* Amateur section inner tabs */
+.inner-tab-button {
+  @apply py-2 font-semibold text-center;
+  flex: 1;
+}
+
+.inner-tab-active {
+  @apply bg-[#d9d9d9] text-black font-bold border-b-0;
+}
+
+.inner-tab-inactive {
+  @apply bg-[#17331B] text-white hover:bg-[#1A4923];
+}
+
+/* Page container */
+.page-container {
+  @apply w-full mx-auto max-w-5xl;
+  padding: clamp(1rem, 3vw, 2rem);
+  padding-top: 85px;
+  padding-bottom: clamp(1rem, 2vw, 1.5rem);
+}
+
+/* Content card */
+.content-card {
+  @apply bg-white rounded-lg mb-5;
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+/* Loading and error states */
+.loading-container {
+  @apply text-center;
+  padding-top: 85px;
+  font-size: clamp(1rem, 1vw + 0.75rem, 1.25rem);
+}
+
+.error-container {
+  @apply text-center;
+  padding-top: 85px;
+  font-size: clamp(1rem, 1vw + 0.75rem, 1.25rem);
+}
+
+/* Not found container */
+.not-found-container {
+  @apply bg-white shadow-md rounded-lg text-center;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.not-found-title {
+  @apply font-bold;
+  font-size: clamp(1.5rem, 2vw + 1rem, 2rem);
+  margin-bottom: clamp(1rem, 2vw, 1.5rem);
+}
+
+.not-found-message {
+  font-size: clamp(1rem, 1vw + 0.75rem, 1.25rem);
+  margin-bottom: clamp(1rem, 1.5vw, 1.5rem);
+}
+
+.not-found-secondary {
+  @apply text-gray-600;
+  font-size: clamp(0.875rem, 0.8vw + 0.7rem, 1rem);
+}
+
+/* Header */
+.event-header {
+  margin-bottom: clamp(1rem, 1.5vw, 1.75rem);
+}
+
+.event-title {
+  @apply font-bold;
+  font-size: clamp(1.5rem, 2.5vw + 0.75rem, 2.25rem);
+}
+
+.event-type {
+  font-size: clamp(1.125rem, 1.5vw + 0.75rem, 1.5rem);
+  margin-top: clamp(0.5rem, 0.5vw, 0.625rem);
+  margin-bottom: clamp(0.5rem, 0.5vw, 0.625rem);
+}
+
+.event-date {
+  padding-bottom: 0;
+  font-size: clamp(0.875rem, 1vw + 0.75rem, 1.125rem);
+}
+
+/* Add these styles to your furtherResultsPage.css file */
+
+.event-review-container {
+  margin: 1rem 0;
+}
+
+.event-review-truncated {
+  overflow: hidden;
+  text-transform: none;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.event-review-truncated,
+.event-review-full {
+  text-transform: none; /* Overrides any uppercase formatting */
+  font-weight: normal;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.event-review-full {
+  margin: 0;
+  text-transform: none;
+  line-height: 1.5;
+}
+
+.read-more-button,
+.read-less-button {
+  display: block;
+  background: none;
+  border: none;
+  color: #214a27;
+  font-weight: 600;
+  padding: 0;
+  padding-bottom: 1.5rem;
+  margin-top: 0.25rem;
+  cursor: pointer;
+  place-self: center;
+}
+
+.read-more-button:hover,
+.read-less-button:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .event-review-truncated {
+    -webkit-line-clamp: 3;
+  }
+}
+
+/* Tabs navigation */
+.tabs-navigation {
+  margin-bottom: clamp(1.5rem, 3vw, 3rem);
+  @apply flex justify-center;
+}
+
+.tab-button {
+  @apply font-semibold flex items-center;
+  font-size: clamp(0.75rem, 1vw + 0.6rem, 1.125rem);
+  padding: clamp(0.25rem, 0.75vw, 0.75rem) clamp(0.5rem, 1vw, 1rem);
+  margin-left: clamp(0.25rem, 0.5vw, 0.75rem);
+  margin-right: clamp(0.25rem, 0.5vw, 0.75rem);
+}
+
+.tab-button-active {
+  @apply text-[#214A27] border-b-2 border-[#214A27];
+}
+
+.tab-button-inactive {
+  @apply text-gray-700 hover:text-[#214A27];
+}
+
+.tab-icon {
+  margin-right: clamp(0.25rem, 0.5vw, 0.5rem);
+  width: clamp(1rem, 1vw + 0.8rem, 1.25rem);
+  height: clamp(1rem, 1vw + 0.8rem, 1.25rem);
+}
+
+/* Section titles and dividers */
+.section-title {
+  @apply font-semibold text-[#214A27];
+  font-size: clamp(1.125rem, 1.2vw + 0.8rem, 1.5rem);
+  margin-bottom: clamp(1rem, 1.5vw, 1.5rem);
+  margin-top: clamp(1rem, 1.5vw, 1.5rem);
+  padding-bottom: clamp(0.25rem, 0.5vw, 0.5rem);
+}
+
+.section-divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin-top: clamp(1.5rem, 2vw, 2.5rem);
+  margin-bottom: clamp(1.5rem, 2vw, 2.5rem);
+}
+
+/* Results table */
+.results-table-container {
+  @apply overflow-x-auto;
+  margin-bottom: clamp(1rem, 1.5vw, 1.5rem);
+}
+
+.results-table {
+  @apply w-full border-collapse;
+  font-size: clamp(0.75rem, 0.7vw + 0.65rem, 1rem);
+}
+
+.results-table-header {
+  @apply bg-[#214A27] text-white;
+}
+
+.results-table-header-cell {
+  @apply border text-center;
+  font-size: clamp(0.75rem, 0.7vw + 0.65rem, 1rem);
+  padding: clamp(0.25rem, 0.5vw, 0.75rem);
+}
+
+.results-table-row-even {
+  @apply bg-[#d9d9d9];
+}
+
+.results-table-row-odd {
+  @apply bg-white;
+}
+
+.results-table-cell {
+  @apply border;
+  font-size: clamp(0.75rem, 0.7vw + 0.65rem, 1rem);
+  padding: clamp(0.25rem, 0.5vw, 0.75rem);
+}
+
+.golfer-senior-tag {
+  @apply text-red-500 font-semibold;
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+}
+
+.golfer-pro-tag {
+  @apply text-blue-700 font-semibold;
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+}
+
+/* Team results */
+.team-title {
+  @apply text-center font-semibold;
+  font-size: clamp(1rem, 1.2vw + 0.8rem, 1.375rem);
+  margin-top: clamp(0.5rem, 0.75vw, 1rem);
+  margin-bottom: clamp(0.5rem, 0.75vw, 1rem);
+}
+
+.team-divider {
+  height: clamp(1rem, 1.5vw, 1.5rem);
+}
+
+/* Horizontal team layout specific adjustments */
+@media (min-width: 768px) {
+  .md\:flex-1 {
+    padding: 0 clamp(0.25rem, 0.75vw, 1rem);
+  }
+
+  .md\:flex-1 .team-title {
+    font-size: clamp(0.9rem, 1vw + 0.7rem, 1.25rem);
+  }
+
+  .md\:flex-1 .results-table {
+    font-size: clamp(0.7rem, 0.5vw + 0.65rem, 0.9rem);
+  }
+
+  .md\:flex-1 p {
+    font-size: clamp(0.7rem, 0.5vw + 0.65rem, 0.9rem);
+  }
+
+  .md\:gap-4 {
+    gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  }
+
+  .md\:mb-0 {
+    margin-bottom: 0;
+  }
+}
+
+/* Single-column layout spacing */
+@media (max-width: 767px) {
+  .mb-6 {
+    margin-bottom: clamp(1rem, 4vw, 1.5rem);
+  }
+}
+
+/* Button Styles for Amateur Section Tabs */
+.amateur-tab-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 50px;
+  background-color: #214a27;
+  color: white;
+  margin-bottom: 16px;
+}
+
+.amateur-tab-button {
+  width: 33.33%;
+  font-size: 14px;
+  height: 100%;
+  border-right: 1px solid #4a4a4a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .amateur-tab-button {
+    font-size: 16px;
+  }
+}
+
+.amateur-tab-button-active {
+  background-color: #d9d9d9;
+  color: black;
+  font-weight: bold;
+  border: none;
+}
+
+.amateur-tab-button-inactive {
+  background-color: #214a27;
+  color: white;
+}
+
+.amateur-tab-button-inactive:hover {
+  background-color: #1a4923;
+}
+
+/* Search filter styles for further results page */
+.results-search-filter {
+  margin-bottom: 1.5rem;
+}
+
+.results-search-filter .filter-container {
+  background-color: #f5f5f5;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.results-search-filter .search-group {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.results-search-filter .input-field,
+.results-search-filter .select-field {
+  width: 100%;
+  height: 45px;
+  border: 1px solid #ddd;
+  background-color: white;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+}
+
+/* Override the media query that puts inputs side by side */
+@media (min-width: 768px) {
+  .results-search-filter .filter-container {
+    flex-direction: column;
+  }
+
+  .results-search-filter .search-group {
+    flex: 1;
+    margin-bottom: 1rem;
+    margin-right: 0;
+    width: 100%;
+  }
+
+  .results-search-filter div:last-child {
+    width: 100%;
+  }
+}

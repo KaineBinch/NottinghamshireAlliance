@@ -1,0 +1,80 @@
+.teetimes-container {
+  @apply w-full;
+}
+
+.search-filter-container {
+  @apply mb-4;
+}
+
+.no-results-container {
+  @apply block;
+}
+
+.no-results-heading {
+  @apply font-bold text-xl;
+}
+
+.no-results-message {
+  @apply text-lg;
+}
+
+.teetimes-grid {
+  @apply grid md:grid-cols-2 grid-cols-1 gap-4 w-full drop-shadow-sm;
+}
+
+.teetime-card {
+  @apply col-span-1 border border-gray-400 bg-[#D9D9D9] drop-shadow;
+}
+
+.teetime-header {
+  @apply p-2 border-b border-gray-300 text-white bg-[#214A27];
+}
+
+.teetime-time {
+  @apply text-lg font-semibold;
+}
+
+.teetime-body {
+  @apply p-1;
+}
+
+.players-grid {
+  @apply grid md:grid-cols-2 grid-cols-1;
+}
+
+.player-container {
+  @apply p-2;
+}
+
+/* New golfer info styles */
+.golfer-info-container {
+  @apply flex flex-col gap-1;
+}
+
+.golfer-name {
+  @apply font-medium text-gray-900;
+}
+
+.golfer-club {
+  @apply text-sm text-gray-500;
+}
+
+.golfer-status {
+  @apply flex gap-2 mt-1 justify-center;
+}
+
+.player-senior-tag {
+  @apply text-xs font-medium text-red-700 px-1;
+}
+
+.player-pro-tag {
+  @apply text-xs font-medium text-blue-700 px-1;
+}
+
+.loading-container {
+  @apply pt-[85px];
+}
+
+.error-message {
+  @apply pt-[85px];
+}

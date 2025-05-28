@@ -58,7 +58,7 @@ const Weather = ({ city }) => {
         {dailyForecast.length > 0
           ? dailyForecast.map((day, index) => (
               <div key={index} className="mx-4 text-center">
-                <div className="flex items-center justify-center mr-4">
+                <div className="flex items-center justify-center mr-1">
                   <span className="weather-icon text-2xl [text-shadow:_2px_3px_2px_rgb(0_0_0_/_60%)]">
                     {getWeatherIcon(day.icon)}
                   </span>
@@ -69,7 +69,7 @@ const Weather = ({ city }) => {
                 </div>
               </div>
             ))
-          : "Loading..."}
+          : ""}
       </div>
     </div>
   )

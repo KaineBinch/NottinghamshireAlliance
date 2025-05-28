@@ -1,11 +1,13 @@
 import { useState } from "react"
 import PageHeader from "../components/pageHeader"
-import TeeTimesTable from "../components/teeTime"
-import ListView from "../components/teeTimeListView"
+import TeeTimesTable from "../components/teeTimes/teeTime"
+import ListView from "../components/teeTimes/teeTimeListView"
 import { queryBuilder } from "../utils/queryBuilder"
 import { MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { getNextEventDate } from "../utils/getNextEventDate"
+import { TeeTimesPageSkeleton } from "../components/skeletons"
+import "./teeTimesPage.css"
 
 const getOrdinalSuffix = (day) => {
   if (day > 3 && day < 21) return "th"
@@ -50,24 +52,26 @@ const TeeTimesPage = () => {
   const { isLoading, isError, data, error } = useFetch(query)
 
   if (isLoading) {
-    return <p className="pt-[85px]">Loading...</p>
+    return <TeeTimesPageSkeleton isListView={isListView} />
   } else if (isError) {
     console.error("Error:", error)
-    return <p className="pt-[85px]">Something went wrong...</p>
+    return <p className="error-message">Something went wrong...</p>
   }
 
   const nextEventDate = getNextEventDate(data)
   const nextEvent = data?.data.find(
     (entry) => entry.event?.eventDate === nextEventDate
   )
-  console.log(nextEvent)
 
   const eventDate = nextEvent?.event?.eventDate
     ? formatDateWithOrdinal(nextEvent.event.eventDate)
     : "Upcoming Event"
 
+  const isPastEvent = nextEvent?.event?.eventDate
+    ? new Date(nextEvent.event.eventDate) < new Date()
+    : false
+
   const filteredTeeTimes = nextEvent?.golfers || []
-  console.log(filteredTeeTimes)
 
   const handleToggleView = () => {
     setIsListView(!isListView)
@@ -76,14 +80,14 @@ const TeeTimesPage = () => {
   return (
     <>
       <PageHeader title="Order of Play" />
-      <hr className="border-black" />
-      <div className="bg-[#d9d9d9]">
-        <div className="max-w-5xl mx-auto py-5 px-4 sm:px-6 lg:px-8 text-start">
+      <hr className="header-divider" />
+      <div className="page-background">
+        <div className="page-content-container">
           <p>
-            Please provide any changes or details regarding ‘unnamed’ players by
-            17:00 on the Monday before the event, at the latest.
+            Please provide any changes or details regarding &#39;unnamed&#39;
+            players by 17:00 on the Monday before the event, at the latest.
           </p>
-          <p className="py-5">
+          <p className="info-paragraph">
             Please collect your scorecard at least 10 minutes before your
             scheduled tee time.
           </p>
@@ -92,40 +96,47 @@ const TeeTimesPage = () => {
             notification.
           </p>
         </div>
-        <hr className="border-black" />
+        <hr className="header-divider" />
       </div>
-      <div className="mt-6 flex flex-col mx-5">
+      <div className="page-content">
         {nextEvent ? (
           <>
             <div className="justify-center items-center">
               <div>
-                <h4 className="text-3xl font-bold">
+                <h4 className="club-name">
                   {nextEvent.event?.golf_club?.clubName}
                 </h4>
-                <h4 className="text-xl mt-2">{eventDate}</h4>
+                <h4 className="event-date">{eventDate}</h4>
+                {isPastEvent && (
+                  <p className="past-event-indicator">Past event</p>
+                )}
               </div>
             </div>
-            <div className="flex justify-end max-w-5xl mx-auto">
-              <button
-                onClick={handleToggleView}
-                className="bg-[#214A27] text-white px-6 mt-5 py-2 rounded-lg shadow-md ">
+            <div className="view-toggle-container">
+              <button onClick={handleToggleView} className="view-toggle-button">
                 {isListView ? "Tee Time View" : "Club View"}
               </button>
             </div>
           </>
         ) : (
-          <p className="text-center mt-5 text-xl">No upcoming events found.</p>
+          <p className="no-events-message">No upcoming events found.</p>
         )}
       </div>
-      <div className="flex justify-center">
-        <div className="max-w-5xl w-full">
-          <div className="mx-5 mb-5 mt-3">
+      <div className="tee-times-container">
+        <div className="tee-times-wrapper">
+          <div className="tee-times-content">
             {!!filteredTeeTimes.length && (
               <>
                 {isListView ? (
-                  <ListView teeTimes={filteredTeeTimes} />
+                  <ListView
+                    teeTimes={filteredTeeTimes}
+                    isPastEvent={isPastEvent}
+                  />
                 ) : (
-                  <TeeTimesTable teeTimes={filteredTeeTimes} />
+                  <TeeTimesTable
+                    teeTimes={filteredTeeTimes}
+                    isPastEvent={isPastEvent}
+                  />
                 )}
               </>
             )}

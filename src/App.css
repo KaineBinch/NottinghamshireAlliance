@@ -34,8 +34,8 @@
 
   @font-face {
     font-family: "WeatherIcons";
-    src: url("public/assets/fonts/weathericons-regular-webfont.woff2")
-      format("woff2");
+    src: url("/assets/fonts/weathericons-regular-webfont.ttf")
+      format("truetype");
     font-weight: normal;
     font-style: normal;
   }
@@ -67,6 +67,19 @@
   animation: "spin 1s linear infinite";
 }
 
+@keyframes fadeInEase {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.gallery-ease-in {
+  animation: fadeInEase 1s cubic-bezier(0.4, 0, 1, 1);
+}
+
 .containerStyles {
   display: "flex";
   align-items: "center";
@@ -80,6 +93,37 @@
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+/* Skeleton wave animation */
+.skeleton-wave {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: wave 1.5s infinite;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  transform: translateX(-100%);
+}
+
+.content-container {
+  transition: opacity 0.3s ease-in-out, height 0.3s ease-in-out;
+}
+
+@keyframes wave {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(100%);
   }
 }
 

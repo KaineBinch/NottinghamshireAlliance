@@ -1,0 +1,55 @@
+/* Loading and error states */
+.loading-container {
+  @apply pt-[85px];
+}
+
+.error-container {
+  @apply pt-[85px];
+}
+
+/* Description section */
+.description-section {
+  @apply bg-[#d9d9d9];
+}
+
+.description-container {
+  @apply max-w-5xl mx-auto py-5 px-4 sm:px-6 lg:px-8 text-start;
+}
+
+/* Main content */
+.officers-container {
+  @apply max-w-5xl mx-auto py-5 px-4 sm:px-6 lg:px-8 text-black;
+}
+
+/* President section */
+.president-title {
+  @apply font-semibold text-2xl pt-5;
+}
+
+/* Committee section */
+.committee-title {
+  @apply font-semibold text-2xl pt-10;
+}
+
+/* Secretary section */
+.secretary-title {
+  @apply font-semibold text-2xl pt-10;
+}
+
+/* Officer items */
+.officer-item {
+  @apply py-2;
+}
+
+.secretary-item {
+  @apply py-2 pb-10;
+}
+
+/* Officer details */
+.officer-name {
+  @apply font-semibold pr-5;
+}
+
+.officer-club {
+  @apply inline;
+}

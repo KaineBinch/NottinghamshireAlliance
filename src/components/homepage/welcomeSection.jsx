@@ -1,5 +1,5 @@
 import Weather from "./weather.jsx"
-import image from "../../assets/background.jpg"
+import backgroundImage from "../../assets/background.jpg"
 
 const WelcomeSection = () => {
   return (
@@ -7,7 +7,7 @@ const WelcomeSection = () => {
       <div
         className="mt-[58px] w-full h-[40svh] place-content-end"
         style={{
-          backgroundImage: `url(${image})`,
+          backgroundImage: `url(${backgroundImage})`,
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           backgroundPosition: "center",
@@ -27,12 +27,12 @@ const WelcomeSection = () => {
           </p>
           <a
             className="btn rounded-none mr-8 w-[125px] border-black"
-            href="/#/teetimes">
+            href="/teetimes">
             Tee Times
           </a>
           <a
             className="btn rounded-none ml-8 w-[125px] border-black text-white bg-[#214A27]"
-            href="/#/results">
+            href="/results">
             Results
           </a>
         </div>
