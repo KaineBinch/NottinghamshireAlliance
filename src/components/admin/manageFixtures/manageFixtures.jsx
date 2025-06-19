@@ -2,9 +2,12 @@ import { useState } from "react"
 import { MODELS, QUERIES } from "../../../constants/api"
 import useFetch from "../../../utils/hooks/useFetch"
 import { queryBuilder } from "../../../utils/queryBuilder"
+import { createFixture } from "../../../utils/api/fixturesApi"
 
 const ManageFixtures = () => {
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitMessage, setSubmitMessage] = useState("")
   const [formData, setFormData] = useState({
     eventDate: "",
     eventType: "",
@@ -18,6 +21,7 @@ const ManageFixtures = () => {
 
   const toggleForm = () => {
     setIsFormOpen((prev) => !prev)
+    setSubmitMessage("") // Clear any previous messages
     // Reset form when closing
     if (isFormOpen) {
       setFormData({
@@ -37,28 +41,78 @@ const ManageFixtures = () => {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setIsSubmitting(true)
+    setSubmitMessage("")
 
-    // Prepare data for submission
-    const submitData = {
-      ...formData,
-      golfClubId: formData.golfClubId ? parseInt(formData.golfClubId) : null,
+    try {
+      // Prepare data for submission
+      let golfClubDocumentId = null
+
+      // If a golf club is selected, get its documentId from the fetched data
+      if (formData.golfClubId) {
+        const selectedClub = golfClubsData?.data?.find(
+          (club) => club.id.toString() === formData.golfClubId.toString()
+        )
+        golfClubDocumentId = selectedClub?.documentId || selectedClub?.id
+        console.log("Selected club:", selectedClub)
+        console.log("Using documentId:", golfClubDocumentId)
+      }
+
+      const submitData = {
+        eventDate: formData.eventDate,
+        eventType: formData.eventType,
+        eventReview: formData.eventReview || null,
+        golfClubDocumentId: golfClubDocumentId,
+      }
+
+      console.log("Creating fixture:", submitData)
+
+      // Send to Strapi API
+      const result = await createFixture(submitData)
+
+      console.log("Fixture created successfully:", result)
+      setSubmitMessage("✅ Fixture created successfully!")
+
+      // Reset form and close after successful creation
+      setFormData({
+        eventDate: "",
+        eventType: "",
+        golfClubId: "",
+        eventReview: "",
+      })
+
+      // Close form after a brief delay to show success message
+      setTimeout(() => {
+        setIsFormOpen(false)
+        setSubmitMessage("")
+      }, 2000)
+    } catch (error) {
+      console.error("Error creating fixture:", error)
+
+      // Show detailed error information
+      let errorMessage = "Unknown error"
+      if (error.response?.data?.error?.message) {
+        errorMessage = error.response.data.error.message
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+
+      setSubmitMessage(`❌ Error creating fixture: ${errorMessage}`)
+
+      // Log detailed error info for debugging
+      console.log("Full error details:", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        headers: error.response?.headers,
+      })
+    } finally {
+      setIsSubmitting(false)
     }
-
-    console.log("Fixture form submitted:", submitData)
-
-    // TODO: Send to Strapi API
-    // await createFixture(submitData)
-
-    // Reset form and close
-    setFormData({
-      eventDate: "",
-      eventType: "",
-      golfClubId: "",
-      eventReview: "",
-    })
-    setIsFormOpen(false)
   }
 
   const eventTypes = [
@@ -104,6 +158,18 @@ const ManageFixtures = () => {
             Please fill in the fixture information below
           </p>
 
+          {/* Show submit message */}
+          {submitMessage && (
+            <div
+              className={`text-center p-3 rounded ${
+                submitMessage.includes("✅")
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
+              }`}>
+              {submitMessage}
+            </div>
+          )}
+
           {/* Event Date and Type Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -117,6 +183,7 @@ const ManageFixtures = () => {
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
                 required
+                disabled={isSubmitting}
               />
             </div>
 
@@ -129,7 +196,8 @@ const ManageFixtures = () => {
                 value={formData.eventType}
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
-                required>
+                required
+                disabled={isSubmitting}>
                 <option value="">Select Event Type</option>
                 {eventTypes.map((type, index) => (
                   <option key={index} value={type}>
@@ -150,7 +218,7 @@ const ManageFixtures = () => {
               value={formData.golfClubId}
               onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
-              disabled={isLoading}>
+              disabled={isLoading || isSubmitting}>
               <option value="">Select Golf Club (Optional)</option>
               {golfClubsData?.data?.map((club) => (
                 <option key={club.id} value={club.id}>
@@ -177,6 +245,7 @@ const ManageFixtures = () => {
               rows={3}
               className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent resize-none"
               placeholder="Optional description or review of the event..."
+              disabled={isSubmitting}
             />
           </div>
 
@@ -185,13 +254,15 @@ const ManageFixtures = () => {
             <button
               type="button"
               className="px-6 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition duration-300"
-              onClick={toggleForm}>
+              onClick={toggleForm}
+              disabled={isSubmitting}>
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-[#214A27] text-white rounded hover:bg-green-600 transition duration-300 font-medium">
-              Create Fixture
+              className="px-6 py-2 bg-[#214A27] text-white rounded hover:bg-green-600 transition duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting}>
+              {isSubmitting ? "Creating..." : "Create Fixture"}
             </button>
           </div>
         </form>

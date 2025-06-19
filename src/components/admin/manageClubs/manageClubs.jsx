@@ -1,7 +1,10 @@
 import { useState } from "react"
+import { createGolfClub } from "../../../utils/api/clubsApi"
 
 const ManageClubs = () => {
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitMessage, setSubmitMessage] = useState("")
   const [formData, setFormData] = useState({
     clubName: "",
     clubAddress: "",
@@ -15,6 +18,7 @@ const ManageClubs = () => {
 
   const toggleForm = () => {
     setIsFormOpen((prev) => !prev)
+    setSubmitMessage("") // Clear any previous messages
     // Reset form when closing
     if (isFormOpen) {
       setFormData({
@@ -62,39 +66,69 @@ const ManageClubs = () => {
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setIsSubmitting(true)
+    setSubmitMessage("")
 
-    // Prepare form data for submission
-    const submitData = {
-      ...formData,
-      // Convert contact number to string if needed
-      clubContactNumber: formData.clubContactNumber.toString(),
+    try {
+      // Prepare form data for submission
+      const submitData = {
+        ...formData,
+        // Convert contact number to string if needed
+        clubContactNumber: formData.clubContactNumber.toString(),
+      }
+
+      console.log("Creating golf club:", submitData)
+
+      // Send to Strapi API - the function will handle files vs no files automatically
+      const result = await createGolfClub(submitData)
+
+      console.log("Golf club created successfully:", result)
+      setSubmitMessage("✅ Golf club created successfully!")
+
+      // Reset form and close after successful creation
+      setFormData({
+        clubName: "",
+        clubAddress: "",
+        clubURL: "",
+        clubContactNumber: "",
+        clubID: "",
+        proName: "",
+        clubImage: null,
+        clubLogo: null,
+      })
+
+      // Close form after a brief delay to show success message
+      setTimeout(() => {
+        setIsFormOpen(false)
+        setSubmitMessage("")
+      }, 2000)
+    } catch (error) {
+      console.error("Error creating golf club:", error)
+
+      // Show detailed error information
+      let errorMessage = "Unknown error"
+      if (error.response?.data?.error?.message) {
+        errorMessage = error.response.data.error.message
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+
+      setSubmitMessage(`❌ Error creating golf club: ${errorMessage}`)
+
+      // Log detailed error info for debugging
+      console.log("Full error details:", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        headers: error.response?.headers,
+      })
+    } finally {
+      setIsSubmitting(false)
     }
-
-    console.log("Club form submitted:", submitData)
-
-    // TODO: Send to Strapi API with file uploads
-    // const formDataToSend = new FormData()
-    // Object.keys(submitData).forEach(key => {
-    //   if (submitData[key] !== null) {
-    //     formDataToSend.append(key, submitData[key])
-    //   }
-    // })
-    // await createClub(formDataToSend)
-
-    // Reset form and close
-    setFormData({
-      clubName: "",
-      clubAddress: "",
-      clubURL: "",
-      clubContactNumber: "",
-      clubID: "",
-      proName: "",
-      clubImage: null,
-      clubLogo: null,
-    })
-    setIsFormOpen(false)
   }
 
   return (
@@ -124,6 +158,18 @@ const ManageClubs = () => {
             Please fill in the club information below
           </p>
 
+          {/* Show submit message */}
+          {submitMessage && (
+            <div
+              className={`text-center p-3 rounded ${
+                submitMessage.includes("✅")
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
+              }`}>
+              {submitMessage}
+            </div>
+          )}
+
           {/* Club Name and Address Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -138,9 +184,10 @@ const ManageClubs = () => {
                 className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
                 placeholder="e.g., Bulwell Forest"
                 required
+                disabled={isSubmitting}
               />
               <p className="text-xs text-gray-500 mt-1">
-                Enter name without "Golf Club"
+                Enter name without &quot;Golf Club&quot;
               </p>
             </div>
 
@@ -156,6 +203,7 @@ const ManageClubs = () => {
                 className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
                 placeholder="Street, Town, Postcode"
                 required
+                disabled={isSubmitting}
               />
             </div>
           </div>
@@ -172,6 +220,7 @@ const ManageClubs = () => {
               onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
               placeholder="https://www.clubwebsite.com"
+              disabled={isSubmitting}
             />
           </div>
 
@@ -188,6 +237,7 @@ const ManageClubs = () => {
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
                 placeholder="01234 567890"
+                disabled={isSubmitting}
               />
             </div>
 
@@ -202,6 +252,7 @@ const ManageClubs = () => {
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
                 placeholder="e.g., BUL, OP, etc."
+                disabled={isSubmitting}
               />
               <p className="text-xs text-gray-500 mt-1">
                 Short identifier for the club
@@ -221,10 +272,12 @@ const ManageClubs = () => {
               onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
               placeholder="Professional's name"
+              disabled={isSubmitting}
             />
           </div>
 
-          {/* Image Uploads Row */}
+          {/* Image Uploads Row - Temporarily disabled for testing */}
+          {/* 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -236,6 +289,7 @@ const ManageClubs = () => {
                 accept="image/jpeg,image/jpg,image/png,image/webp"
                 onChange={(e) => handleFileChange(e, "clubImage")}
                 className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-[#214A27] file:text-white hover:file:bg-green-600"
+                disabled={isSubmitting}
               />
               <p className="text-xs text-gray-500 mt-1">
                 Course photo (max 5MB, JPEG/PNG/WebP)
@@ -257,6 +311,7 @@ const ManageClubs = () => {
                 accept="image/jpeg,image/jpg,image/png,image/webp"
                 onChange={(e) => handleFileChange(e, "clubLogo")}
                 className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-[#214A27] file:text-white hover:file:bg-green-600"
+                disabled={isSubmitting}
               />
               <p className="text-xs text-gray-500 mt-1">
                 Club logo (max 5MB, JPEG/PNG/WebP)
@@ -268,19 +323,29 @@ const ManageClubs = () => {
               )}
             </div>
           </div>
+          */}
+
+          <div className="bg-yellow-100 p-3 rounded mb-4">
+            <p className="text-sm text-yellow-700">
+              📝 Note: File uploads temporarily disabled while testing. Basic
+              club creation should work now.
+            </p>
+          </div>
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-3 pt-4">
             <button
               type="button"
               className="px-6 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition duration-300"
-              onClick={toggleForm}>
+              onClick={toggleForm}
+              disabled={isSubmitting}>
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-[#214A27] text-white rounded hover:bg-green-600 transition duration-300 font-medium">
-              Create Golf Club
+              className="px-6 py-2 bg-[#214A27] text-white rounded hover:bg-green-600 transition duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting}>
+              {isSubmitting ? "Creating..." : "Create Golf Club"}
             </button>
           </div>
         </form>
