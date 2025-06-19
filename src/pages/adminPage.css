@@ -49,6 +49,11 @@
   @apply mt-6 bg-[#214A27] p-6 rounded-lg shadow-lg max-w-5xl;
 }
 
+/* CSV preview container */
+.add-container {
+  @apply mt-6 bg-[#214A27] p-6 rounded-lg shadow-lg max-w-5xl;
+}
+
 /* Login prompt */
 .login-link {
   @apply text-blue-500 hover:underline cursor-pointer;
