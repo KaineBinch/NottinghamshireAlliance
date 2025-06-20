@@ -50,7 +50,7 @@ const ResultsTable = ({ limit }) => {
           }
         }
 
-        acc[playerName].totalPoints += playerScore
+        // Store all scores but don't add to totalPoints yet
         acc[playerName].scores.push({
           date: eventDate,
           score: playerScore,
@@ -58,6 +58,16 @@ const ResultsTable = ({ limit }) => {
 
         return acc
       }, {})
+
+      // Now calculate totalPoints using only top 9 scores for each player
+      Object.values(playerScores).forEach((player) => {
+        const sortedScores = player.scores
+          .map((scoreItem) => scoreItem.score)
+          .sort((a, b) => b - a) // Sort highest to lowest
+          .slice(0, 9) // Take only top 9 scores
+
+        player.totalPoints = sortedScores.reduce((sum, score) => sum + score, 0)
+      })
 
       return Object.values(playerScores)
     }
