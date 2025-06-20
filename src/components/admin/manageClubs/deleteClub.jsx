@@ -165,7 +165,7 @@ const DeleteClub = ({ onClose, onSuccess }) => {
             {clubs.map((club) => (
               <div
                 key={club.id || club.documentId}
-                className="border border-gray-300 rounded-lg p-4 hover:bg-red-50 cursor-pointer transition-colors"
+                className="border border-gray-300 rounded-lg p-4 hover:bg-red-50 cursor-pointer transition-colors bg-gray-200"
                 onClick={() => handleClubSelect(club.id || club.documentId)}>
                 <h4 className="font-bold text-gray-800">{club.clubName}</h4>
                 <p className="text-sm text-gray-600">{club.clubAddress}</p>
