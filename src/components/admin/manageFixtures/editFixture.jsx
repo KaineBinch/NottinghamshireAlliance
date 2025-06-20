@@ -336,7 +336,7 @@ const EditFixture = ({ onClose, onSuccess }) => {
             {fixtures.map((fixture) => (
               <div
                 key={fixture.id || fixture.documentId}
-                className="border border-gray-300 rounded-lg p-4 hover:bg-green-50 cursor-pointer transition-colors duration-200 hover:border-green-300"
+                className="border border-gray-300 rounded-lg p-4 hover:bg-green-50 cursor-pointer transition-colors duration-200 hover:border-green-300 bg-gray-200"
                 onClick={() =>
                   handleFixtureSelect(fixture.id || fixture.documentId)
                 }>
