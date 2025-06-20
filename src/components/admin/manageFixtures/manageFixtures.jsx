@@ -11,6 +11,7 @@ const ManageFixtures = () => {
   const [formData, setFormData] = useState({
     eventDate: "",
     eventType: "",
+    customEventType: "", // New field for custom event type
     golfClubId: "",
     eventReview: "",
   })
@@ -27,6 +28,7 @@ const ManageFixtures = () => {
       setFormData({
         eventDate: "",
         eventType: "",
+        customEventType: "", // Reset custom field
         golfClubId: "",
         eventReview: "",
       })
@@ -39,6 +41,15 @@ const ManageFixtures = () => {
       ...prev,
       [name]: value,
     }))
+
+    // Clear custom event type if user changes away from "Other"
+    if (name === "eventType" && value !== "Other") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+        customEventType: "",
+      }))
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -60,9 +71,15 @@ const ManageFixtures = () => {
         console.log("Using documentId:", golfClubDocumentId)
       }
 
+      // Use custom event type if "Other" is selected, otherwise use the selected event type
+      const finalEventType =
+        formData.eventType === "Other"
+          ? formData.customEventType
+          : formData.eventType
+
       const submitData = {
         eventDate: formData.eventDate,
-        eventType: formData.eventType,
+        eventType: finalEventType,
         eventReview: formData.eventReview || null,
         golfClubDocumentId: golfClubDocumentId,
       }
@@ -79,6 +96,7 @@ const ManageFixtures = () => {
       setFormData({
         eventDate: "",
         eventType: "",
+        customEventType: "", // Reset custom field
         golfClubId: "",
         eventReview: "",
       })
@@ -208,6 +226,25 @@ const ManageFixtures = () => {
             </div>
           </div>
 
+          {/* Custom Event Type Field - Only show when "Other" is selected */}
+          {formData.eventType === "Other" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Custom Event Type *
+              </label>
+              <input
+                type="text"
+                name="customEventType"
+                value={formData.customEventType}
+                onChange={handleChange}
+                placeholder="Enter custom event type"
+                className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
+                required
+                disabled={isSubmitting}
+              />
+            </div>
+          )}
+
           {/* Golf Club Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -219,7 +256,7 @@ const ManageFixtures = () => {
               onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
               disabled={isLoading || isSubmitting}>
-              <option value="">Select Golf Club (Optional)</option>
+              <option value="">Select Golf Club</option>
               {golfClubsData?.data?.map((club) => (
                 <option key={club.id} value={club.id}>
                   {club.clubName} Golf Club
@@ -231,22 +268,6 @@ const ManageFixtures = () => {
                 Error loading golf clubs. You can still create the fixture.
               </p>
             )}
-          </div>
-
-          {/* Event Review */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Event Review/Description
-            </label>
-            <textarea
-              name="eventReview"
-              value={formData.eventReview}
-              onChange={handleChange}
-              rows={3}
-              className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent resize-none"
-              placeholder="Optional description or review of the event..."
-              disabled={isSubmitting}
-            />
           </div>
 
           {/* Action Buttons */}
