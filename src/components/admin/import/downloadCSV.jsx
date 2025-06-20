@@ -607,7 +607,7 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   }
 
   return (
-    <div className="flex flex-col space-y-4 bg-white h-full p-6 rounded-lg shadow-lg">
+    <div className="flex flex-col space-y-4 bg-gray-100 h-full p-6 rounded-lg shadow-lg">
       {view === "upload" && renderUploadView()}
       {view === "processing" && renderProcessingView()}
       {view === "results" && renderResultsView()}

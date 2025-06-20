@@ -149,10 +149,8 @@ const ManageFixtures = () => {
   }
 
   return (
-    <div className="h-full flex flex-col space-y-4 bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-lg font-semibold text-center text-white bg-[#214A27] -m-6 mb-4 p-4 rounded-t-lg">
-        Manage Fixtures
-      </h2>
+    <div className="h-full flex flex-col space-y-4 bg-gray-100 p-6 rounded-lg shadow-lg">
+      <h2 className="text-lg font-semibold text-center">Manage Fixtures</h2>
 
       {!isFormOpen ? (
         <div className="text-center">

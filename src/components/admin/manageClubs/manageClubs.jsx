@@ -132,10 +132,8 @@ const ManageClubs = () => {
   }
 
   return (
-    <div className="h-full flex flex-col space-y-4 bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-lg font-semibold text-center text-white bg-[#214A27] -m-6 mb-4 p-4 rounded-t-lg">
-        Manage Golf Clubs
-      </h2>
+    <div className="h-full flex flex-col space-y-4 bg-gray-100 p-6 rounded-lg shadow-lg">
+      <h2 className="text-lg font-semibold text-center">Manage Golf Clubs</h2>
 
       {!isFormOpen ? (
         <div className="text-center">
@@ -205,6 +203,9 @@ const ManageClubs = () => {
                 required
                 disabled={isSubmitting}
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Enter Street, Town & Postcode
+              </p>
             </div>
           </div>
 
@@ -222,6 +223,9 @@ const ManageClubs = () => {
               placeholder="https://www.clubwebsite.com"
               disabled={isSubmitting}
             />
+            <p className="text-xs text-gray-500 mt-1">
+              This website URL needs to have https:// in front of the www.
+            </p>
           </div>
 
           {/* Contact Number and Club ID Row */}
@@ -243,7 +247,7 @@ const ManageClubs = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Club ID
+                Club ID *
               </label>
               <input
                 type="text"
@@ -252,6 +256,7 @@ const ManageClubs = () => {
                 onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
                 placeholder="e.g., BUL, OP, etc."
+                required
                 disabled={isSubmitting}
               />
               <p className="text-xs text-gray-500 mt-1">
@@ -324,13 +329,6 @@ const ManageClubs = () => {
             </div>
           </div>
           */}
-
-          <div className="bg-yellow-100 p-3 rounded mb-4">
-            <p className="text-sm text-yellow-700">
-              📝 Note: File uploads temporarily disabled while testing. Basic
-              club creation should work now.
-            </p>
-          </div>
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-3 pt-4">
