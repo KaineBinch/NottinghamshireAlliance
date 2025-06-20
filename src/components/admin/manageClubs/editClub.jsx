@@ -1,11 +1,18 @@
 import { useState, useEffect } from "react"
-import { createGolfClub, getAllGolfClubs } from "../../../utils/api/clubsApi"
+import {
+  getAllGolfClubs,
+  getGolfClubById,
+  updateGolfClub,
+} from "../../../utils/api/clubsApi"
 
-const AddClub = ({ onClose, onSuccess }) => {
+const EditClub = ({ onClose, onSuccess }) => {
+  const [step, setStep] = useState("select") // "select" or "edit"
+  const [clubs, setClubs] = useState([])
+  const [selectedClub, setSelectedClub] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState("")
   const [validationErrors, setValidationErrors] = useState([])
-  const [existingClubs, setExistingClubs] = useState([])
   const [realtimeWarnings, setRealtimeWarnings] = useState([])
   const [formData, setFormData] = useState({
     clubName: "",
@@ -14,27 +21,34 @@ const AddClub = ({ onClose, onSuccess }) => {
     clubContactNumber: "",
     clubID: "",
     proName: "",
-    clubImage: null,
-    clubLogo: null,
   })
 
-  // Load existing clubs for real-time validation
+  // Load all clubs on component mount
   useEffect(() => {
-    const loadExistingClubs = async () => {
+    const loadClubs = async () => {
+      setIsLoading(true)
       try {
-        const clubs = await getAllGolfClubs()
-        setExistingClubs(clubs)
-        console.log("Loaded existing clubs:", clubs) // Debug log
+        const clubsData = await getAllGolfClubs()
+        // Sort clubs alphabetically by club name (A-Z)
+        const sortedClubs = clubsData.sort((a, b) => {
+          const nameA = (a.clubName || "").toLowerCase()
+          const nameB = (b.clubName || "").toLowerCase()
+          return nameA.localeCompare(nameB)
+        })
+        setClubs(sortedClubs)
       } catch (error) {
-        console.error("Error loading existing clubs:", error)
+        console.error("Error loading clubs:", error)
+        setSubmitMessage("❌ Error loading clubs")
+      } finally {
+        setIsLoading(false)
       }
     }
-    loadExistingClubs()
+    loadClubs()
   }, [])
 
-  // Real-time validation as user types
+  // Real-time validation as user types (excluding current club)
   const checkRealtimeConflicts = (fieldName, value) => {
-    if (!value || existingClubs.length === 0) {
+    if (!value || clubs.length === 0) {
       setRealtimeWarnings([])
       return
     }
@@ -42,9 +56,19 @@ const AddClub = ({ onClose, onSuccess }) => {
     const warnings = []
     const normalizedValue = value.toLowerCase().trim()
 
-    existingClubs.forEach((club) => {
-      // FIX: Access club data directly, not through .attributes
-      // The data structure is: club.clubName, not club.attributes.clubName
+    clubs.forEach((club) => {
+      // Skip the club being edited - check multiple ID formats
+      if (
+        selectedClub &&
+        (club.id === selectedClub.id ||
+          club.documentId === selectedClub.documentId ||
+          club.id === selectedClub.documentId ||
+          club.documentId === selectedClub.id ||
+          club.id?.toString() === selectedClub.id?.toString() ||
+          club.documentId?.toString() === selectedClub.documentId?.toString())
+      ) {
+        return
+      }
 
       switch (fieldName) {
         case "clubName":
@@ -81,6 +105,35 @@ const AddClub = ({ onClose, onSuccess }) => {
     setRealtimeWarnings(warnings)
   }
 
+  const handleClubSelect = async (clubId) => {
+    if (!clubId) return
+
+    console.log("Selected club ID:", clubId) // Debug log
+    setIsLoading(true)
+    try {
+      const clubData = await getGolfClubById(clubId)
+      console.log("Loaded club data:", clubData) // Debug log
+      setSelectedClub(clubData)
+
+      // Populate form with existing data
+      setFormData({
+        clubName: clubData.clubName || "",
+        clubAddress: clubData.clubAddress || "",
+        clubURL: clubData.clubURL || "",
+        clubContactNumber: clubData.clubContactNumber || "",
+        clubID: clubData.clubID || "",
+        proName: clubData.proName || "",
+      })
+
+      setStep("edit")
+    } catch (error) {
+      console.error("Error loading club details:", error)
+      setSubmitMessage("❌ Error loading club details: " + error.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({
@@ -98,51 +151,6 @@ const AddClub = ({ onClose, onSuccess }) => {
     checkRealtimeConflicts(name, value)
   }
 
-  const handleFileChange = (e, fieldName) => {
-    const file = e.target.files[0]
-    if (file) {
-      // Validate file type
-      const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"]
-      if (!validTypes.includes(file.type)) {
-        alert("Please select a valid image file (JPEG, PNG, or WebP)")
-        return
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File size must be less than 5MB")
-        return
-      }
-
-      console.log(`Selected ${fieldName}:`, file)
-      setFormData((prev) => ({
-        ...prev,
-        [fieldName]: file,
-      }))
-    }
-  }
-
-  const resetForm = () => {
-    setFormData({
-      clubName: "",
-      clubAddress: "",
-      clubURL: "",
-      clubContactNumber: "",
-      clubID: "",
-      proName: "",
-      clubImage: null,
-      clubLogo: null,
-    })
-    setValidationErrors([])
-    setRealtimeWarnings([])
-  }
-
-  const handleCancel = () => {
-    resetForm()
-    setSubmitMessage("")
-    if (onClose) onClose()
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -158,30 +166,21 @@ const AddClub = ({ onClose, onSuccess }) => {
     setSubmitMessage("")
     setValidationErrors([])
 
-    console.log("Form submission started...")
-
     try {
-      // Prepare form data for submission
       const submitData = {
         ...formData,
-        // Convert contact number to string if needed
         clubContactNumber: formData.clubContactNumber.toString(),
       }
 
-      console.log("Creating golf club:", submitData)
+      console.log("Updating golf club:", submitData)
 
-      // Send to Strapi API - the function will handle validation and files automatically
-      const result = await createGolfClub(submitData)
+      const result = await updateGolfClub(
+        selectedClub.id || selectedClub.documentId,
+        submitData
+      )
 
-      console.log("Golf club created successfully:", result)
-      setSubmitMessage("✅ Golf club created successfully!")
-
-      // Reset form data but keep message
-      resetForm()
-
-      // Reload existing clubs after successful creation
-      const updatedClubs = await getAllGolfClubs()
-      setExistingClubs(updatedClubs)
+      console.log("Golf club updated successfully:", result)
+      setSubmitMessage("✅ Golf club updated successfully!")
 
       // Close form after a brief delay to show success message
       setTimeout(() => {
@@ -190,7 +189,7 @@ const AddClub = ({ onClose, onSuccess }) => {
         if (onSuccess) onSuccess(result)
       }, 2000)
     } catch (error) {
-      console.error("Error creating golf club:", error)
+      console.error("Error updating golf club:", error)
 
       // Handle validation errors specifically
       if (error.validationErrors && Array.isArray(error.validationErrors)) {
@@ -207,35 +206,104 @@ const AddClub = ({ onClose, onSuccess }) => {
           errorMessage = error.message
         }
 
-        const fullErrorMessage = `❌ Error creating golf club: ${errorMessage}`
-        console.log("Setting error message:", fullErrorMessage)
+        const fullErrorMessage = `❌ Error updating golf club: ${errorMessage}`
         setSubmitMessage(fullErrorMessage)
       }
-
-      // Log detailed error info for debugging
-      console.log("Full error details:", {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        headers: error.response?.headers,
-        validationErrors: error.validationErrors,
-      })
     } finally {
-      console.log("Setting isSubmitting to false")
       setIsSubmitting(false)
     }
   }
 
+  const handleBack = () => {
+    setStep("select")
+    setSelectedClub(null)
+    setFormData({
+      clubName: "",
+      clubAddress: "",
+      clubURL: "",
+      clubContactNumber: "",
+      clubID: "",
+      proName: "",
+    })
+    setValidationErrors([])
+    setRealtimeWarnings([])
+    setSubmitMessage("")
+  }
+
+  const handleCancel = () => {
+    handleBack()
+    if (onClose) onClose()
+  }
+
+  if (step === "select") {
+    return (
+      <div className="space-y-4 bg-gray-100 p-6 rounded-lg shadow-lg border border-gray-300">
+        <h3 className="text-lg font-medium text-center text-gray-800">
+          Select Golf Club to Edit
+        </h3>
+        <p className="text-sm text-gray-600 text-center mb-4">
+          Choose which club you want to edit from the list below (sorted A-Z)
+        </p>
+
+        {submitMessage && (
+          <div className="text-center p-3 rounded mb-4 bg-red-100 text-red-700 border border-red-300">
+            <div className="font-medium">{submitMessage}</div>
+          </div>
+        )}
+
+        {isLoading ? (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#214A27] mx-auto"></div>
+            <p className="mt-2 text-gray-600">Loading clubs...</p>
+          </div>
+        ) : clubs.length > 0 ? (
+          <div className="space-y-3 max-h-64 overflow-y-auto">
+            {clubs.map((club) => (
+              <div
+                key={club.id || club.documentId}
+                className="border border-gray-300 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                onClick={() => handleClubSelect(club.documentId || club.id)}>
+                <h4 className="font-medium text-gray-800">{club.clubName}</h4>
+                <p className="text-sm text-gray-600">{club.clubAddress}</p>
+                <p className="text-xs text-gray-500">Club ID: {club.clubID}</p>
+                {/* Debug info */}
+                <p className="text-xs text-blue-500">
+                  Internal ID: {club.documentId || club.id}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-600">No clubs found</p>
+        )}
+
+        <div className="flex justify-center mt-4">
+          <button
+            className="px-6 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition duration-300"
+            onClick={handleCancel}>
+            Cancel
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Edit form (similar to AddClub but with existing data)
   return (
     <form
       onSubmit={handleSubmit}
       className="space-y-4 bg-gray-100 p-6 rounded-lg shadow-lg border border-gray-300">
-      <h3 className="text-lg font-medium text-center text-gray-800">
-        New Golf Club Details
-      </h3>
-      <p className="text-sm text-gray-600 text-center mb-4">
-        Please fill in the club information below
-      </p>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-medium text-gray-800">
+          Edit Golf Club: {selectedClub?.clubName}
+        </h3>
+        <button
+          type="button"
+          onClick={handleBack}
+          className="text-sm text-blue-600 hover:text-blue-800">
+          ← Back to Selection
+        </button>
+      </div>
 
       {/* Show submit message */}
       {submitMessage && (
@@ -283,14 +351,10 @@ const AddClub = ({ onClose, onSuccess }) => {
               </li>
             ))}
           </ul>
-          <p className="text-xs text-red-600 mt-3">
-            Please modify the conflicting information or contact support if you
-            believe this is an error.
-          </p>
         </div>
       )}
 
-      {/* Club Name and Address Row */}
+      {/* Form fields - same as AddClub but with dynamic highlighting */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -310,9 +374,6 @@ const AddClub = ({ onClose, onSuccess }) => {
             required
             disabled={isSubmitting}
           />
-          <p className="text-xs text-gray-500 mt-1">
-            Enter name without &quot;Golf Club&quot;
-          </p>
         </div>
 
         <div>
@@ -333,13 +394,9 @@ const AddClub = ({ onClose, onSuccess }) => {
             required
             disabled={isSubmitting}
           />
-          <p className="text-xs text-gray-500 mt-1">
-            Enter Street, Town & Postcode
-          </p>
         </div>
       </div>
 
-      {/* Club URL */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Club Website
@@ -357,12 +414,8 @@ const AddClub = ({ onClose, onSuccess }) => {
           placeholder="https://www.clubwebsite.com"
           disabled={isSubmitting}
         />
-        <p className="text-xs text-gray-500 mt-1">
-          This website URL needs to have https:// in front of the www.
-        </p>
       </div>
 
-      {/* Contact Number and Club ID Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -401,13 +454,9 @@ const AddClub = ({ onClose, onSuccess }) => {
             required
             disabled={isSubmitting}
           />
-          <p className="text-xs text-gray-500 mt-1">
-            Short identifier for the club
-          </p>
         </div>
       </div>
 
-      {/* Club Professional */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Club Professional
@@ -421,9 +470,6 @@ const AddClub = ({ onClose, onSuccess }) => {
           placeholder="Professional's name"
           disabled={isSubmitting}
         />
-        <p className="text-xs text-gray-500 mt-1">
-          Multiple clubs can share the same professional
-        </p>
       </div>
 
       {/* Action Buttons */}
@@ -437,7 +483,7 @@ const AddClub = ({ onClose, onSuccess }) => {
         </button>
         <button
           type="submit"
-          className={`px-6 py-2 bg-[#214A27] text-white rounded hover:bg-green-600 transition duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
+          className={`px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
             isSubmitting || realtimeWarnings.length > 0 ? "opacity-75" : ""
           }`}
           disabled={isSubmitting || realtimeWarnings.length > 0}>
@@ -460,10 +506,10 @@ const AddClub = ({ onClose, onSuccess }) => {
                   fill="currentColor"
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Creating...
+              Updating...
             </span>
           ) : (
-            "Create Golf Club"
+            "Update Golf Club"
           )}
         </button>
       </div>
@@ -471,4 +517,4 @@ const AddClub = ({ onClose, onSuccess }) => {
   )
 }
 
-export default AddClub
+export default EditClub

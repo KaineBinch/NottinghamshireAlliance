@@ -1,352 +1,261 @@
-import { useState } from "react"
-import { createGolfClub } from "../../../utils/api/clubsApi"
+import { useState, useEffect } from "react"
+import AddClub from "./addClub"
+import EditClub from "./editClub"
+import DeleteClub from "./deleteClub"
+import { getAllGolfClubs } from "../../../utils/api/clubsApi"
 
 const ManageClubs = () => {
-  const [isFormOpen, setIsFormOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitMessage, setSubmitMessage] = useState("")
-  const [formData, setFormData] = useState({
-    clubName: "",
-    clubAddress: "",
-    clubURL: "",
-    clubContactNumber: "",
-    clubID: "",
-    proName: "",
-    clubImage: null,
-    clubLogo: null,
-  })
+  const [activeAction, setActiveAction] = useState(null)
+  const [notification, setNotification] = useState(null)
+  const [clubsCount, setClubsCount] = useState(0)
+  const [isLoadingStats, setIsLoadingStats] = useState(false)
 
-  const toggleForm = () => {
-    setIsFormOpen((prev) => !prev)
-    setSubmitMessage("") // Clear any previous messages
-    // Reset form when closing
-    if (isFormOpen) {
-      setFormData({
-        clubName: "",
-        clubAddress: "",
-        clubURL: "",
-        clubContactNumber: "",
-        clubID: "",
-        proName: "",
-        clubImage: null,
-        clubLogo: null,
-      })
-    }
-  }
+  // Load initial statistics
+  useEffect(() => {
+    loadClubStatistics()
+  }, [])
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-  }
-
-  const handleFileChange = (e, fieldName) => {
-    const file = e.target.files[0]
-    if (file) {
-      // Validate file type
-      const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"]
-      if (!validTypes.includes(file.type)) {
-        alert("Please select a valid image file (JPEG, PNG, or WebP)")
-        return
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File size must be less than 5MB")
-        return
-      }
-
-      console.log(`Selected ${fieldName}:`, file)
-      setFormData((prev) => ({
-        ...prev,
-        [fieldName]: file,
-      }))
-    }
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setSubmitMessage("")
-
+  const loadClubStatistics = async () => {
+    setIsLoadingStats(true)
     try {
-      // Prepare form data for submission
-      const submitData = {
-        ...formData,
-        // Convert contact number to string if needed
-        clubContactNumber: formData.clubContactNumber.toString(),
-      }
-
-      console.log("Creating golf club:", submitData)
-
-      // Send to Strapi API - the function will handle files vs no files automatically
-      const result = await createGolfClub(submitData)
-
-      console.log("Golf club created successfully:", result)
-      setSubmitMessage("✅ Golf club created successfully!")
-
-      // Reset form and close after successful creation
-      setFormData({
-        clubName: "",
-        clubAddress: "",
-        clubURL: "",
-        clubContactNumber: "",
-        clubID: "",
-        proName: "",
-        clubImage: null,
-        clubLogo: null,
-      })
-
-      // Close form after a brief delay to show success message
-      setTimeout(() => {
-        setIsFormOpen(false)
-        setSubmitMessage("")
-      }, 2000)
+      const clubs = await getAllGolfClubs()
+      setClubsCount(clubs.length)
     } catch (error) {
-      console.error("Error creating golf club:", error)
-
-      // Show detailed error information
-      let errorMessage = "Unknown error"
-      if (error.response?.data?.error?.message) {
-        errorMessage = error.response.data.error.message
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message
-      } else if (error.message) {
-        errorMessage = error.message
-      }
-
-      setSubmitMessage(`❌ Error creating golf club: ${errorMessage}`)
-
-      // Log detailed error info for debugging
-      console.log("Full error details:", {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        headers: error.response?.headers,
-      })
+      console.error("Error loading club statistics:", error)
     } finally {
-      setIsSubmitting(false)
+      setIsLoadingStats(false)
     }
+  }
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type })
+    // Auto-hide notification after 5 seconds
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
+  }
+
+  const hideNotification = () => {
+    setNotification(null)
+  }
+
+  const handleAddClubSuccess = async (result) => {
+    console.log("Club added successfully:", result)
+
+    // Show success notification
+    const clubName = result?.data?.clubName || "New club"
+    showNotification(
+      `✅ ${clubName} has been successfully added to the alliance!`,
+      "success"
+    )
+
+    // Refresh club statistics
+    await loadClubStatistics()
+
+    // Optional: Trigger any parent component updates
+    // if (onClubsUpdated) onClubsUpdated()
+
+    // Close the active action after a brief delay to show success
+    setTimeout(() => {
+      setActiveAction(null)
+    }, 2000)
+  }
+
+  const handleEditClubSuccess = async (result) => {
+    console.log("Club updated successfully:", result)
+
+    // Show success notification
+    const clubName = result?.data?.clubName || "Club"
+    showNotification(
+      `✅ ${clubName} information has been successfully updated!`,
+      "success"
+    )
+
+    // Refresh club statistics (in case club name changed)
+    await loadClubStatistics()
+
+    // Optional: Clear any cached club data
+    // if (clearClubCache) clearClubCache()
+
+    // Close the active action after a brief delay
+    setTimeout(() => {
+      setActiveAction(null)
+    }, 2000)
+  }
+
+  const handleDeleteClubSuccess = async (result) => {
+    console.log("Club deleted successfully:", result)
+
+    // Show success notification with warnings if any
+    let message = `✅ Golf club has been successfully removed from the alliance.`
+    if (result.warnings && result.warnings.length > 0) {
+      message += ` Note: ${result.warnings.join(", ")}`
+    }
+    showNotification(message, "success")
+
+    // Refresh club statistics
+    await loadClubStatistics()
+
+    // Optional: Clean up any related cached data
+    // if (cleanupDeletedClubData) cleanupDeletedClubData(deletedClubId)
+
+    // Close the active action after a brief delay
+    setTimeout(() => {
+      setActiveAction(null)
+    }, 2000)
+  }
+
+  const handleCloseAction = () => {
+    setActiveAction(null)
+    // Clear any notifications when closing
+    setNotification(null)
   }
 
   return (
     <div className="h-full flex flex-col space-y-4 bg-gray-100 p-6 rounded-lg shadow-lg">
-      <h2 className="text-lg font-semibold text-center">Manage Golf Clubs</h2>
+      <div className="flex items-center justify-center">
+        <h2 className="text-lg font-semibold">Manage Golf Clubs</h2>
+      </div>
 
-      {!isFormOpen ? (
-        <div className="text-center">
-          <p className="mb-6 text-gray-700">
-            Add new golf clubs to the alliance. Each club can host events and
-            have members participate in competitions.
-          </p>
-          <button
-            className="bg-[#214A27] text-white px-6 py-3 rounded hover:bg-green-600 transition duration-300 font-medium"
-            onClick={toggleForm}>
-            Add New Golf Club
-          </button>
+      {/* Notification Banner */}
+      {notification && (
+        <div
+          className={`p-4 rounded-lg border-l-4 ${
+            notification.type === "success"
+              ? "bg-green-50 border-green-400 text-green-700"
+              : notification.type === "error"
+              ? "bg-red-50 border-red-400 text-red-700"
+              : "bg-blue-50 border-blue-400 text-blue-700"
+          }`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="font-medium">{notification.message}</div>
+            </div>
+            <button
+              onClick={hideNotification}
+              className="text-gray-400 hover:text-gray-600 transition-colors">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <h3 className="text-lg font-medium text-center text-gray-800">
-            New Golf Club Details
-          </h3>
-          <p className="text-sm text-gray-600 text-center mb-4">
-            Please fill in the club information below
+      )}
+
+      {!activeAction ? (
+        <div className="text-center">
+          <p className="mb-3 text-gray-700">
+            Add new golf clubs to the alliance, edit existing club information,
+            or remove clubs that are no longer part of the alliance. Each club
+            can host events and have members participate in competitions.
           </p>
 
-          {/* Show submit message */}
-          {submitMessage && (
-            <div
-              className={`text-center p-3 rounded ${
-                submitMessage.includes("✅")
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-              }`}>
-              {submitMessage}
-            </div>
-          )}
-
-          {/* Club Name and Address Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Club Name *
-              </label>
-              <input
-                type="text"
-                name="clubName"
-                value={formData.clubName}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
-                placeholder="e.g., Bulwell Forest"
-                required
-                disabled={isSubmitting}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Enter name without &quot;Golf Club&quot;
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Club Address *
-              </label>
-              <input
-                type="text"
-                name="clubAddress"
-                value={formData.clubAddress}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
-                placeholder="Street, Town, Postcode"
-                required
-                disabled={isSubmitting}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Enter Street, Town & Postcode
-              </p>
-            </div>
-          </div>
-
-          {/* Club URL */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Club Website
-            </label>
-            <input
-              type="url"
-              name="clubURL"
-              value={formData.clubURL}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
-              placeholder="https://www.clubwebsite.com"
-              disabled={isSubmitting}
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              This website URL needs to have https:// in front of the www.
-            </p>
-          </div>
-
-          {/* Contact Number and Club ID Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Contact Number
-              </label>
-              <input
-                type="tel"
-                name="clubContactNumber"
-                value={formData.clubContactNumber}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
-                placeholder="01234 567890"
-                disabled={isSubmitting}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Club ID *
-              </label>
-              <input
-                type="text"
-                name="clubID"
-                value={formData.clubID}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
-                placeholder="e.g., BUL, OP, etc."
-                required
-                disabled={isSubmitting}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Short identifier for the club
-              </p>
-            </div>
-          </div>
-
-          {/* Club Professional */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Club Professional
-            </label>
-            <input
-              type="text"
-              name="proName"
-              value={formData.proName}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
-              placeholder="Professional's name"
-              disabled={isSubmitting}
-            />
-          </div>
-
-          {/* Image Uploads Row - Temporarily disabled for testing */}
-          {/* 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Club Image
-              </label>
-              <input
-                type="file"
-                name="clubImage"
-                accept="image/jpeg,image/jpg,image/png,image/webp"
-                onChange={(e) => handleFileChange(e, "clubImage")}
-                className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-[#214A27] file:text-white hover:file:bg-green-600"
-                disabled={isSubmitting}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Course photo (max 5MB, JPEG/PNG/WebP)
-              </p>
-              {formData.clubImage && (
-                <p className="text-xs text-green-600 mt-1">
-                  ✓ {formData.clubImage.name}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Club Logo
-              </label>
-              <input
-                type="file"
-                name="clubLogo"
-                accept="image/jpeg,image/jpg,image/png,image/webp"
-                onChange={(e) => handleFileChange(e, "clubLogo")}
-                className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-[#214A27] file:text-white hover:file:bg-green-600"
-                disabled={isSubmitting}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Club logo (max 5MB, JPEG/PNG/WebP)
-              </p>
-              {formData.clubLogo && (
-                <p className="text-xs text-green-600 mt-1">
-                  ✓ {formData.clubLogo.name}
-                </p>
+          {/* Clubs Count Pill - Moved to bottom */}
+          <div className="mb-6 flex justify-center">
+            <div className="text-sm text-gray-600">
+              {isLoadingStats ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+                  <span>Loading...</span>
+                </div>
+              ) : (
+                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
+                  {clubsCount} {clubsCount === 1 ? "Club" : "Clubs"} in Alliance
+                </span>
               )}
             </div>
           </div>
-          */}
 
           {/* Action Buttons */}
-          <div className="flex justify-end space-x-3 pt-4">
+          <div className="flex flex-col gap-4 justify-center items-center">
             <button
-              type="button"
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition duration-300"
-              onClick={toggleForm}
-              disabled={isSubmitting}>
-              Cancel
+              className="bg-[#214A27] text-white px-6 py-3 rounded hover:bg-green-600 transition duration-300 font-medium flex items-center justify-center gap-2 min-w-[200px]"
+              onClick={() => setActiveAction("add")}>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Add New Golf Club
             </button>
+
             <button
-              type="submit"
-              className="px-6 py-2 bg-[#214A27] text-white rounded hover:bg-green-600 transition duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create Golf Club"}
+              className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition duration-300 font-medium flex items-center justify-center gap-2 min-w-[200px]"
+              onClick={() => setActiveAction("edit")}>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+              Edit Golf Club
+            </button>
+
+            <button
+              className="bg-red-600 text-white px-6 py-3 rounded hover:bg-red-700 transition duration-300 font-medium flex items-center justify-center gap-2 min-w-[200px]"
+              onClick={() => setActiveAction("delete")}>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+              Delete Golf Club
             </button>
           </div>
-        </form>
+        </div>
+      ) : (
+        <div>
+          {/* Render different components based on active action */}
+          {activeAction === "add" && (
+            <AddClub
+              onClose={handleCloseAction}
+              onSuccess={handleAddClubSuccess}
+            />
+          )}
+
+          {activeAction === "edit" && (
+            <EditClub
+              onClose={handleCloseAction}
+              onSuccess={handleEditClubSuccess}
+            />
+          )}
+
+          {activeAction === "delete" && (
+            <DeleteClub
+              onClose={handleCloseAction}
+              onSuccess={handleDeleteClubSuccess}
+            />
+          )}
+        </div>
       )}
     </div>
   )
