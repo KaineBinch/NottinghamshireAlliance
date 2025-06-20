@@ -1,290 +1,274 @@
-import { useState } from "react"
-import { MODELS, QUERIES } from "../../../constants/api"
-import useFetch from "../../../utils/hooks/useFetch"
-import { queryBuilder } from "../../../utils/queryBuilder"
-import { createFixture } from "../../../utils/api/fixturesApi"
+import { useState, useEffect } from "react"
+import AddFixture from "./addFixture"
+import EditFixture from "./editFixture"
+import DeleteFixture from "./deleteFixture"
+import { getAllFixtures } from "../../../utils/api/fixturesApi"
 
 const ManageFixtures = () => {
-  const [isFormOpen, setIsFormOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitMessage, setSubmitMessage] = useState("")
-  const [formData, setFormData] = useState({
-    eventDate: "",
-    eventType: "",
-    customEventType: "", // New field for custom event type
-    golfClubId: "",
-    eventReview: "",
-  })
+  const [activeAction, setActiveAction] = useState(null)
+  const [notification, setNotification] = useState(null)
+  const [fixturesCount, setFixturesCount] = useState(0)
+  const [upcomingFixtures, setUpcomingFixtures] = useState(0)
+  const [isLoadingStats, setIsLoadingStats] = useState(false)
 
-  // Fetch golf clubs data
-  const query = queryBuilder(MODELS.golfClubs, QUERIES.clubsQuery)
-  const { isLoading, isError, data: golfClubsData, error } = useFetch(query)
+  // Load initial statistics
+  useEffect(() => {
+    loadFixtureStatistics()
+  }, [])
 
-  const toggleForm = () => {
-    setIsFormOpen((prev) => !prev)
-    setSubmitMessage("") // Clear any previous messages
-    // Reset form when closing
-    if (isFormOpen) {
-      setFormData({
-        eventDate: "",
-        eventType: "",
-        customEventType: "", // Reset custom field
-        golfClubId: "",
-        eventReview: "",
-      })
-    }
-  }
-
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-
-    // Clear custom event type if user changes away from "Other"
-    if (name === "eventType" && value !== "Other") {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-        customEventType: "",
-      }))
-    }
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setSubmitMessage("")
-
+  const loadFixtureStatistics = async () => {
+    setIsLoadingStats(true)
     try {
-      // Prepare data for submission
-      let golfClubDocumentId = null
+      const fixtures = await getAllFixtures()
+      setFixturesCount(fixtures.length)
 
-      // If a golf club is selected, get its documentId from the fetched data
-      if (formData.golfClubId) {
-        const selectedClub = golfClubsData?.data?.find(
-          (club) => club.id.toString() === formData.golfClubId.toString()
-        )
-        golfClubDocumentId = selectedClub?.documentId || selectedClub?.id
-        console.log("Selected club:", selectedClub)
-        console.log("Using documentId:", golfClubDocumentId)
-      }
-
-      // Use custom event type if "Other" is selected, otherwise use the selected event type
-      const finalEventType =
-        formData.eventType === "Other"
-          ? formData.customEventType
-          : formData.eventType
-
-      const submitData = {
-        eventDate: formData.eventDate,
-        eventType: finalEventType,
-        eventReview: formData.eventReview || null,
-        golfClubDocumentId: golfClubDocumentId,
-      }
-
-      console.log("Creating fixture:", submitData)
-
-      // Send to Strapi API
-      const result = await createFixture(submitData)
-
-      console.log("Fixture created successfully:", result)
-      setSubmitMessage("✅ Fixture created successfully!")
-
-      // Reset form and close after successful creation
-      setFormData({
-        eventDate: "",
-        eventType: "",
-        customEventType: "", // Reset custom field
-        golfClubId: "",
-        eventReview: "",
+      // Count upcoming fixtures (future dates)
+      const today = new Date()
+      const upcoming = fixtures.filter((fixture) => {
+        const fixtureDate = new Date(fixture.eventDate)
+        return fixtureDate >= today
       })
-
-      // Close form after a brief delay to show success message
-      setTimeout(() => {
-        setIsFormOpen(false)
-        setSubmitMessage("")
-      }, 2000)
+      setUpcomingFixtures(upcoming.length)
     } catch (error) {
-      console.error("Error creating fixture:", error)
-
-      // Show detailed error information
-      let errorMessage = "Unknown error"
-      if (error.response?.data?.error?.message) {
-        errorMessage = error.response.data.error.message
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message
-      } else if (error.message) {
-        errorMessage = error.message
-      }
-
-      setSubmitMessage(`❌ Error creating fixture: ${errorMessage}`)
-
-      // Log detailed error info for debugging
-      console.log("Full error details:", {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        headers: error.response?.headers,
-      })
+      console.error("Error loading fixture statistics:", error)
     } finally {
-      setIsSubmitting(false)
+      setIsLoadingStats(false)
     }
   }
 
-  const eventTypes = [
-    "Order of Merit",
-    "Team Event",
-    "Roy Fletcher Memorial",
-    "Presidents Day",
-    "Away Trip",
-    "Harry Brown",
-    "Singles",
-    "Other",
-  ]
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type })
+    // Auto-hide notification after 5 seconds
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
+  }
 
-  if (isError) {
-    console.error("Error loading golf clubs:", error)
+  const hideNotification = () => {
+    setNotification(null)
+  }
+
+  const handleAddFixtureSuccess = async (result) => {
+    console.log("Fixture added successfully:", result)
+
+    // Show success notification
+    const eventType = result?.data?.eventType || "New fixture"
+    const eventDate = result?.data?.eventDate || ""
+    const dateText = eventDate
+      ? ` for ${new Date(eventDate).toLocaleDateString("en-GB")}`
+      : ""
+    showNotification(
+      `✅ ${eventType} fixture${dateText} has been successfully added to the calendar!`,
+      "success"
+    )
+
+    // Refresh fixture statistics
+    await loadFixtureStatistics()
+
+    // Close the active action after a brief delay to show success
+    setTimeout(() => {
+      setActiveAction(null)
+    }, 2000)
+  }
+
+  const handleEditFixtureSuccess = async (result) => {
+    console.log("Fixture updated successfully:", result)
+
+    // Show success notification
+    const eventType = result?.data?.eventType || "Fixture"
+    const eventDate = result?.data?.eventDate || ""
+    const dateText = eventDate
+      ? ` (${new Date(eventDate).toLocaleDateString("en-GB")})`
+      : ""
+    showNotification(
+      `✅ ${eventType} fixture${dateText} has been successfully updated!`,
+      "success"
+    )
+
+    // Refresh fixture statistics
+    await loadFixtureStatistics()
+
+    // Close the active action after a brief delay
+    setTimeout(() => {
+      setActiveAction(null)
+    }, 2000)
+  }
+
+  const handleDeleteFixtureSuccess = async (result) => {
+    console.log("Fixture deleted successfully:", result)
+
+    // Show success notification with warnings if any
+    let message = `✅ Fixture has been successfully removed from the calendar.`
+    if (result.warnings && result.warnings.length > 0) {
+      message += ` Note: ${result.warnings.join(", ")}`
+    }
+    showNotification(message, "success")
+
+    // Refresh fixture statistics
+    await loadFixtureStatistics()
+
+    // Close the active action after a brief delay
+    setTimeout(() => {
+      setActiveAction(null)
+    }, 2000)
+  }
+
+  const handleCloseAction = () => {
+    setActiveAction(null)
+    // Clear any notifications when closing
+    setNotification(null)
   }
 
   return (
     <div className="h-full flex flex-col space-y-4 bg-gray-100 p-6 rounded-lg shadow-lg">
-      <h2 className="text-lg font-semibold text-center">Manage Fixtures</h2>
+      <div className="flex items-center justify-center">
+        <h2 className="text-lg font-semibold">Manage Fixtures</h2>
+      </div>
 
-      {!isFormOpen ? (
-        <div className="text-center">
-          <p className="mb-6 text-gray-700">
-            Add new fixtures to the competition calendar. Each fixture
-            represents an event that will be played at a specific golf club.
-          </p>
-          <button
-            className="bg-[#214A27] text-white px-6 py-3 rounded hover:bg-green-600 transition duration-300 font-medium"
-            onClick={toggleForm}
-            disabled={isLoading}>
-            {isLoading ? "Loading..." : "Add New Fixture"}
-          </button>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <h3 className="text-lg font-medium text-center text-gray-800">
-            New Fixture Details
-          </h3>
-          <p className="text-sm text-gray-600 text-center mb-4">
-            Please fill in the fixture information below
-          </p>
-
-          {/* Show submit message */}
-          {submitMessage && (
-            <div
-              className={`text-center p-3 rounded ${
-                submitMessage.includes("✅")
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-              }`}>
-              {submitMessage}
+      {/* Notification Banner */}
+      {notification && (
+        <div
+          className={`p-4 rounded-lg border-l-4 ${
+            notification.type === "success"
+              ? "bg-green-50 border-green-400 text-green-700"
+              : notification.type === "error"
+              ? "bg-red-50 border-red-400 text-red-700"
+              : "bg-blue-50 border-blue-400 text-blue-700"
+          }`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="font-medium">{notification.message}</div>
             </div>
-          )}
-
-          {/* Event Date and Type Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Event Date *
-              </label>
-              <input
-                type="date"
-                name="eventDate"
-                value={formData.eventDate}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
-                required
-                disabled={isSubmitting}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Event Type *
-              </label>
-              <select
-                name="eventType"
-                value={formData.eventType}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
-                required
-                disabled={isSubmitting}>
-                <option value="">Select Event Type</option>
-                {eventTypes.map((type, index) => (
-                  <option key={index} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <button
+              onClick={hideNotification}
+              className="text-gray-400 hover:text-gray-600 transition-colors">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
           </div>
+        </div>
+      )}
 
-          {/* Custom Event Type Field - Only show when "Other" is selected */}
-          {formData.eventType === "Other" && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Custom Event Type *
-              </label>
-              <input
-                type="text"
-                name="customEventType"
-                value={formData.customEventType}
-                onChange={handleChange}
-                placeholder="Enter custom event type"
-                className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
-                required
-                disabled={isSubmitting}
-              />
+      {!activeAction ? (
+        <div className="text-center">
+          <p className="mb-3 text-gray-700">
+            Add new fixtures to the competition calendar, edit existing fixture
+            details, or remove fixtures that have been cancelled.
+          </p>
+
+          {/* Fixture Statistics Pills */}
+          <div className="mb-6 flex justify-center gap-4">
+            <div className="text-sm text-gray-600">
+              {isLoadingStats ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+                  <span>Loading...</span>
+                </div>
+              ) : (
+                <div className="flex gap-4">
+                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
+                    {fixturesCount} Total{" "}
+                    {fixturesCount === 1 ? "Fixture" : "Fixtures"}
+                  </span>
+                  <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
+                    {upcomingFixtures} Upcoming
+                  </span>
+                </div>
+              )}
             </div>
-          )}
-
-          {/* Golf Club Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Host Golf Club
-            </label>
-            <select
-              name="golfClubId"
-              value={formData.golfClubId}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
-              disabled={isLoading || isSubmitting}>
-              <option value="">Select Golf Club</option>
-              {golfClubsData?.data?.map((club) => (
-                <option key={club.id} value={club.id}>
-                  {club.clubName} Golf Club
-                </option>
-              ))}
-            </select>
-            {isError && (
-              <p className="text-red-500 text-sm mt-1">
-                Error loading golf clubs. You can still create the fixture.
-              </p>
-            )}
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end space-x-3 pt-4">
+          <div className="flex flex-col gap-4 justify-center items-center">
             <button
-              type="button"
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition duration-300"
-              onClick={toggleForm}
-              disabled={isSubmitting}>
-              Cancel
+              className="bg-[#214A27] hover:bg-green-600 text-white px-6 py-3 rounded transition duration-300 font-medium flex items-center justify-center gap-2 min-w-[200px]"
+              onClick={() => setActiveAction("add")}>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Add New Fixture
             </button>
+
             <button
-              type="submit"
-              className="px-6 py-2 bg-[#214A27] text-white rounded hover:bg-green-600 transition duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create Fixture"}
+              className="bg-[#214A27] hover:bg-green-600 text-white px-6 py-3 rounded transition duration-300 font-medium flex items-center justify-center gap-2 min-w-[200px]"
+              onClick={() => setActiveAction("edit")}>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+              Edit Fixture
+            </button>
+
+            <button
+              className="bg-red-600 text-white px-6 py-3 rounded hover:bg-red-700 transition duration-300 font-medium flex items-center justify-center gap-2 min-w-[200px]"
+              onClick={() => setActiveAction("delete")}>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+              Delete Fixture
             </button>
           </div>
-        </form>
+        </div>
+      ) : (
+        <div>
+          {/* Render different components based on active action */}
+          {activeAction === "add" && (
+            <AddFixture
+              onClose={handleCloseAction}
+              onSuccess={handleAddFixtureSuccess}
+            />
+          )}
+
+          {activeAction === "edit" && (
+            <EditFixture
+              onClose={handleCloseAction}
+              onSuccess={handleEditFixtureSuccess}
+            />
+          )}
+
+          {activeAction === "delete" && (
+            <DeleteFixture
+              onClose={handleCloseAction}
+              onSuccess={handleDeleteFixtureSuccess}
+            />
+          )}
+        </div>
       )}
     </div>
   )

@@ -155,8 +155,7 @@ const ManageClubs = () => {
         <div className="text-center">
           <p className="mb-3 text-gray-700">
             Add new golf clubs to the alliance, edit existing club information,
-            or remove clubs that are no longer part of the alliance. Each club
-            can host events and have members participate in competitions.
+            or remove clubs that are no longer part of the alliance.
           </p>
 
           {/* Clubs Count Pill - Moved to bottom */}
@@ -178,7 +177,7 @@ const ManageClubs = () => {
           {/* Action Buttons */}
           <div className="flex flex-col gap-4 justify-center items-center">
             <button
-              className="bg-[#214A27] text-white px-6 py-3 rounded hover:bg-green-600 transition duration-300 font-medium flex items-center justify-center gap-2 min-w-[200px]"
+              className="bg-[#214A27] hover:bg-green-600 text-white px-6 py-3 rounded transition duration-300 font-medium flex items-center justify-center gap-2 min-w-[200px]"
               onClick={() => setActiveAction("add")}>
               <svg
                 className="w-5 h-5"
@@ -196,7 +195,7 @@ const ManageClubs = () => {
             </button>
 
             <button
-              className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition duration-300 font-medium flex items-center justify-center gap-2 min-w-[200px]"
+              className="bg-[#214A27] hover:bg-green-600 text-white px-6 py-3 rounded transition duration-300 font-medium flex items-center justify-center gap-2 min-w-[200px]"
               onClick={() => setActiveAction("edit")}>
               <svg
                 className="w-5 h-5"

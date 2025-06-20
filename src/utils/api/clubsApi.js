@@ -1,6 +1,6 @@
 import axios from "axios"
 import { queryBuilder } from "../queryBuilder"
-import { MODELS } from "../../constants/api"
+import { MODELS, API_URL } from "../../constants/api"
 
 // Add missing golfers model constant
 const GOLFERS_MODEL = "/golfers"
@@ -268,6 +268,92 @@ export const checkClubDeletionSafety = async (clubId) => {
   }
 }
 
+// Helper function to upload a file and associate it with a club field
+const uploadFileToClub = async (clubId, fieldName, file) => {
+  try {
+    // Step 1: Upload the file to Strapi's media library
+    const formData = new FormData()
+    formData.append('files', file)
+
+    // For Strapi v5, we need to handle folder assignment differently
+    const fileInfo = {
+      alternativeText: `${fieldName} for club ${clubId}`,
+      caption: `${fieldName}`,
+      name: `${fieldName}_club_${clubId}`
+    }
+
+    // Try to get the folder ID for organization
+    const folderName = getClubMediaFolder(fieldName)
+    if (folderName) {
+      try {
+        // Try to find the folder by name first
+        const foldersResponse = await axios.get(`${API_URL}/upload/folders`)
+        const folder = foldersResponse.data.data?.find(f => f.name === folderName)
+        if (folder) {
+          fileInfo.folder = folder.id
+          console.log(`Assigning file to folder: ${folderName} (ID: ${folder.id})`)
+        } else {
+          console.log(`Folder ${folderName} not found, file will go to root`)
+        }
+      } catch (error) {
+        console.log(`Could not determine folder, file will go to root:`, error.message)
+      }
+    }
+
+    formData.append('fileInfo', JSON.stringify(fileInfo))
+
+    console.log(`Uploading ${fieldName} to media library...`)
+
+    const uploadResponse = await axios.post(`${API_URL}/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+
+    const uploadedFiles = uploadResponse.data
+    const uploadedFile = uploadedFiles[0] // Get the first (and only) uploaded file
+
+    console.log(`${fieldName} uploaded successfully, ID:`, uploadedFile.id)
+
+    // Step 2: Associate the uploaded file with the club record
+    const updateData = {
+      data: {
+        [fieldName]: [uploadedFile.id] // Strapi media fields expect array of IDs
+      }
+    }
+
+    console.log(`Associating ${fieldName} with club ${clubId} using documentId...`)
+
+    const updateUrl = queryBuilder(MODELS.golfClubs, `/${clubId}`)
+    console.log(`PUT URL: ${updateUrl}`)
+    const associateResponse = await axios.put(updateUrl, updateData, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    console.log(`${fieldName} successfully associated with club`)
+    return uploadedFile
+
+  } catch (error) {
+    console.error(`Error uploading ${fieldName}:`, error)
+    throw error
+  }
+}
+
+// Helper function to determine media folder based on field type
+const getClubMediaFolder = (fieldName) => {
+  // You can organize files into different folders in Strapi's media library
+  switch (fieldName) {
+    case 'clubImage':
+      return 'courses' // Will put club images in /courses folder
+    case 'clubLogo':
+      return 'logos'   // Will put club logos in /logos folder
+    default:
+      return null      // No folder organization
+  }
+}
+
 export const createGolfClub = async (clubData) => {
   try {
     // First validate the club data
@@ -285,9 +371,43 @@ export const createGolfClub = async (clubData) => {
       console.warn('Validation warning:', validation.validationError)
     }
 
-    const url = queryBuilder(MODELS.golfClubs, "")
+    // Check if we have files to upload
+    const hasFiles = clubData.clubImage || clubData.clubLogo
 
-    const payload = {
+    if (!hasFiles) {
+      // No files - send as JSON (your existing approach)
+      console.log('No files detected - sending as JSON')
+
+      const url = queryBuilder(MODELS.golfClubs, "")
+      const payload = {
+        data: {
+          clubName: clubData.clubName,
+          clubAddress: clubData.clubAddress,
+          clubURL: clubData.clubURL || null,
+          clubContactNumber: clubData.clubContactNumber || null,
+          clubID: clubData.clubID || null,
+          proName: clubData.proName || null,
+        }
+      }
+
+      console.log('Sending JSON payload:', payload)
+      console.log('To URL:', url)
+
+      const response = await axios.post(url, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      return response.data
+    }
+
+    // Has files - use FormData approach
+    console.log('Files detected - using FormData approach')
+
+    // Step 1: Create the club record first without files
+    const url = queryBuilder(MODELS.golfClubs, "")
+    const initialPayload = {
       data: {
         clubName: clubData.clubName,
         clubAddress: clubData.clubAddress,
@@ -298,16 +418,56 @@ export const createGolfClub = async (clubData) => {
       }
     }
 
-    console.log('Sending JSON payload:', payload)
-    console.log('To URL:', url)
+    console.log('Creating club record first:', initialPayload)
 
-    const response = await axios.post(url, payload, {
+    const createResponse = await axios.post(url, initialPayload, {
       headers: {
         'Content-Type': 'application/json',
       },
     })
 
-    return response.data
+    const createdClub = createResponse.data
+    const clubId = createdClub.data.documentId || createdClub.data.id
+
+    console.log('Club created successfully, documentId:', clubId, 'regular ID:', createdClub.data.id)
+
+    // Step 2: Upload files if they exist and associate them with the club
+    const filePromises = []
+
+    if (clubData.clubImage) {
+      console.log('Uploading club image...')
+      filePromises.push(uploadFileToClub(clubId, 'clubImage', clubData.clubImage))
+    }
+
+    if (clubData.clubLogo) {
+      console.log('Uploading club logo...')
+      filePromises.push(uploadFileToClub(clubId, 'clubLogo', clubData.clubLogo))
+    }
+
+    // Wait for all file uploads to complete
+    if (filePromises.length > 0) {
+      try {
+        await Promise.all(filePromises)
+        console.log('All files uploaded successfully')
+      } catch (fileError) {
+        console.error('Error uploading files:', fileError)
+        // Files failed but club was created - you could handle this differently
+        // For now we'll continue and return the club data
+      }
+    }
+
+    // Step 3: Fetch the updated club with populated media
+    try {
+      const updatedUrl = queryBuilder(MODELS.golfClubs, `/${clubId}?populate=*`)
+      console.log(`Fetching updated club from: ${updatedUrl}`)
+      const updatedResponse = await axios.get(updatedUrl)
+      return updatedResponse.data
+    } catch (error) {
+      // If fetching updated data fails, return the original creation response
+      console.warn('Could not fetch updated club data:', error.message)
+      return createdClub
+    }
+
   } catch (error) {
     console.error('Error creating golf club:', error)
     console.error('Response data:', error.response?.data)
@@ -333,17 +493,46 @@ export const updateGolfClub = async (clubId, clubData) => {
       console.warn('Validation warning:', validation.validationError)
     }
 
-    // Try different ID approaches for Strapi v5 compatibility
-    let url
-    let updateSuccess = false
-    let response
-
     // First, get the club to find the correct documentId
     const club = await getGolfClubById(clubId)
     const actualId = club.documentId || club.id
 
-    url = queryBuilder(MODELS.golfClubs, `/${actualId}`)
+    // Check if we have files to upload
+    const hasFiles = clubData.clubImage || clubData.clubLogo
 
+    if (!hasFiles) {
+      // No files - send as JSON (your existing approach)
+      console.log('No files detected - updating with JSON')
+
+      const url = queryBuilder(MODELS.golfClubs, `/${actualId}`)
+      const payload = {
+        data: {
+          clubName: clubData.clubName,
+          clubAddress: clubData.clubAddress,
+          clubURL: clubData.clubURL || null,
+          clubContactNumber: clubData.clubContactNumber || null,
+          clubID: clubData.clubID || null,
+          proName: clubData.proName || null,
+        }
+      }
+
+      console.log('Updating golf club:', payload)
+      console.log('To URL:', url)
+
+      const response = await axios.put(url, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      return response.data
+    }
+
+    // Has files - handle file uploads
+    console.log('Files detected - updating with files')
+
+    // Step 1: Update the basic club data first
+    const url = queryBuilder(MODELS.golfClubs, `/${actualId}`)
     const payload = {
       data: {
         clubName: clubData.clubName,
@@ -355,16 +544,50 @@ export const updateGolfClub = async (clubId, clubData) => {
       }
     }
 
-    console.log('Updating golf club:', payload)
-    console.log('To URL:', url)
+    console.log('Updating club data first:', payload)
 
-    response = await axios.put(url, payload, {
+    const updateResponse = await axios.put(url, payload, {
       headers: {
         'Content-Type': 'application/json',
       },
     })
 
-    return response.data
+    // Step 2: Upload new files if they exist
+    const filePromises = []
+
+    if (clubData.clubImage) {
+      console.log('Uploading new club image...')
+      filePromises.push(uploadFileToClub(actualId, 'clubImage', clubData.clubImage))
+    }
+
+    if (clubData.clubLogo) {
+      console.log('Uploading new club logo...')
+      filePromises.push(uploadFileToClub(actualId, 'clubLogo', clubData.clubLogo))
+    }
+
+    // Wait for all file uploads to complete
+    if (filePromises.length > 0) {
+      try {
+        await Promise.all(filePromises)
+        console.log('All files uploaded successfully')
+      } catch (fileError) {
+        console.error('Error uploading files:', fileError)
+        // Files failed but club was updated - you could handle this differently
+      }
+    }
+
+    // Step 3: Return updated club with populated media
+    try {
+      const updatedUrl = queryBuilder(MODELS.golfClubs, `/${actualId}?populate=*`)
+      console.log(`Fetching final updated club from: ${updatedUrl}`)
+      const finalResponse = await axios.get(updatedUrl)
+      return finalResponse.data
+    } catch (error) {
+      // If fetching updated data fails, return the original update response
+      console.warn('Could not fetch updated club data:', error.message)
+      return updateResponse.data
+    }
+
   } catch (error) {
     console.error('Error updating golf club:', error)
     console.error('Response data:', error.response?.data)

@@ -426,6 +426,155 @@ const AddClub = ({ onClose, onSuccess }) => {
         </p>
       </div>
 
+      {/* Image Upload Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Club Image Upload */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Club Image
+          </label>
+          <div className="relative">
+            <input
+              type="file"
+              id="clubImage"
+              accept="image/jpeg,image/jpg,image/png,image/webp"
+              onChange={(e) => handleFileChange(e, "clubImage")}
+              className="hidden"
+              disabled={isSubmitting}
+            />
+            <label
+              htmlFor="clubImage"
+              className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors duration-200 ${
+                formData.clubImage
+                  ? "border-green-400 bg-green-50"
+                  : "border-gray-300 hover:border-[#214A27] hover:bg-gray-50"
+              } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}>
+              {formData.clubImage ? (
+                <div className="text-center">
+                  <div className="text-green-600 mb-1">
+                    <svg
+                      className="w-8 h-8 mx-auto"
+                      fill="currentColor"
+                      viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-green-700 font-medium">
+                    {formData.clubImage.name}
+                  </p>
+                  <p className="text-xs text-green-600">
+                    {(formData.clubImage.size / 1024 / 1024).toFixed(2)} MB
+                  </p>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <div className="text-gray-400 mb-2">
+                    <svg
+                      className="w-8 h-8 mx-auto"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Click to upload club image
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    JPEG, PNG, WebP (max 5MB)
+                  </p>
+                </div>
+              )}
+            </label>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Optional: Main image showcasing the golf course
+          </p>
+        </div>
+
+        {/* Club Logo Upload */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Club Logo
+          </label>
+          <div className="relative">
+            <input
+              type="file"
+              id="clubLogo"
+              accept="image/jpeg,image/jpg,image/png,image/webp"
+              onChange={(e) => handleFileChange(e, "clubLogo")}
+              className="hidden"
+              disabled={isSubmitting}
+            />
+            <label
+              htmlFor="clubLogo"
+              className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors duration-200 ${
+                formData.clubLogo
+                  ? "border-green-400 bg-green-50"
+                  : "border-gray-300 hover:border-[#214A27] hover:bg-gray-50"
+              } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}>
+              {formData.clubLogo ? (
+                <div className="text-center">
+                  <div className="text-green-600 mb-1">
+                    <svg
+                      className="w-8 h-8 mx-auto"
+                      fill="currentColor"
+                      viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-green-700 font-medium">
+                    {formData.clubLogo.name}
+                  </p>
+                  <p className="text-xs text-green-600">
+                    {(formData.clubLogo.size / 1024 / 1024).toFixed(2)} MB
+                  </p>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <div className="text-gray-400 mb-2">
+                    <svg
+                      className="w-8 h-8 mx-auto"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Click to upload club logo
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    JPEG, PNG, WebP (max 5MB)
+                  </p>
+                </div>
+              )}
+            </label>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Optional: Club&#39;s official logo or emblem
+          </p>
+        </div>
+      </div>
+
       {/* Action Buttons */}
       <div className="flex justify-end space-x-3 pt-4">
         <button
