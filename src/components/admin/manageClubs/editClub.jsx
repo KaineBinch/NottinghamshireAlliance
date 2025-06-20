@@ -263,7 +263,7 @@ const EditClub = ({ onClose, onSuccess }) => {
                 key={club.id || club.documentId}
                 className="border border-gray-300 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
                 onClick={() => handleClubSelect(club.documentId || club.id)}>
-                <h4 className="font-medium text-gray-800">{club.clubName}</h4>
+                <h4 className="font-bold text-gray-800">{club.clubName}</h4>
                 <p className="text-sm text-gray-600">{club.clubAddress}</p>
                 <p className="text-xs text-gray-500">Club ID: {club.clubID}</p>
               </div>
