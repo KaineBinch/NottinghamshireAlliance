@@ -1,21 +1,23 @@
 import { useState, useEffect } from "react"
+import { MODELS, QUERIES } from "../../../constants/api"
+import useFetch from "../../../utils/hooks/useFetch"
+import { queryBuilder } from "../../../utils/queryBuilder"
 import {
   getAllFixtures,
   getFixtureById,
   updateFixture,
 } from "../../../utils/api/fixturesApi"
-import { getAllGolfClubs } from "../../../utils/api/clubsApi"
 
 const EditFixture = ({ onClose, onSuccess }) => {
-  const [step, setStep] = useState("select") // "select" or "edit"
+  const [step, setStep] = useState("select") // "select", "edit", or "updating"
   const [fixtures, setFixtures] = useState([])
-  const [golfClubs, setGolfClubs] = useState([])
   const [selectedFixture, setSelectedFixture] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false)
   const [submitMessage, setSubmitMessage] = useState("")
   const [validationErrors, setValidationErrors] = useState([])
   const [realtimeWarnings, setRealtimeWarnings] = useState([])
+  const [existingFixtures, setExistingFixtures] = useState([])
   const [formData, setFormData] = useState({
     eventDate: "",
     eventType: "",
@@ -35,16 +37,21 @@ const EditFixture = ({ onClose, onSuccess }) => {
     "Other",
   ]
 
-  // Load all fixtures and golf clubs on component mount
+  // Fetch golf clubs data
+  const query = queryBuilder(MODELS.golfClubs, QUERIES.clubsQuery)
+  const {
+    isLoading: clubsLoading,
+    isError,
+    data: golfClubsData,
+    error,
+  } = useFetch(query)
+
+  // Load all fixtures on component mount
   useEffect(() => {
-    const loadData = async () => {
+    const loadFixtures = async () => {
       setIsLoading(true)
       try {
-        const [fixturesData, clubsData] = await Promise.all([
-          getAllFixtures(),
-          getAllGolfClubs(),
-        ])
-
+        const fixturesData = await getAllFixtures()
         // Sort fixtures by date (most recent first) then by event type
         const sortedFixtures = fixturesData.sort((a, b) => {
           const dateA = new Date(a.eventDate)
@@ -54,22 +61,49 @@ const EditFixture = ({ onClose, onSuccess }) => {
           }
           return (a.eventType || "").localeCompare(b.eventType || "")
         })
-
         setFixtures(sortedFixtures)
-        setGolfClubs(clubsData)
+        setExistingFixtures(sortedFixtures)
       } catch (error) {
-        console.error("Error loading data:", error)
-        setSubmitMessage("❌ Error loading fixtures and clubs")
+        console.error("Error loading fixtures:", error)
+        setSubmitMessage("❌ Error loading fixtures")
       } finally {
         setIsLoading(false)
       }
     }
-    loadData()
+    loadFixtures()
   }, [])
 
-  // Real-time validation as user types (excluding current fixture)
+  const handleFixtureSelect = async (fixtureId) => {
+    if (!fixtureId) return
+
+    setIsLoading(true)
+    try {
+      const fixtureData = await getFixtureById(fixtureId)
+      setSelectedFixture(fixtureData)
+
+      // Pre-populate form with existing data
+      const isCustomType = !eventTypes.includes(fixtureData.eventType)
+      setFormData({
+        eventDate: fixtureData.eventDate || "",
+        eventType: isCustomType ? "Other" : fixtureData.eventType || "",
+        customEventType: isCustomType ? fixtureData.eventType || "" : "",
+        golfClubId:
+          fixtureData.golf_club?.documentId || fixtureData.golf_club?.id || "",
+        eventReview: fixtureData.eventReview || "",
+      })
+
+      setStep("edit")
+    } catch (error) {
+      console.error("Error loading fixture details:", error)
+      setSubmitMessage("❌ Error loading fixture details")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Real-time validation as user types
   const checkRealtimeConflicts = (fieldName, value) => {
-    if (!value || fixtures.length === 0) {
+    if (!value || existingFixtures.length === 0) {
       setRealtimeWarnings([])
       return
     }
@@ -91,22 +125,14 @@ const EditFixture = ({ onClose, onSuccess }) => {
       fieldName === "golfClubId" ? value : formData.golfClubId
 
     if (currentEventDate && currentEventType) {
-      fixtures.forEach((fixture) => {
-        // Skip the fixture being edited - check multiple ID formats
-        if (
-          selectedFixture &&
-          (fixture.id === selectedFixture.id ||
-            fixture.documentId === selectedFixture.documentId ||
-            fixture.id === selectedFixture.documentId ||
-            fixture.documentId === selectedFixture.id ||
-            fixture.id?.toString() === selectedFixture.id?.toString() ||
-            fixture.documentId?.toString() ===
-              selectedFixture.documentId?.toString())
-        ) {
-          return
-        }
+      existingFixtures.forEach((fixture) => {
+        // Skip checking against the fixture we're currently editing
+        const currentFixtureId =
+          selectedFixture?.id || selectedFixture?.documentId
+        const fixtureId = fixture.id || fixture.documentId
+        if (fixtureId === currentFixtureId) return
 
-        // Check for same date + same event type + same club (exact duplicate)
+        // Check for conflicts with other fixtures
         if (
           fixture.eventDate === currentEventDate &&
           fixture.eventType === currentEventType &&
@@ -118,7 +144,6 @@ const EditFixture = ({ onClose, onSuccess }) => {
           )
         }
 
-        // Check for same date + same event type at different club (potential conflict)
         if (
           fixture.eventDate === currentEventDate &&
           fixture.eventType === currentEventType &&
@@ -134,42 +159,6 @@ const EditFixture = ({ onClose, onSuccess }) => {
     }
 
     setRealtimeWarnings(warnings)
-  }
-
-  const handleFixtureSelect = async (fixtureId) => {
-    if (!fixtureId) return
-
-    console.log("Selected fixture ID:", fixtureId)
-    setIsLoading(true)
-    try {
-      const fixtureData = await getFixtureById(fixtureId)
-      console.log("Loaded fixture data:", fixtureData)
-      setSelectedFixture(fixtureData)
-
-      // Find the golf club ID for the form
-      const clubId =
-        fixtureData.golf_club?.id || fixtureData.golf_club?.documentId || ""
-
-      // Populate form with existing data
-      setFormData({
-        eventDate: fixtureData.eventDate || "",
-        eventType: eventTypes.includes(fixtureData.eventType)
-          ? fixtureData.eventType
-          : "Other",
-        customEventType: eventTypes.includes(fixtureData.eventType)
-          ? ""
-          : fixtureData.eventType || "",
-        golfClubId: clubId.toString(),
-        eventReview: fixtureData.eventReview || "",
-      })
-
-      setStep("edit")
-    } catch (error) {
-      console.error("Error loading fixture details:", error)
-      setSubmitMessage("❌ Error loading fixture details: " + error.message)
-    } finally {
-      setIsLoading(false)
-    }
   }
 
   const handleChange = (e) => {
@@ -198,18 +187,18 @@ const EditFixture = ({ onClose, onSuccess }) => {
     checkRealtimeConflicts(name, value)
   }
 
-  const handleSubmit = async (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault()
 
     // Don't submit if there are real-time warnings
     if (realtimeWarnings.length > 0) {
       setSubmitMessage(
-        "❌ Please resolve the conflicts above before submitting"
+        "❌ Please resolve the scheduling conflicts above before submitting"
       )
       return
     }
 
-    setIsSubmitting(true)
+    setIsUpdating(true)
     setSubmitMessage("")
     setValidationErrors([])
 
@@ -217,10 +206,12 @@ const EditFixture = ({ onClose, onSuccess }) => {
       // Prepare data for submission
       let golfClubDocumentId = null
 
-      // If a golf club is selected, get its documentId from the loaded data
+      // If a golf club is selected, get its documentId from the fetched data
       if (formData.golfClubId) {
-        const selectedClub = golfClubs.find(
-          (club) => club.id.toString() === formData.golfClubId.toString()
+        const selectedClub = golfClubsData?.data?.find(
+          (club) =>
+            (club.id || club.documentId).toString() ===
+            formData.golfClubId.toString()
         )
         golfClubDocumentId = selectedClub?.documentId || selectedClub?.id
       }
@@ -231,18 +222,16 @@ const EditFixture = ({ onClose, onSuccess }) => {
           ? formData.customEventType
           : formData.eventType
 
-      const submitData = {
+      const updateData = {
         eventDate: formData.eventDate,
         eventType: finalEventType,
         eventReview: formData.eventReview || null,
         golfClubDocumentId: golfClubDocumentId,
       }
 
-      console.log("Updating fixture:", submitData)
-
       const result = await updateFixture(
         selectedFixture.id || selectedFixture.documentId,
-        submitData
+        updateData
       )
 
       console.log("Fixture updated successfully:", result)
@@ -272,11 +261,10 @@ const EditFixture = ({ onClose, onSuccess }) => {
           errorMessage = error.message
         }
 
-        const fullErrorMessage = `❌ Error updating fixture: ${errorMessage}`
-        setSubmitMessage(fullErrorMessage)
+        setSubmitMessage(`❌ Error updating fixture: ${errorMessage}`)
       }
     } finally {
-      setIsSubmitting(false)
+      setIsUpdating(false)
     }
   }
 
@@ -304,6 +292,17 @@ const EditFixture = ({ onClose, onSuccess }) => {
     if (!dateString) return ""
     const date = new Date(dateString)
     return date.toLocaleDateString("en-GB", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  }
+
+  const formatDateShort = (dateString) => {
+    if (!dateString) return ""
+    const date = new Date(dateString)
+    return date.toLocaleDateString("en-GB", {
       weekday: "short",
       year: "numeric",
       month: "short",
@@ -318,8 +317,7 @@ const EditFixture = ({ onClose, onSuccess }) => {
           Select Fixture to Edit
         </h3>
         <p className="text-sm text-gray-600 text-center mb-4">
-          Choose which fixture you want to edit from the list below (sorted by
-          date)
+          Choose which fixture you want to modify
         </p>
 
         {submitMessage && (
@@ -330,7 +328,7 @@ const EditFixture = ({ onClose, onSuccess }) => {
 
         {isLoading ? (
           <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#214A27] mx-auto"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
             <p className="mt-2 text-gray-600">Loading fixtures...</p>
           </div>
         ) : fixtures.length > 0 ? (
@@ -338,28 +336,21 @@ const EditFixture = ({ onClose, onSuccess }) => {
             {fixtures.map((fixture) => (
               <div
                 key={fixture.id || fixture.documentId}
-                className="border border-gray-300 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                className="border border-gray-300 rounded-lg p-4 hover:bg-green-50 cursor-pointer transition-colors duration-200 hover:border-green-300"
                 onClick={() =>
-                  handleFixtureSelect(fixture.documentId || fixture.id)
+                  handleFixtureSelect(fixture.id || fixture.documentId)
                 }>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="font-medium text-gray-800">
-                      {fixture.eventType}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-gray-800 text-lg">
+                      {fixture.golf_club?.clubName || "No club assigned"}
                     </h4>
-                    <p className="text-sm text-gray-600">
-                      {formatDate(fixture.eventDate)}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {fixture.golf_club?.clubName
-                        ? `at ${fixture.golf_club.clubName}`
-                        : "No club assigned"}
-                    </p>
+                    <span className="text-sm font-medium text-gray-600 bg-gray-200 px-2 py-1 rounded">
+                      {formatDateShort(fixture.eventDate)}
+                    </span>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs text-blue-500">
-                      ID: {fixture.documentId || fixture.id}
-                    </p>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-sm text-gray-600">{fixture.eventType}</p>
                   </div>
                 </div>
               </div>
@@ -380,11 +371,9 @@ const EditFixture = ({ onClose, onSuccess }) => {
     )
   }
 
-  // Edit form
+  // Edit step
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 bg-gray-100 p-6 rounded-lg shadow-lg border border-gray-300">
+    <div className="space-y-4 bg-gray-100 p-6 rounded-lg shadow-lg border border-gray-300">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-medium text-gray-800">
           Edit Fixture: {selectedFixture?.eventType}
@@ -392,7 +381,8 @@ const EditFixture = ({ onClose, onSuccess }) => {
         <button
           type="button"
           onClick={handleBack}
-          className="text-sm text-blue-600 hover:text-blue-800">
+          className="text-sm text-blue-600 hover:text-blue-800"
+          disabled={isUpdating}>
           ← Back to Selection
         </button>
       </div>
@@ -443,160 +433,171 @@ const EditFixture = ({ onClose, onSuccess }) => {
               </li>
             ))}
           </ul>
+          <p className="text-xs text-red-600 mt-3">
+            Please modify the conflicting information or contact support if you
+            believe this is an error.
+          </p>
         </div>
       )}
 
-      {/* Event Date and Type Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Event Date *
-          </label>
-          <input
-            type="date"
-            name="eventDate"
-            value={formData.eventDate}
-            onChange={handleChange}
-            className={`w-full p-3 border rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent ${
-              realtimeWarnings.some((w) => w.includes("scheduled"))
-                ? "border-yellow-400 bg-yellow-50"
-                : "border-gray-300"
-            }`}
-            required
-            disabled={isSubmitting}
-          />
+      <form onSubmit={handleUpdate} className="space-y-4">
+        {/* Event Date and Type Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Event Date *
+            </label>
+            <input
+              type="date"
+              name="eventDate"
+              value={formData.eventDate}
+              onChange={handleChange}
+              className={`w-full p-3 border rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent ${
+                realtimeWarnings.some((w) => w.includes("scheduled"))
+                  ? "border-yellow-400 bg-yellow-50"
+                  : "border-gray-300"
+              }`}
+              required
+              disabled={isUpdating}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Event Type *
+            </label>
+            <select
+              name="eventType"
+              value={formData.eventType}
+              onChange={handleChange}
+              className={`w-full p-3 border rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent ${
+                realtimeWarnings.some((w) => w.includes("scheduled"))
+                  ? "border-yellow-400 bg-yellow-50"
+                  : "border-gray-300"
+              }`}
+              required
+              disabled={isUpdating}>
+              <option value="">Select Event Type</option>
+              {eventTypes.map((type, index) => (
+                <option key={index} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
+        {/* Custom Event Type Field - Only show when "Other" is selected */}
+        {formData.eventType === "Other" && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Custom Event Type *
+            </label>
+            <input
+              type="text"
+              name="customEventType"
+              value={formData.customEventType}
+              onChange={handleChange}
+              placeholder="Enter custom event type"
+              className={`w-full p-3 border rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent ${
+                realtimeWarnings.some((w) => w.includes("scheduled"))
+                  ? "border-yellow-400 bg-yellow-50"
+                  : "border-gray-300"
+              }`}
+              required
+              disabled={isUpdating}
+            />
+          </div>
+        )}
+
+        {/* Golf Club Selection */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Event Type *
+            Host Golf Club
           </label>
           <select
-            name="eventType"
-            value={formData.eventType}
+            name="golfClubId"
+            value={formData.golfClubId}
             onChange={handleChange}
             className={`w-full p-3 border rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent ${
               realtimeWarnings.some((w) => w.includes("scheduled"))
                 ? "border-yellow-400 bg-yellow-50"
                 : "border-gray-300"
             }`}
-            required
-            disabled={isSubmitting}>
-            <option value="">Select Event Type</option>
-            {eventTypes.map((type, index) => (
-              <option key={index} value={type}>
-                {type}
+            disabled={clubsLoading || isUpdating}>
+            <option value="">Select Golf Club</option>
+            {golfClubsData?.data?.map((club) => (
+              <option key={club.id} value={club.documentId || club.id}>
+                {club.clubName} Golf Club
               </option>
             ))}
           </select>
+          {isError && (
+            <p className="text-red-500 text-sm mt-1">
+              Error loading golf clubs. You can still update the fixture.
+            </p>
+          )}
         </div>
-      </div>
 
-      {/* Custom Event Type Field - Only show when "Other" is selected */}
-      {formData.eventType === "Other" && (
+        {/* Event Review */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Custom Event Type *
+            Event Review
           </label>
-          <input
-            type="text"
-            name="customEventType"
-            value={formData.customEventType}
+          <textarea
+            name="eventReview"
+            value={formData.eventReview}
             onChange={handleChange}
-            placeholder="Enter custom event type"
-            className={`w-full p-3 border rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent ${
-              realtimeWarnings.some((w) => w.includes("scheduled"))
-                ? "border-yellow-400 bg-yellow-50"
-                : "border-gray-300"
-            }`}
-            required
-            disabled={isSubmitting}
+            placeholder="Add any notes or review about this fixture"
+            rows={3}
+            className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
+            disabled={isUpdating}
           />
         </div>
-      )}
 
-      {/* Golf Club Selection */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Host Golf Club
-        </label>
-        <select
-          name="golfClubId"
-          value={formData.golfClubId}
-          onChange={handleChange}
-          className={`w-full p-3 border rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent ${
-            realtimeWarnings.some((w) => w.includes("scheduled"))
-              ? "border-yellow-400 bg-yellow-50"
-              : "border-gray-300"
-          }`}
-          disabled={isSubmitting}>
-          <option value="">Select Golf Club</option>
-          {golfClubs.map((club) => (
-            <option key={club.id} value={club.id}>
-              {club.clubName} Golf Club
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Event Review */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Event Review/Notes
-        </label>
-        <textarea
-          name="eventReview"
-          value={formData.eventReview}
-          onChange={handleChange}
-          className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
-          placeholder="Optional event review or notes..."
-          rows="3"
-          disabled={isSubmitting}
-        />
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex justify-end space-x-3 pt-4">
-        <button
-          type="button"
-          className="px-6 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition duration-300"
-          onClick={handleCancel}
-          disabled={isSubmitting}>
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className={`px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
-            isSubmitting || realtimeWarnings.length > 0 ? "opacity-75" : ""
-          }`}
-          disabled={isSubmitting || realtimeWarnings.length > 0}>
-          {isSubmitting ? (
-            <span className="flex items-center">
-              <svg
-                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24">
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Updating...
-            </span>
-          ) : (
-            "Update Fixture"
-          )}
-        </button>
-      </div>
-    </form>
+        {/* Action Buttons */}
+        <div className="flex justify-end space-x-3 pt-4">
+          <button
+            type="button"
+            className="px-6 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition duration-300"
+            onClick={handleCancel}
+            disabled={isUpdating}>
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className={`px-6 py-2 bg-[#214A27] text-white rounded hover:bg-green-600 transition duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
+              isUpdating || realtimeWarnings.length > 0 ? "opacity-75" : ""
+            }`}
+            disabled={isUpdating || realtimeWarnings.length > 0}>
+            {isUpdating ? (
+              <span className="flex items-center">
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24">
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Updating...
+              </span>
+            ) : (
+              "Update Fixture"
+            )}
+          </button>
+        </div>
+      </form>
+    </div>
   )
 }
 

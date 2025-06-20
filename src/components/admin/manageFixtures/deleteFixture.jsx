@@ -195,28 +195,21 @@ const DeleteFixture = ({ onClose, onSuccess }) => {
             {fixtures.map((fixture) => (
               <div
                 key={fixture.id || fixture.documentId}
-                className="border border-gray-300 rounded-lg p-4 hover:bg-red-50 cursor-pointer transition-colors"
+                className="border border-gray-300 rounded-lg p-4 hover:bg-red-50 cursor-pointer transition-colors duration-200 hover:border-red-300"
                 onClick={() =>
                   handleFixtureSelect(fixture.id || fixture.documentId)
                 }>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="font-medium text-gray-800">
-                      {fixture.eventType}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-gray-800 text-lg">
+                      {fixture.golf_club?.clubName || "No club assigned"}
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <span className="text-sm font-medium text-gray-600 bg-gray-200 px-2 py-1 rounded">
                       {formatDateShort(fixture.eventDate)}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {fixture.golf_club?.clubName
-                        ? `at ${fixture.golf_club.clubName}`
-                        : "No club assigned"}
-                    </p>
+                    </span>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs text-blue-500">
-                      ID: {fixture.documentId || fixture.id}
-                    </p>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-sm text-gray-600">{fixture.eventType}</p>
                   </div>
                 </div>
               </div>
@@ -267,34 +260,46 @@ const DeleteFixture = ({ onClose, onSuccess }) => {
 
       {/* Fixture details */}
       <div className="bg-white border border-gray-300 rounded-lg p-4 mb-4">
-        <h4 className="font-medium text-gray-800 mb-2">Fixture Details:</h4>
-        <div className="text-sm text-gray-600 space-y-1">
-          <p>
-            <strong>Event Type:</strong> {selectedFixture?.eventType}
-          </p>
-          <p>
-            <strong>Date:</strong> {formatDate(selectedFixture?.eventDate)}
-          </p>
-          <p>
-            <strong>Host Club:</strong>{" "}
-            {selectedFixture?.golf_club?.clubName || "No club assigned"}
-          </p>
-          {selectedFixture?.golf_club?.clubAddress && (
-            <p>
-              <strong>Club Address:</strong>{" "}
-              {selectedFixture.golf_club.clubAddress}
+        <h4 className="font-medium text-gray-800 mb-3">Fixture Details:</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+          <div>
+            <p className="mb-2">
+              <strong className="text-gray-800">Event Type:</strong>
+              <br />
+              {selectedFixture?.eventType}
             </p>
-          )}
-          {selectedFixture?.eventReview && (
-            <p>
-              <strong>Event Review:</strong> {selectedFixture.eventReview}
+            <p className="mb-2">
+              <strong className="text-gray-800">Date:</strong>
+              <br />
+              {formatDate(selectedFixture?.eventDate)}
             </p>
-          )}
-          <p className="text-xs text-blue-500 mt-2">
-            <strong>Internal ID:</strong>{" "}
-            {selectedFixture?.documentId || selectedFixture?.id}
-          </p>
+          </div>
+          <div>
+            <p className="mb-2">
+              <strong className="text-gray-800">Host Club:</strong>
+              <br />
+              {selectedFixture?.golf_club?.clubName || "No club assigned"}
+            </p>
+            {selectedFixture?.golf_club?.clubAddress && (
+              <p className="mb-2">
+                <strong className="text-gray-800">Club Address:</strong>
+                <br />
+                {selectedFixture.golf_club.clubAddress}
+              </p>
+            )}
+          </div>
         </div>
+        {selectedFixture?.eventReview && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p>
+              <strong className="text-gray-800">Event Review:</strong>
+              <br />
+              <span className="text-sm text-gray-600">
+                {selectedFixture.eventReview}
+              </span>
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Safety warnings */}
