@@ -27,7 +27,7 @@ const DeleteFixture = ({ onClose, onSuccess }) => {
           const dateA = new Date(a.eventDate)
           const dateB = new Date(b.eventDate)
           if (dateA.getTime() !== dateB.getTime()) {
-            return dateB - dateA // Most recent first
+            return dateA - dateB
           }
           return (a.eventType || "").localeCompare(b.eventType || "")
         })
@@ -221,7 +221,7 @@ const DeleteFixture = ({ onClose, onSuccess }) => {
 
         <div className="flex justify-center mt-4">
           <button
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition duration-300"
+            className="px-6 py-2 border border-gray-300 rounded text-white bg-red-600 hover:bg-red-700 transition duration-300"
             onClick={handleCancel}>
             Cancel
           </button>
@@ -388,7 +388,7 @@ const DeleteFixture = ({ onClose, onSuccess }) => {
       {/* Action Buttons */}
       <div className="flex justify-end space-x-3 pt-4">
         <button
-          className="px-6 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition duration-300"
+          className="px-6 py-2 border border-gray-300 rounded text-white bg-red-600 hover:bg-red-700 transition duration-300"
           onClick={handleCancel}
           disabled={isDeleting}>
           Cancel
@@ -397,7 +397,7 @@ const DeleteFixture = ({ onClose, onSuccess }) => {
         {safetyCheck?.canDelete && (
           <button
             onClick={handleDelete}
-            className={`px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={`px-6 py-2 bg-[#214A27] text-white rounded hover:bg-green-600 transition duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
               isDeleting || confirmText.toLowerCase() !== "delete"
                 ? "opacity-50"
                 : ""

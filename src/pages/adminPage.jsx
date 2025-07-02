@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom"
 import DownloadCSVFile from "../components/admin/import/downloadCSV"
 import TemplateCard from "../components/admin/template/TemplateCard"
 import CSVPreview from "../components/admin/import/csvPreview"
-import ManageFixtures from "../components/admin/manageFixtures/manageFixtures"
-import ManageClubs from "../components/admin/manageClubs/manageClubs"
+import UnifiedManagement from "../components/admin/unifiedManagement"
 import { useState, useEffect } from "react"
 import "./adminPage.css"
 
@@ -77,13 +76,10 @@ const AdminPage = () => {
               </div>
             )}
 
-            {/* Data Management Section */}
-            <div className="card-layout mt-6">
+            {/* Unified Data Management Section */}
+            <div className="mt-6">
               <div className="card-container">
-                <ManageFixtures />
-              </div>
-              <div className="card-container">
-                <ManageClubs />
+                <UnifiedManagement />
               </div>
             </div>
           </>

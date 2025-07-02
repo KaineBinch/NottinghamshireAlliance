@@ -57,7 +57,7 @@ const EditFixture = ({ onClose, onSuccess }) => {
           const dateA = new Date(a.eventDate)
           const dateB = new Date(b.eventDate)
           if (dateA.getTime() !== dateB.getTime()) {
-            return dateB - dateA // Most recent first
+            return dateA - dateB
           }
           return (a.eventType || "").localeCompare(b.eventType || "")
         })
@@ -362,7 +362,7 @@ const EditFixture = ({ onClose, onSuccess }) => {
 
         <div className="flex justify-center mt-4">
           <button
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition duration-300"
+            className="px-6 py-2 border border-gray-300 rounded text-white bg-red-600 hover:bg-red-700 transition duration-300"
             onClick={handleCancel}>
             Cancel
           </button>
@@ -559,7 +559,7 @@ const EditFixture = ({ onClose, onSuccess }) => {
         <div className="flex justify-end space-x-3 pt-4">
           <button
             type="button"
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition duration-300"
+            className="px-6 py-2 border border-gray-300 rounded text-white bg-red-600 hover:bg-red-700 transition duration-300"
             onClick={handleCancel}
             disabled={isUpdating}>
             Cancel

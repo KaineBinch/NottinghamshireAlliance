@@ -34,9 +34,14 @@
   @apply bg-red-100 text-red-800 border border-red-300;
 }
 
-/* Card layout */
+/* Card layout - side by side for import/template cards */
 .card-layout {
   @apply flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0;
+}
+
+/* Card layout stacked - always vertical for management components */
+.card-layout-stacked {
+  @apply flex flex-col space-y-6;
 }
 
 /* Card containers */
