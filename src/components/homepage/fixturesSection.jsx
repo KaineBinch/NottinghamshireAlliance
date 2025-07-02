@@ -37,7 +37,7 @@ const FixturesSection = () => {
 
   if (!nextFixture && !upcomingFixtures?.length) {
     return (
-      <div className="pt-[85px]">
+      <div className="">
         <HomePageHeader
           title="Fixtures"
           subtext="Stay updated with the latest details on upcoming fixtures. Click here for more information."
@@ -45,7 +45,7 @@ const FixturesSection = () => {
           btnStyle="text-white bg-[#214A27]"
           page="fixtures"
         />
-        <p>No upcoming fixtures available at the moment.</p>
+        <p className="pb-6">No upcoming fixtures available at the moment.</p>
       </div>
     )
   }
