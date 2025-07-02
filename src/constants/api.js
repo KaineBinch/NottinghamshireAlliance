@@ -12,6 +12,7 @@ export const API_URL = BASE_URL + "/api";
 
 export const MODELS = {
   golfClubs: "/golf-clubs",
+  golfers: "/golfers",
   scores: "/scores",
   rules: "/rules",
   conditions: "/conditions",
@@ -25,6 +26,8 @@ export const MODELS = {
 
 export const QUERIES = {
   clubsQuery: "?sort[0]=clubName:asc&populate=*",
+  golfersQuery: "?sort[0]=golferName:asc&populate=golf_club",
+  scoresQuery: "?sort[0]=golferEventScore:asc&populate=golfer,event",
   rulesQuery: "?sort[0]=ruleTitle:asc",
   conditionsQuery: "?sort[0]=conditionTitle:asc",
   contactQuery: "",
