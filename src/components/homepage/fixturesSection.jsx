@@ -14,7 +14,7 @@ const FixturesSection = () => {
     return <FixturesSectionSkeleton />
   } else if (isError) {
     console.error("Error:", error)
-    return <p className="pt-[85px]">Something went wrong...</p>
+    return <p className="pt-[35px]">Something went wrong...</p>
   }
 
   const sortedData = (data?.data || []).sort((a, b) => {
