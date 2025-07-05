@@ -38,6 +38,7 @@ const MobFoot = () => {
 
   return (
     <>
+      <AdSense />
       <div className="bg-[#D9D9D9] text-black px-5 pb-5">
         {/* Logo */}
         <div className="flex flex-col items-center justify-center py-6 mx-auto max-w-5xl">
@@ -118,7 +119,6 @@ const MobFoot = () => {
           </a>
         </div>
       </div>
-      <AdSense />
     </>
   )
 }
