@@ -7,7 +7,6 @@ import WelcomeSection from "../components/homepage/welcomeSection.jsx"
 import TeeTimesSection from "../components/homepage/teeTimeSection.jsx"
 import ResultsSection from "../components/homepage/resultsSection.jsx"
 import "./homePage.css"
-import AdSense from "../components/adSense.jsx"
 
 const ScrollRevealSection = ({ children, id }) => {
   const [isVisible, setIsVisible] = useState(false)
@@ -140,7 +139,6 @@ const HomePage = () => {
           </ScrollRevealSection>
 
           <hr className="border-black" />
-          <AdSense height="200px" />
         </>
       )}
     </div>
