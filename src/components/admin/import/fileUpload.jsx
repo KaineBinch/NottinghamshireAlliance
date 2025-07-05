@@ -1,9 +1,15 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { FiUpload } from "react-icons/fi"
 
-const FileUpload = ({ onFileUpload }) => {
+const FileUpload = ({ onFileUpload, resetFileName }) => {
   const [fileName, setFileName] = useState(null)
   const [isDragActive, setIsDragActive] = useState(false)
+
+  useEffect(() => {
+    if (resetFileName) {
+      setFileName(null)
+    }
+  }, [resetFileName])
 
   const handleFileChange = (event) => {
     const file = event.target.files[0]

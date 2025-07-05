@@ -4,50 +4,63 @@ import { useNavigate } from "react-router-dom"
 import DownloadCSVFile from "../components/admin/import/downloadCSV"
 import TemplateCard from "../components/admin/template/TemplateCard"
 import CSVPreview from "../components/admin/import/csvPreview"
+import UnifiedManagement from "../components/admin/unifiedManagement"
 import { useState, useEffect } from "react"
+import "./adminPage.css"
 
 const AdminPage = () => {
   const { isAuthenticated, isLoading, loginWithPopup, logout } = useAuth0()
+  const [loginAttempted, setLoginAttempted] = useState(false)
   const navigate = useNavigate()
   const [csvData, setCsvData] = useState([])
   const [groupedData, setGroupedData] = useState({})
 
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
-      loginWithPopup().catch((error) => console.error("Login failed", error))
+    if (!isAuthenticated && !isLoading && !loginAttempted) {
+      setLoginAttempted(true)
+      loginWithPopup().catch((error) => {
+        console.error("Login failed", error)
+      })
     }
-  }, [isAuthenticated, isLoading, loginWithPopup])
+  }, [isAuthenticated, isLoading, loginWithPopup, loginAttempted])
 
   const handleLogout = () => {
-    logout({ returnTo: window.location.origin })
+    const productionOrigin = window.location.hostname.includes("localhost")
+      ? window.location.origin
+      : "https://nottsalliance.com"
+
+    logout({
+      logoutParams: {
+        returnTo: productionOrigin,
+      },
+    })
     navigate("/")
   }
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <div></div>
   }
 
   return (
     <>
       <PageHeader title="Admin" />
       {isAuthenticated && (
-        <div className="relative">
-          <button
-            className="absolute -mt-20 top-4 right-10 bg-[#214A27] text-white py-2 px-4 rounded hover:bg-green-600 transition duration-300"
-            onClick={handleLogout}>
+        <div className="logout-button-container">
+          <button className="logout-button" onClick={handleLogout}>
             Log Out
           </button>
         </div>
       )}
 
-      <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-black">
+      <div className="admin-container">
         {isAuthenticated && (
           <>
-            <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
-              <div className="flex-1 bg-[#214A27] p-6 rounded-lg shadow-lg">
+            {/* Existing Import/Template Section */}
+            <div className="card-layout">
+              <div className="card-container">
                 <TemplateCard />
               </div>
-              <div className="flex-1 bg-[#214A27] p-6 rounded-lg shadow-lg">
+              <div className="card-container">
                 <DownloadCSVFile
                   setCsvData={setCsvData}
                   setGroupedData={setGroupedData}
@@ -56,29 +69,42 @@ const AdminPage = () => {
               </div>
             </div>
 
+            {/* CSV Preview Section */}
             {csvData.length > 0 && (
-              <div className="mt-6 bg-[#214A27] p-6 rounded-lg shadow-lg max-w-5xl">
+              <div className="csv-preview-container">
                 <CSVPreview csvData={csvData} groupedData={groupedData} />
               </div>
             )}
+
+            {/* Unified Data Management Section */}
+            <div className="mt-6">
+              <div className="card-container">
+                <UnifiedManagement />
+              </div>
+            </div>
           </>
         )}
+
         {!isAuthenticated && (
-          <div>
-            You must be logged in to view this page. <br />
-            Please{" "}
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault()
-                loginWithPopup().catch((error) =>
-                  console.error("Login failed", error)
-                )
-              }}
-              className="text-blue-500 hover:underline cursor-pointer">
-              log in
-            </a>{" "}
-            to continue.
+          <div className="text-center py-8">
+            <p className="text-lg mb-4">
+              You must be logged in to view this page.
+            </p>
+            <p>
+              Please{" "}
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  loginWithPopup().catch((error) =>
+                    console.error("Login failed", error)
+                  )
+                }}
+                className="login-link text-blue-500 hover:underline cursor-pointer">
+                log in
+              </a>{" "}
+              to continue.
+            </p>
           </div>
         )}
       </div>

@@ -1,23 +1,66 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import PageHeader from "../components/pageHeader"
-import FixtureCard from "../components/fixtureCard"
-import FixturesListView from "../components/FixturesListView"
+import FixtureCard from "../components/fixtures/fixtureCard"
+import FixturesListView from "../components/fixtures/FixturesListView"
 import { queryBuilder } from "../utils/queryBuilder"
 import { BASE_URL, MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import defaultImage from "../assets/background.jpg"
+import ToggleViewButton from "../components/toggleViewButton"
+import { FixturesPageSkeleton } from "../components/skeletons"
+import "./fixturesPage.css"
 
 const FixturesPage = () => {
-  const [isListView, setIsListView] = useState(false)
+  const getSavedViewPreference = () => {
+    try {
+      const savedPreference = localStorage.getItem("fixturesListView")
+      return savedPreference === "true"
+    } catch (error) {
+      return false
+    }
+  }
+
+  const [isListView, setIsListView] = useState(getSavedViewPreference)
+  const [showContent, setShowContent] = useState(false)
 
   const query = queryBuilder(MODELS.events, QUERIES.eventsQuery)
   const { isLoading, isError, data, error } = useFetch(query)
 
+  useEffect(() => {
+    const checkIfMobile = () => {
+      if (window.innerWidth < 768) {
+        setIsListView(true)
+      }
+    }
+
+    checkIfMobile()
+  }, [])
+
+  useEffect(() => {
+    if (!isLoading && data) {
+      const timer = setTimeout(() => {
+        setShowContent(true)
+      }, 100)
+
+      return () => clearTimeout(timer)
+    }
+  }, [isLoading, data])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("fixturesListView", isListView.toString())
+    } catch (error) {
+      console.warn("Could not save view preference")
+    }
+  }, [isListView])
+
   if (isLoading) {
-    return <p className="pt-[85px]">Loading...</p>
-  } else if (isError) {
+    return <FixturesPageSkeleton isListView={isListView} />
+  }
+
+  if (isError) {
     console.error("Error:", error)
-    return <p className="pt-[85px]">Something went wrong...</p>
+    return <p className="error-container">Something went wrong...</p>
   }
 
   const sortedData = (data?.data || []).sort((a, b) => {
@@ -25,9 +68,7 @@ const FixturesPage = () => {
     const bHasDate = b.eventDate !== null && b.eventDate !== undefined
 
     if (aHasDate === bHasDate) return 0
-
     if (aHasDate) return -1
-
     return 1
   })
 
@@ -35,13 +76,13 @@ const FixturesPage = () => {
     <>
       <PageHeader title="Fixtures" />
       <hr className="border-black" />
-      <div className="bg-[#d9d9d9]">
-        <div className="max-w-5xl mx-auto py-5 px-4 sm:px-6 lg:px-8 text-start">
+      <div className="description-section">
+        <div className="description-container">
           <p>
             Welcome to this year{"'"}s fixture list. Here, you{"'"}ll find all
             the upcoming events and match dates for the season.
           </p>
-          <p className="pt-5">
+          <p className="description-paragraph">
             Stay ahead by planning your schedule around these key fixtures. Make
             sure not to miss out on any of the action!
           </p>
@@ -49,53 +90,51 @@ const FixturesPage = () => {
         <hr className="border-black" />
       </div>
 
-      <div className="flex justify-center pt-4">
-        <button
-          onClick={() => setIsListView(!isListView)}
-          className="bg-[#214A27] text-white px-6 mt-5 py-2 rounded-lg shadow-md -mb-4">
-          {isListView ? "Switch to Card View" : "Switch to List View"}
-        </button>
-      </div>
+      <ToggleViewButton isListView={isListView} setIsListView={setIsListView} />
 
       {isListView ? (
         <FixturesListView />
       ) : (
-        <div className="w-full pt-8">
-          <div className="flex flex-col items-center">
-            <div className="w-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-5">
-              {sortedData?.map((club) => {
-                const clubName = club.golf_club
-                  ? `${club.golf_club.clubName} Golf Club`
-                  : "Location To be Confirmed"
-                const clubAddress = club.golf_club
-                  ? club.golf_club.clubAddress
-                  : ""
-                const clubImage = club.golf_club?.clubImage?.[0]?.url
-                  ? `${BASE_URL}${club.golf_club.clubImage[0].url}`
-                  : defaultImage
-
-                const eventDate = club.eventDate
-                const dateText = eventDate ? eventDate : null
-
-                const competitionText =
-                  club.eventType &&
-                  club.eventType !== "Competition type to be confirmed"
-                    ? " competition"
+        <div className="card-view-container">
+          <div className="cards-container">
+            {showContent ? (
+              <div className="card-grid">
+                {sortedData?.map((club) => {
+                  const clubName = club.golf_club
+                    ? `${club.golf_club.clubName} Golf Club`
+                    : "Location To be Confirmed"
+                  const clubAddress = club.golf_club
+                    ? club.golf_club.clubAddress
                     : ""
+                  const clubImage = club.golf_club?.clubImage?.[0]?.url
+                    ? `${BASE_URL}${club.golf_club.clubImage[0].url}`
+                    : defaultImage
 
-                return (
-                  <FixtureCard
-                    key={club.id}
-                    name={clubName}
-                    address={clubAddress}
-                    clubImage={clubImage}
-                    comp={club.eventType}
-                    date={dateText}
-                    competitionText={competitionText}
-                  />
-                )
-              })}
-            </div>
+                  const eventDate = club.eventDate
+                  const dateText = eventDate ? eventDate : null
+
+                  const competitionText =
+                    club.eventType &&
+                    club.eventType !== "Competition type to be confirmed"
+                      ? " competition"
+                      : ""
+
+                  return (
+                    <FixtureCard
+                      key={club.id}
+                      name={clubName}
+                      address={clubAddress}
+                      clubImage={clubImage}
+                      comp={club.eventType}
+                      date={dateText}
+                      competitionText={competitionText}
+                    />
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="loading-placeholder"></div>
+            )}
           </div>
         </div>
       )}

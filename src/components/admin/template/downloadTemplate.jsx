@@ -22,14 +22,20 @@ const DownloadTemplateButton = ({
       "Senior?",
       "Pro?",
       "Club",
-      "Score",
+      "Front 9",
+      "Back 9",
+      "Overall Score",
     ]
 
     const header = worksheet.addRow(headerRow)
-    header.height = 26.25
+    header.height = 34.5
     header.eachCell((cell) => {
       cell.font = { bold: true, size: 12, color: { argb: "FFFFFFFF" } }
-      cell.alignment = { horizontal: "center", vertical: "middle" }
+      cell.alignment = {
+        horizontal: "center",
+        vertical: "middle",
+        wrapText: true,
+      }
       cell.fill = {
         type: "pattern",
         pattern: "solid",
@@ -37,7 +43,7 @@ const DownloadTemplateButton = ({
       }
     })
 
-    const columnWidths = [15, 15, 20, 10, 10, 15, 10]
+    const columnWidths = [15, 15, 20, 10, 10, 10, 10, 10, 10]
     columnWidths.forEach((width, index) => {
       worksheet.getColumn(index + 1).width = width
     })
@@ -46,7 +52,6 @@ const DownloadTemplateButton = ({
     const [startHour, startMinute] = startTime.split(":").map(Number)
     const [endHour, endMinute] = endTime.split(":").map(Number)
 
-    // Generate tee times based on user-selected interval
     let currentHour = startHour
     let currentMinute = startMinute
 
@@ -58,12 +63,10 @@ const DownloadTemplateButton = ({
         .toString()
         .padStart(2, "0")}`
 
-      // Add 4 slots per tee time
       for (let i = 0; i < 4; i++) {
         teeTimes.push(time)
       }
 
-      // Increment by user-selected minutes
       currentMinute += minuteIncrement
       if (currentMinute >= 60) {
         currentMinute -= 60
@@ -81,10 +84,8 @@ const DownloadTemplateButton = ({
       worksheet.addRow([eventDate, teeDatetime, "", "", "", "", ""])
     })
 
-    // Set column formatting for the "Tee time" column
     worksheet.getColumn(2).numFmt = "hh:mm"
 
-    // Alternating row colors
     const color1 = "00B050"
     const color2 = "B5E6A2"
 
@@ -93,17 +94,15 @@ const DownloadTemplateButton = ({
       const minute = parseInt(time.split(":")[1], 10)
       const bgColor = minute % (2 * minuteIncrement) === 0 ? color1 : color2
 
-      for (let colIndex = 1; colIndex <= 7; colIndex++) {
+      for (let colIndex = 1; colIndex <= 9; colIndex++) {
         const cell = worksheet.getCell(rowIndex, colIndex)
 
-        // Set background color
         cell.fill = {
           type: "pattern",
           pattern: "solid",
           fgColor: { argb: bgColor },
         }
 
-        // Set alignment and font based on column
         if (colIndex <= 2) {
           cell.alignment = { horizontal: "center", vertical: "middle" }
           cell.font = {
@@ -115,14 +114,20 @@ const DownloadTemplateButton = ({
           cell.font = { name: "Aptos Narrow", size: 12 }
         }
 
-        // Set bottom border
         cell.border = {
-          bottom: { style: "thin", color: { argb: "000000" } }, // Thin black bottom border
+          bottom: { style: "thin", color: { argb: "000000" } },
+        }
+
+        if (colIndex === 9) {
+          cell.border.right = { style: "thin", color: { argb: "000000" } }
         }
       }
     })
 
-    // Download logic
+    worksheet.getCell(1, 9).border = {
+      right: { style: "thin", color: { argb: "000000" } },
+    }
+
     await workbook.xlsx.writeBuffer().then((buffer) => {
       const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

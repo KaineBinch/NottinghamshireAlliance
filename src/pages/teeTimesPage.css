@@ -1,0 +1,66 @@
+.header-divider {
+  @apply border-black;
+}
+
+.page-background {
+  @apply bg-[#d9d9d9];
+  height: auto;
+  min-height: min-content;
+  clear: both;
+}
+
+.page-content-container {
+  @apply max-w-5xl mx-auto py-5 px-4 sm:px-6 lg:px-8 text-start;
+}
+
+.info-paragraph {
+  @apply py-5;
+}
+
+.loading-placeholder {
+  @apply pt-[85px];
+}
+
+.error-message {
+  @apply pt-[85px];
+}
+
+.page-content {
+  @apply my-6 flex flex-col mx-5;
+}
+
+.club-name {
+  @apply text-3xl font-bold;
+}
+
+.event-date {
+  @apply text-xl mt-2;
+}
+
+.past-event-indicator {
+  @apply text-amber-700 font-medium pb-[10px];
+}
+
+.view-toggle-container {
+  @apply flex justify-end max-w-5xl mx-auto py-4;
+}
+
+.view-toggle-button {
+  @apply bg-[#214A27] text-white px-6 mt-2 py-2 rounded-lg shadow-md;
+}
+
+.no-events-message {
+  @apply text-center mt-5 text-xl;
+}
+
+.tee-times-container {
+  @apply flex justify-center;
+}
+
+.tee-times-wrapper {
+  @apply max-w-5xl w-full;
+}
+
+.tee-times-content {
+  @apply mx-5 mb-10 mt-3;
+}

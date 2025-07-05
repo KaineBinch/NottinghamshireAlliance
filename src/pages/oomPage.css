@@ -1,0 +1,19 @@
+.page-divider {
+  @apply border-black;
+}
+
+.content-background {
+  @apply bg-[#d9d9d9];
+}
+
+.content-container {
+  @apply max-w-5xl mx-auto py-5 px-4 sm:px-6 lg:px-8 text-start;
+}
+
+.description-text {
+  @apply pt-5;
+}
+
+.results-container {
+  @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8;
+}

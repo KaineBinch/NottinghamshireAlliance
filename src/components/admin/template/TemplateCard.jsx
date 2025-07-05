@@ -8,7 +8,7 @@ const TemplateCard = () => {
   const [eventDate, setEventDate] = useState("")
   const [startTime, setStartTime] = useState("07:30")
   const [endTime, setEndTime] = useState("14:00")
-  const [minuteIncrement, setMinuteIncrement] = useState(10) // Default to 10-minute intervals
+  const [minuteIncrement, setMinuteIncrement] = useState(10)
 
   const query = queryBuilder(MODELS.events, QUERIES.eventsQuery)
   const { isLoading, isError, data, error } = useFetch(query)

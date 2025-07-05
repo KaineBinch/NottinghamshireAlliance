@@ -1,7 +1,10 @@
+import { useState } from "react"
 import PageHeader from "../components/pageHeader"
 import { MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
+import { RulesPageSkeleton } from "../components/skeletons"
+import "./rulesPage.css"
 
 const RulesPage = () => {
   const rulesQuery = queryBuilder(MODELS.rules, QUERIES.rulesQuery)
@@ -23,14 +26,24 @@ const RulesPage = () => {
     error: errorConditions,
   } = useFetch(conditionsQuery)
 
+  const [activeSection, setActiveSection] = useState({
+    type: null,
+    index: null,
+  })
+
+  const [visibleSections, setVisibleSections] = useState({
+    rules: {},
+    conditions: {},
+  })
+
   if (isLoadingRules || isLoadingConditions) {
-    return <p className="pt-[85px]">Loading...</p>
+    return <RulesPageSkeleton />
   }
 
   if (isErrorRules || isErrorConditions) {
     console.error("Error fetching data:", errorRules || errorConditions)
     return (
-      <div className="pt-[85px]">
+      <div className="error-container">
         <p>Something went wrong...</p>
         <button onClick={() => window.location.reload()}>Retry</button>
       </div>
@@ -41,7 +54,11 @@ const RulesPage = () => {
     if (typeof contentItem === "string") {
       const isIndented = contentItem.trim().startsWith("-")
       return (
-        <p key={contentItem} className={`mb-4 ${isIndented ? "ml-6" : ""}`}>
+        <p
+          key={contentItem}
+          className={`paragraph-spacing ${
+            isIndented ? "indented-paragraph" : ""
+          }`}>
           {contentItem}
         </p>
       )
@@ -52,7 +69,7 @@ const RulesPage = () => {
         <div key={contentItem.subTitle}>
           <strong>{contentItem.subTitle}</strong>
           {contentItem.text.map((paragraph, idx) => (
-            <p key={idx} className="mb-4">
+            <p key={idx} className="paragraph-spacing">
               {paragraph}
             </p>
           ))}
@@ -75,52 +92,119 @@ const RulesPage = () => {
     }
   }
 
+  const isSectionOpen = (type, index) => {
+    return activeSection.type === type && activeSection.index === index
+  }
+
+  const toggleSection = (type, index) => {
+    const isCurrentlyActive = isSectionOpen(type, index)
+
+    if (isCurrentlyActive) {
+      setActiveSection({ type: null, index: null })
+      setTimeout(() => {
+        setVisibleSections((prev) => ({
+          ...prev,
+          [type]: {
+            ...prev[type],
+            [index]: false,
+          },
+        }))
+      }, 300)
+    } else {
+      if (activeSection.type) {
+        setTimeout(() => {
+          setVisibleSections((prev) => ({
+            ...prev,
+            [activeSection.type]: {
+              ...prev[activeSection.type],
+              [activeSection.index]: false,
+            },
+          }))
+        }, 300)
+      }
+
+      setActiveSection({ type, index })
+
+      setVisibleSections((prev) => ({
+        ...prev,
+        [type]: {
+          ...prev[type],
+          [index]: true,
+        },
+      }))
+    }
+  }
+
   return (
     <>
       <PageHeader title="Rules" />
-      <hr className="border-black" />
-      <div className="bg-[#D9D9D9]">
-        <div className="max-w-5xl mx-auto text-black py-8 px-4 sm:px-6 lg:px-8 text-start">
-          <h1 className="text-3xl mb-2">
+      <hr className="page-divider" />
+      <div className="page-background">
+        <div className="content-container">
+          <h1 className="page-title">
             The Nottinghamshire Amateur & Professional Golfers{"'"} Alliance
           </h1>
-          <h2 className="mb-8">Founded 1921</h2>
-          <h2 className="mb-8">Competition Rules</h2>
+          <h2 className="page-subtitle">Founded 1921</h2>
+          <h2 className="page-subtitle">Competition Rules</h2>
 
           <hr />
-          <div className="border-">
+          <div>
             {rulesData?.data && rulesData.data.length > 0 ? (
               rulesData.data.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="collapse collapse-arrow bg-[#fff] drop-shadow mb-1">
-                  <input type="checkbox" className="peer" />
+                <div key={idx} className="collapse-item">
+                  <input
+                    type="checkbox"
+                    name={`rules-accordion-${idx}`}
+                    checked={isSectionOpen("rules", idx)}
+                    onChange={() => toggleSection("rules", idx)}
+                  />
                   <div className="collapse-title text-xl font-medium">
                     {item.ruleTitle}
                   </div>
-                  <div className="collapse-content">
-                    {renderSectionContent(item)}
-                  </div>
+                  {(visibleSections.rules[idx] ||
+                    isSectionOpen("rules", idx)) && (
+                    <div
+                      className={`collapse-content ${
+                        isSectionOpen("rules", idx)
+                          ? "animate-fade-in-down"
+                          : "animate-fade-out-up"
+                      }`}
+                      key={`rules-content-${idx}`}>
+                      {renderSectionContent(item)}
+                    </div>
+                  )}
                 </div>
               ))
             ) : (
               <p>No rules available.</p>
             )}
 
-            <h2 className="my-8">Conditions of Competition</h2>
+            <h2 className="rules-section-header">Conditions of Competition</h2>
 
             {conditionsData?.data && conditionsData.data.length > 0 ? (
               conditionsData.data.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="collapse collapse-arrow bg-[#fff] drop-shadow mb-1">
-                  <input type="checkbox" className="peer" />
+                <div key={idx} className="collapse-item">
+                  <input
+                    type="checkbox"
+                    name={`conditions-accordion-${idx}`}
+                    checked={isSectionOpen("conditions", idx)}
+                    onChange={() => toggleSection("conditions", idx)}
+                  />
                   <div className="collapse-title text-xl font-medium">
                     {item.conditionTitle || "No Title"}{" "}
                   </div>
-                  <div className="collapse-content">
-                    {renderSectionContent(item)}
-                  </div>
+                  {(visibleSections.conditions[idx] ||
+                    isSectionOpen("conditions", idx)) && (
+                    <div
+                      className={`collapse-content ${
+                        isSectionOpen("conditions", idx)
+                          ? "animate-fade-in-down"
+                          : "animate-fade-out-up"
+                      }`}
+                      key={`conditions-content-${idx}`}>
+                      {renderSectionContent(item)}
+                    </div>
+                  )}
                 </div>
               ))
             ) : (

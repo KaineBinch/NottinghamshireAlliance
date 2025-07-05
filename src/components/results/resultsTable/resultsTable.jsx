@@ -18,14 +18,25 @@ const ResultsTable = ({ limit }) => {
 
   const results = useMemo(() => {
     if (data?.data) {
-      const playerScores = data.data.reduce((acc, item) => {
-        const playerName = item?.golfer?.golferName || "Unknown Player"
-        const playerScore = item?.golferEventScore || 0
-        const clubName = item?.golfer?.golf_club?.clubName || "No Club"
-        const clubID = item?.golfer?.golf_club?.clubID || null
-        const isPro = item?.golfer?.isPro || false
-        const isSenior = item?.golfer?.isSenior || false
-        const eventDate = item?.event?.eventDate || "Unknown Date"
+      const validItems = data.data.filter(
+        (item) =>
+          item &&
+          item.golfer &&
+          item.golfer.golferName &&
+          item.event &&
+          item.event.eventDate &&
+          item.golferEventScore !== null &&
+          item.golferEventScore !== undefined
+      )
+
+      const playerScores = validItems.reduce((acc, item) => {
+        const playerName = item.golfer.golferName
+        const playerScore = item.golferEventScore
+        const clubName = item.golfer.golf_club?.clubName || "No Club"
+        const clubID = item.golfer.golf_club?.clubID || null
+        const isPro = item.golfer.isPro || false
+        const isSenior = item.golfer.isSenior || false
+        const eventDate = item.event.eventDate
 
         if (!acc[playerName]) {
           acc[playerName] = {
@@ -39,7 +50,7 @@ const ResultsTable = ({ limit }) => {
           }
         }
 
-        acc[playerName].totalPoints += playerScore
+        // Store all scores but don't add to totalPoints yet
         acc[playerName].scores.push({
           date: eventDate,
           score: playerScore,
@@ -47,6 +58,16 @@ const ResultsTable = ({ limit }) => {
 
         return acc
       }, {})
+
+      // Now calculate totalPoints using only top 9 scores for each player
+      Object.values(playerScores).forEach((player) => {
+        const sortedScores = player.scores
+          .map((scoreItem) => scoreItem.score)
+          .sort((a, b) => b - a) // Sort highest to lowest
+          .slice(0, 9) // Take only top 9 scores
+
+        player.totalPoints = sortedScores.reduce((sum, score) => sum + score, 0)
+      })
 
       return Object.values(playerScores)
     }
@@ -156,7 +177,7 @@ const ResultsTable = ({ limit }) => {
     : filteredResults
 
   if (isLoading) {
-    return <p className="pt-[85px]">Loading...</p>
+    return <p className="pt-[85px]"></p>
   }
 
   if (isError) {

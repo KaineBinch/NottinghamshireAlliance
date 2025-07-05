@@ -1,0 +1,62 @@
+/* Tailwind CSS classes for Navbar component */
+.navbar-container {
+  @apply fixed w-full flex bg-[#214A27] justify-center h-[60px] z-50;
+}
+
+.navbar-content {
+  @apply flex max-w-5xl w-full items-center justify-between h-full px-4;
+}
+
+.mobile-menu {
+  @apply visible lg:invisible justify-start items-start lg:w-0 w-auto z-20;
+}
+
+.menu-button {
+  @apply btn btn-ghost btn-square text-white justify-center items-center;
+}
+
+.menu-icon {
+  @apply inline-block w-7 h-7 stroke-current;
+}
+
+.dropdown-container {
+  @apply flex flex-row;
+}
+
+.dropdown-menu {
+  @apply menu absolute left-0 bg-[#214A27] w-[175px] items-start rounded-b-[1px] text-lg -ml-5;
+}
+
+.dropdown-item-container {
+  @apply ml-1;
+}
+
+.mobile-title {
+  @apply lg:invisible visible absolute w-full left-0 flex items-center justify-center text-white text-lg;
+}
+
+.desktop-menu-container {
+  @apply hidden lg:flex h-full items-center justify-center flex-grow;
+}
+
+.desktop-menu {
+  @apply h-full flex menu menu-horizontal place-content-evenly w-full text-base -ml-5;
+}
+
+.logo-container {
+  @apply flex items-center h-full;
+}
+
+.logo {
+  @apply max-h-[50px] max-w-[50px];
+}
+
+/* Active link styling */
+.link-active {
+  @apply bg-[#17331B];
+}
+
+/* Link styling */
+.nav-link {
+  @apply text-center font-normal text-white inline hover:bg-green-600 rounded-none;
+}

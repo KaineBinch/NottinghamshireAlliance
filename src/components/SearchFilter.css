@@ -1,0 +1,15 @@
+.filter-container {
+  @apply flex flex-col mb-4 p-4 border border-gray-300;
+}
+
+.search-group {
+  @apply mb-4;
+}
+
+.input-field {
+  @apply p-2 border border-gray-300 w-full placeholder-gray-500 text-base h-12 rounded-none;
+}
+
+.select-field {
+  @apply p-2 border border-gray-300 w-full placeholder-gray-500 text-base h-12 rounded-none;
+}

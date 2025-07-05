@@ -2,27 +2,51 @@ import PageHeader from "../components/pageHeader"
 import { MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
+import { ClubOfficersPageSkeleton } from "../components/skeletons"
+import { useState, useEffect } from "react"
+import "./clubOfficersPage.css"
 
 const ClubOfficersPage = () => {
   const query = queryBuilder(MODELS.clubOfficers, QUERIES.officerQuery)
-
-  // Log the query to ensure it's correctly generated
-  console.log("Generated query:", query)
-
   const { isLoading, isError, data, error } = useFetch(query)
+  const [animatedItems, setAnimatedItems] = useState([])
 
-  // Log loading and error states
-  console.log("isLoading:", isLoading)
-  console.log("isError:", isError)
-  if (isError) {
-    console.error("Error:", error) // Log the error details
-    return <p className="pt-[85px]">Something went wrong...</p>
+  useEffect(() => {
+    if (!isLoading && data?.data) {
+      setAnimatedItems([])
+
+      const officers = [...data.data]
+      let index = 0
+
+      const animationInterval = setInterval(() => {
+        if (index < officers.length) {
+          setAnimatedItems((prev) => [...prev, officers[index]?.id])
+          index++
+        } else {
+          clearInterval(animationInterval)
+        }
+      }, 100)
+
+      return () => clearInterval(animationInterval)
+    }
+  }, [isLoading, data])
+
+  if (isLoading) {
+    return <ClubOfficersPageSkeleton />
+  } else if (isError) {
+    console.error("Error:", error)
+    return (
+      <div className="error-container">
+        <p>Something went wrong loading the club officers information.</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 bg-[#214A27] text-white px-4 py-2 rounded">
+          Try Again
+        </button>
+      </div>
+    )
   }
 
-  // Log the data if it's available
-  console.log("Fetched data:", data)
-
-  // Group officers by their position
   const president =
     data?.data?.filter((officer) => officer.Positions === "President") || []
   const secretary =
@@ -31,26 +55,34 @@ const ClubOfficersPage = () => {
     data?.data?.filter((officer) => officer.Positions === "Committee Member") ||
     []
 
+  const getAnimationClass = (officerId) => {
+    return animatedItems.includes(officerId)
+      ? "opacity-100 translate-y-0 transition-all duration-500 ease-in-out"
+      : "opacity-0 translate-y-4"
+  }
+
   return (
     <>
       <PageHeader title="Club Officers" />
       <hr className="border-black" />
-      <div className="bg-[#d9d9d9]">
-        <div className="max-w-5xl mx-auto py-5 px-4 sm:px-6 lg:px-8 text-start">
+      <div className="description-section">
+        <div className="description-container">
           <p>Please see below this years committee members</p>
         </div>
         <hr className="border-black" />
       </div>
-      <div className="max-w-5xl mx-auto py-5 px-4 sm:px-6 lg:px-8 text-black">
+      <div className="officers-container">
         {/* Render President */}
         {president.length > 0 && (
           <div>
-            <p className="font-semibold text-2xl pt-5">President</p>
+            <p className="president-title">President</p>
             {president.map((officer) => (
-              <div key={officer.id} className="py-2">
+              <div
+                key={officer.id}
+                className={`officer-item ${getAnimationClass(officer.id)}`}>
                 <p>
-                  <span className="font-semibold pr-5">{officer.Name}</span>
-                  <span className="inline">
+                  <span className="officer-name">{officer.Name}</span>
+                  <span className="officer-club">
                     {officer.golf_club?.clubName} Golf Club
                   </span>
                 </p>
@@ -62,12 +94,14 @@ const ClubOfficersPage = () => {
         {/* Render Committee Members */}
         {committeeMembers.length > 0 && (
           <div>
-            <p className="font-semibold text-2xl pt-10">Committee Members</p>
+            <p className="committee-title">Committee Members</p>
             {committeeMembers.map((officer) => (
-              <div key={officer.id} className="py-2">
+              <div
+                key={officer.id}
+                className={`officer-item ${getAnimationClass(officer.id)}`}>
                 <p>
-                  <span className="font-semibold pr-5">{officer.Name}</span>
-                  <span className="inline">
+                  <span className="officer-name">{officer.Name}</span>
+                  <span className="officer-club">
                     {officer.golf_club?.clubName} Golf Club
                   </span>
                 </p>
@@ -79,12 +113,14 @@ const ClubOfficersPage = () => {
         {/* Render Secretary */}
         {secretary.length > 0 && (
           <div>
-            <p className="font-semibold text-2xl pt-10">Secretary</p>
+            <p className="secretary-title">Secretary</p>
             {secretary.map((officer) => (
-              <div key={officer.id} className="py-2 pb-10">
+              <div
+                key={officer.id}
+                className={`secretary-item ${getAnimationClass(officer.id)}`}>
                 <p>
-                  <span className="font-semibold pr-5">{officer.Name}</span>
-                  <span className="inline">
+                  <span className="officer-name">{officer.Name}</span>
+                  <span className="officer-club">
                     {officer.golf_club?.clubName} Golf Club
                   </span>
                 </p>

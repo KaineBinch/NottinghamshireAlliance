@@ -1,19 +1,20 @@
 import { BASE_URL, MODELS, QUERIES } from "../../constants/api.js"
 import useFetch from "../../utils/hooks/useFetch.js"
 import { queryBuilder } from "../../utils/queryBuilder.js"
-import FixtureCard from "../fixtureCard.jsx"
+import FixtureCard from "../fixtures/fixtureCard.jsx"
 import HomePageHeader from "./homepageHeader.jsx"
 import defaultImage from "../../assets/background.jpg"
+import FixturesSectionSkeleton from "./fixturesSectionSkeleton.jsx"
 
 const FixturesSection = () => {
   const query = queryBuilder(MODELS.events, QUERIES.eventsQuery)
   const { isLoading, isError, data, error } = useFetch(query)
 
   if (isLoading) {
-    return <p className="pt-[85px]">Loading...</p>
+    return <FixturesSectionSkeleton />
   } else if (isError) {
     console.error("Error:", error)
-    return <p className="pt-[85px]">Something went wrong...</p>
+    return <p className="pt-[35px]">Something went wrong...</p>
   }
 
   const sortedData = (data?.data || []).sort((a, b) => {
@@ -36,7 +37,7 @@ const FixturesSection = () => {
 
   if (!nextFixture && !upcomingFixtures?.length) {
     return (
-      <div className="pt-[85px]">
+      <div className="">
         <HomePageHeader
           title="Fixtures"
           subtext="Stay updated with the latest details on upcoming fixtures. Click here for more information."
@@ -44,7 +45,7 @@ const FixturesSection = () => {
           btnStyle="text-white bg-[#214A27]"
           page="fixtures"
         />
-        <p>No upcoming fixtures available at the moment.</p>
+        <p className="pb-6">No upcoming fixtures available at the moment.</p>
       </div>
     )
   }

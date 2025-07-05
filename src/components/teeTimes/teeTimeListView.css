@@ -1,0 +1,53 @@
+/* teeTimeListView.css */
+
+.list-view-container {
+  @apply w-full flex justify-center;
+}
+
+.list-view-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl w-full;
+}
+
+.club-card {
+  @apply border border-gray-400 shadow-md bg-[#d9d9d9];
+}
+
+.club-header {
+  @apply bg-[#214A27] text-white text-center p-4;
+}
+
+.club-title {
+  @apply text-lg font-semibold truncate;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.players-container {
+  @apply p-4;
+}
+
+.player-item {
+  @apply mb-2 text-gray-700 font-semibold;
+}
+
+.player-time {
+  @apply font-medium;
+}
+
+.player-senior-tag {
+  @apply text-sm text-red-500;
+}
+
+.player-pro-tag {
+  @apply text-sm text-blue-700;
+}
+
+.loading-container {
+  @apply pt-[85px];
+}
+
+.error-message {
+  @apply pt-[85px];
+}

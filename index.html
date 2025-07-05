@@ -5,10 +5,131 @@
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
-      name="Nottinghamshire Alliance"
-      content="Official website of the Nottinghamshire Golf Alliance"
-    />
+      name="description"
+      content="Official website of the Nottinghamshire Golf Alliance" />
     <title>Nottinghamshire Alliance</title>
+    <script>
+      window.ENV = {
+        POSTHOG_KEY: "%VITE_REACT_APP_PUBLIC_POSTHOG_KEY%",
+        POSTHOG_HOST: "%VITE_REACT_APP_POSTHOG_HOST%",
+      }
+      const ADSENSE_CLIENT_ID = "%VITE_ADSENSE_CLIENT_ID%"
+    </script>
+    <script>
+      !(function (t, e) {
+        var o, n, p, r
+        e.__SV ||
+          ((window.posthog = e),
+          (e._i = []),
+          (e.init = function (i, s, a) {
+            function g(t, e) {
+              var o = e.split(".")
+              2 == o.length && ((t = t[o[0]]), (e = o[1])),
+                (t[e] = function () {
+                  t.push([e].concat(Array.prototype.slice.call(arguments, 0)))
+                })
+            }
+            ;((p = t.createElement("script")).type = "text/javascript"),
+              (p.crossOrigin = "anonymous"),
+              (p.async = !0),
+              (p.src =
+                s.api_host.replace(".i.posthog.com", "-assets.i.posthog.com") +
+                "/static/array.js"),
+              (r = t.getElementsByTagName("script")[0]).parentNode.insertBefore(
+                p,
+                r
+              )
+            var u = e
+            for (
+              void 0 !== a ? (u = e[a] = []) : (a = "posthog"),
+                u.people = u.people || [],
+                u.toString = function (t) {
+                  var e = "posthog"
+                  return (
+                    "posthog" !== a && (e += "." + a), t || (e += " (stub)"), e
+                  )
+                },
+                u.people.toString = function () {
+                  return u.toString(1) + ".people (stub)"
+                },
+                o =
+                  "init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTraceFeedback captureTraceMetric".split(
+                    " "
+                  ),
+                n = 0;
+              n < o.length;
+              n++
+            )
+              g(u, o[n])
+            e._i.push([i, s, a])
+          }),
+          (e.__SV = 1))
+      })(document, window.posthog || [])
+
+      posthog.init(window.ENV.POSTHOG_KEY, {
+        api_host: window.ENV.POSTHOG_HOST,
+        person_profiles: "identified_only",
+        capture_pageview: true,
+        persistence: "localStorage",
+        autocapture: true,
+        opt_out_capturing_by_default: false,
+        loaded: function (posthog) {
+          if (
+            window.location.hostname === "localhost" ||
+            window.location.hostname === "127.0.0.1"
+          ) {
+            posthog.debug(true)
+          }
+        },
+      })
+    </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        console.log("Checking for service workers...")
+        navigator.serviceWorker
+          .getRegistrations()
+          .then(function (registrations) {
+            if (registrations.length > 0) {
+              console.log(
+                "Found service workers to unregister:",
+                registrations.length
+              )
+              Promise.all(registrations.map((r) => r.unregister())).then(() => {
+                console.log("All service workers unregistered")
+                window.location.reload(true)
+              })
+            } else {
+              console.log("No service workers found")
+            }
+          })
+      }
+      window.addEventListener("error", function (event) {
+        if (
+          event.message &&
+          event.message.includes("Failed to load module script")
+        ) {
+          console.log("Detected module loading error, refreshing page...")
+          localStorage.setItem("moduleLoadError", "true")
+          window.location.reload(true)
+        }
+      })
+
+      if (localStorage.getItem("moduleLoadError") === "true") {
+        localStorage.removeItem("moduleLoadError")
+        console.log("Clearing application cache...")
+        if ("caches" in window) {
+          caches.keys().then(function (names) {
+            names.forEach(function (name) {
+              caches.delete(name)
+            })
+          })
+        }
+      }
+    </script>
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=%VITE_ADSENSE_CLIENT_ID%"
+      crossorigin="anonymous"></script>
   </head>
   <body>
     <div id="root"></div>
