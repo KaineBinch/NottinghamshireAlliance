@@ -8,6 +8,7 @@ import {
   X,
   UserCheck,
   Trophy,
+  Shield,
 } from "lucide-react"
 
 // Import your existing sub-components
@@ -23,12 +24,17 @@ import DeleteGolfer from "./manageGolfers/deleteGolfer"
 import AddScore from "./manageScores/addScore"
 import EditScore from "./manageScores/editScore"
 import DeleteScore from "./manageScores/deleteScore"
+// Import new officer components
+import AddOfficer from "./manageOfficers/addOfficers"
+import EditOfficer from "./manageOfficers/editOfficers"
+import DeleteOfficer from "./manageOfficers/deleteOfficers"
 
 // Import your API functions
 import { getAllFixtures } from "../../utils/api/fixturesApi"
 import { getAllGolfClubs } from "../../utils/api/clubsApi"
 import { getAllGolfers } from "../../utils/api/golfersApi"
 import { getAllScores } from "../../utils/api/scoresApi"
+import { getAllOfficers } from "../../utils/api/officersApi"
 
 const UnifiedManagement = () => {
   const [activeView, setActiveView] = useState("fixtures")
@@ -47,6 +53,9 @@ const UnifiedManagement = () => {
   const [proCount, setProCount] = useState(0)
   const [seniorCount, setSeniorCount] = useState(0)
 
+  // Officers stats
+  const [officersCount, setOfficersCount] = useState(0)
+
   // Scores stats
   // const [scoresCount, setScoresCount] = useState(0)
 
@@ -64,6 +73,7 @@ const UnifiedManagement = () => {
         loadFixtureStatistics(),
         loadClubStatistics(),
         loadGolferStatistics(),
+        loadOfficerStatistics(),
         loadScoreStatistics(),
       ])
     } catch (error) {
@@ -112,6 +122,15 @@ const UnifiedManagement = () => {
       setSeniorCount(seniors.length)
     } catch (error) {
       console.error("Error loading golfer statistics:", error)
+    }
+  }
+
+  const loadOfficerStatistics = async () => {
+    try {
+      const officers = await getAllOfficers()
+      setOfficersCount(officers.length)
+    } catch (error) {
+      console.error("Error loading officer statistics:", error)
     }
   }
 
@@ -252,6 +271,39 @@ const UnifiedManagement = () => {
     setTimeout(() => setActiveAction(null), 2000)
   }
 
+  // Officer success handlers
+  const handleAddOfficerSuccess = async (result) => {
+    console.log("Officer added successfully:", result)
+    const officerName = result?.data?.Name || "New officer"
+    showNotification(
+      `✅ ${officerName} has been successfully added as an officer!`,
+      "success"
+    )
+    await loadOfficerStatistics()
+    setTimeout(() => setActiveAction(null), 2000)
+  }
+
+  const handleEditOfficerSuccess = async (result) => {
+    console.log("Officer updated successfully:", result)
+    const officerName = result?.data?.Name || "Officer"
+    showNotification(
+      `✅ ${officerName} information has been successfully updated!`,
+      "success"
+    )
+    await loadOfficerStatistics()
+    setTimeout(() => setActiveAction(null), 2000)
+  }
+
+  const handleDeleteOfficerSuccess = async (result) => {
+    console.log("Officer deleted successfully:", result)
+    showNotification(
+      `✅ Officer has been successfully removed from the system.`,
+      "success"
+    )
+    await loadOfficerStatistics()
+    setTimeout(() => setActiveAction(null), 2000)
+  }
+
   // Score success handlers
   const handleAddScoreSuccess = async (result) => {
     console.log("Score added successfully:", result)
@@ -292,9 +344,9 @@ const UnifiedManagement = () => {
   return (
     <div className="w-full bg-gray-100 max-w-7xl mx-auto p-4">
       <h2 className="text-lg font-semibold text-center mb-6 pt-2">
-        {" "}
-        Data Management{" "}
+        Data Management
       </h2>
+
       {/* Notification */}
       {notification && (
         <div
@@ -350,6 +402,16 @@ const UnifiedManagement = () => {
             }`}>
             <UserCheck className="w-4 h-4 md:w-5 md:h-5 inline mr-2" />
             Golfers
+          </button>
+          <button
+            onClick={() => handleViewChange("officers")}
+            className={`flex-1 px-4 py-3 rounded-md text-sm md:text-lg font-bold transition-colors whitespace-nowrap ${
+              activeView === "officers"
+                ? "bg-green-600 text-white"
+                : "text-green-200 hover:text-white"
+            }`}>
+            <Shield className="w-4 h-4 md:w-5 md:h-5 inline mr-2" />
+            Officers
           </button>
           <button
             onClick={() => handleViewChange("scores")}
@@ -438,6 +500,29 @@ const UnifiedManagement = () => {
               </>
             )}
 
+            {activeView === "officers" && (
+              <>
+                {activeAction === "add" && (
+                  <AddOfficer
+                    onClose={handleCloseAction}
+                    onSuccess={handleAddOfficerSuccess}
+                  />
+                )}
+                {activeAction === "edit" && (
+                  <EditOfficer
+                    onClose={handleCloseAction}
+                    onSuccess={handleEditOfficerSuccess}
+                  />
+                )}
+                {activeAction === "delete" && (
+                  <DeleteOfficer
+                    onClose={handleCloseAction}
+                    onSuccess={handleDeleteOfficerSuccess}
+                  />
+                )}
+              </>
+            )}
+
             {activeView === "scores" && (
               <>
                 {activeAction === "add" && (
@@ -471,14 +556,14 @@ const UnifiedManagement = () => {
                     Manage Fixtures
                   </h3>
                   {isLoadingStats && (
-                    <div className="flex items-center gap-2 ">
+                    <div className="flex items-center gap-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-300"></div>
                       <span className="text-sm">Loading...</span>
                     </div>
                   )}
                 </div>
 
-                <p className=" mb-4 md:mb-6 text-sm md:text-base">
+                <p className="mb-4 md:mb-6 text-sm md:text-base">
                   Add new fixtures to the competition calendar, edit existing
                   fixture details, or remove fixtures that have been cancelled.
                 </p>
@@ -636,6 +721,62 @@ const UnifiedManagement = () => {
                     onClick={() => setActiveAction("delete")}>
                     <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
                     Delete Golfer
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Officers View */}
+            {activeView === "officers" && (
+              <div>
+                <div className="flex flex-col md:flex-row md:justify-center md:items-center mb-4 md:mb-6">
+                  <h3 className="text-lg md:text-xl font-semibold mb-2 md:mb-0 text-center">
+                    Manage Club Officers
+                  </h3>
+                  {isLoadingStats && (
+                    <div className="flex items-center gap-2 text-green-300">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-300"></div>
+                      <span className="text-sm">Loading...</span>
+                    </div>
+                  )}
+                </div>
+
+                <p className="mb-4 md:mb-6 text-sm md:text-base">
+                  Add new club officers, edit existing officer information, or
+                  remove officers who are no longer active.
+                </p>
+
+                {/* Quick Stats */}
+                {!isLoadingStats && (
+                  <div className="mb-6">
+                    <div className="bg-blue-100 text-blue-800 px-3 py-2 rounded-lg font-bold text-sm inline-block">
+                      {officersCount}{" "}
+                      {officersCount === 1 ? "Officer" : "Officers"}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="space-y-3">
+                  <button
+                    className="w-full bg-green-600 hover:bg-green-500 text-white px-4 md:px-6 py-3 rounded transition duration-300 font-bold flex items-center justify-center gap-2 text-sm md:text-base"
+                    onClick={() => setActiveAction("add")}>
+                    <Plus className="w-4 h-4 md:w-5 md:h-5" />
+                    Add New Officer
+                  </button>
+
+                  <button
+                    className="w-full bg-green-600 hover:bg-green-500 text-white px-4 md:px-6 py-3 rounded transition duration-300 font-bold flex items-center justify-center gap-2 text-sm md:text-base"
+                    onClick={() => setActiveAction("edit")}>
+                    <Edit className="w-4 h-4 md:w-5 md:h-5" />
+                    Edit Officer
+                  </button>
+
+                  <button
+                    className="w-full bg-red-600 text-white px-4 md:px-6 py-3 rounded hover:bg-red-700 transition duration-300 font-bold flex items-center justify-center gap-2 text-sm md:text-base"
+                    onClick={() => setActiveAction("delete")}>
+                    <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
+                    Delete Officer
                   </button>
                 </div>
               </div>
