@@ -5,6 +5,7 @@ import {
   updateOfficer,
 } from "../../../utils/api/officersApi"
 import { getAllGolfClubs } from "../../../utils/api/clubsApi"
+import { OFFICER_POSITIONS } from "../../../constants/officerPositions"
 
 const EditOfficer = ({ onClose, onSuccess }) => {
   const [step, setStep] = useState("select") // "select" or "edit"
@@ -135,7 +136,7 @@ const EditOfficer = ({ onClose, onSuccess }) => {
 
   // Re-run validation when golf club changes
   useEffect(() => {
-    if (formData.Name && formData.golfClubDocumentId && selectedOfficer) {
+    if (formData.Name && formData.golfClubDocumentId) {
       checkRealtimeConflicts("Name", formData.Name)
     }
   }, [formData.golfClubDocumentId])
@@ -149,7 +150,7 @@ const EditOfficer = ({ onClose, onSuccess }) => {
       errors.push("Officer name is required")
     }
     if (!formData.Positions.trim()) {
-      errors.push("Position(s) are required")
+      errors.push("Position is required")
     }
     if (!formData.golfClubDocumentId) {
       errors.push("Please select a golf club")
@@ -164,10 +165,11 @@ const EditOfficer = ({ onClose, onSuccess }) => {
     setSubmitMessage("")
 
     try {
-      const officerId = selectedOfficer.documentId || selectedOfficer.id
-      console.log("Updating officer with ID:", officerId, "Data:", formData)
-
-      const result = await updateOfficer(officerId, formData)
+      console.log("Updating officer data:", formData)
+      const result = await updateOfficer(
+        selectedOfficer.documentId || selectedOfficer.id,
+        formData
+      )
       console.log("Officer updated successfully:", result)
 
       setSubmitMessage(
@@ -184,19 +186,11 @@ const EditOfficer = ({ onClose, onSuccess }) => {
       if (error.validationErrors) {
         setValidationErrors(error.validationErrors)
         setSubmitMessage("❌ Please fix the validation errors above.")
-      } else if (error.response?.data?.error?.message) {
-        setSubmitMessage(`❌ Error: ${error.response.data.error.message}`)
       } else {
-        setSubmitMessage(`❌ Failed to update officer: ${error.message}`)
+        setSubmitMessage(`❌ Error updating officer: ${error.message}`)
       }
     } finally {
       setIsSubmitting(false)
-    }
-  }
-
-  const handleCancel = () => {
-    if (onClose) {
-      onClose()
     }
   }
 
@@ -213,32 +207,19 @@ const EditOfficer = ({ onClose, onSuccess }) => {
     setSubmitMessage("")
   }
 
-  // Selection step
+  const handleCancel = () => {
+    if (onClose) {
+      onClose()
+    }
+  }
+
+  // Officer selection step
   if (step === "select") {
     return (
       <div className="space-y-4 bg-gray-100 p-6 rounded-lg shadow-lg border border-gray-300">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium text-gray-800">
-            Select Officer to Edit
-          </h3>
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="text-gray-500 hover:text-gray-700">
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
+        <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
+          Select Officer to Edit
+        </h2>
 
         {isLoading ? (
           <div className="text-center py-8">
@@ -250,7 +231,7 @@ const EditOfficer = ({ onClose, onSuccess }) => {
             {officers.map((officer) => (
               <div
                 key={officer.id || officer.documentId}
-                className="border border-gray-300 hover:bg-green-50 rounded-lg p-4 cursor-pointer transition-colors bg-gray-200"
+                className="border border-gray-300 hover:bg-green-50 rounded-lg p-4 cursor-pointer transition-colors bg-white"
                 onClick={() =>
                   handleOfficerSelect(officer.documentId || officer.id)
                 }>
@@ -268,7 +249,7 @@ const EditOfficer = ({ onClose, onSuccess }) => {
 
         <div className="flex justify-center mt-4">
           <button
-            className="px-6 py-2 border border-gray-300 rounded text-white bg-red-600 hover:bg-red-700 transition duration-300"
+            className="px-6 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 transition duration-300"
             onClick={handleCancel}>
             Cancel
           </button>
@@ -277,66 +258,49 @@ const EditOfficer = ({ onClose, onSuccess }) => {
     )
   }
 
-  const selectedClub = golfClubs.find(
-    (club) =>
-      club.documentId === formData.golfClubDocumentId ||
-      club.id === formData.golfClubDocumentId
-  )
-
-  // Edit form
+  // Edit form step
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 bg-gray-100 p-6 rounded-lg shadow-lg border border-gray-300">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium text-gray-800">
-          Edit Officer: {selectedOfficer?.Name}
-        </h3>
-        <button
-          type="button"
-          onClick={handleBack}
-          className="text-sm text-blue-600 hover:text-blue-800">
-          ← Back to Selection
-        </button>
-      </div>
+      className="space-y-6 bg-gray-100 p-6 rounded-lg shadow-lg border border-gray-300">
+      <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
+        Edit Officer: {selectedOfficer?.Name}
+      </h2>
 
-      {/* Show validation errors */}
+      {/* Display validation errors */}
       {validationErrors.length > 0 && (
-        <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded mb-4">
-          <h4 className="font-bold mb-2">Please fix these errors:</h4>
-          <ul className="list-disc list-inside space-y-1">
+        <div className="bg-red-50 border border-red-200 rounded p-4">
+          <h4 className="font-medium text-red-800 mb-2">
+            Please fix the following errors:
+          </h4>
+          <ul className="list-disc list-inside text-red-700 space-y-1">
             {validationErrors.map((error, index) => (
-              <li key={index} className="text-sm">
-                {error}
-              </li>
+              <li key={index}>{error}</li>
             ))}
           </ul>
         </div>
       )}
 
-      {/* Show real-time warnings */}
+      {/* Display realtime warnings */}
       {realtimeWarnings.length > 0 && (
-        <div className="bg-yellow-100 border border-yellow-300 text-yellow-700 px-4 py-3 rounded mb-4">
-          <h4 className="font-bold mb-2">Warnings:</h4>
-          <ul className="list-disc list-inside space-y-1">
+        <div className="bg-yellow-50 border border-yellow-200 rounded p-4">
+          <ul className="text-yellow-700 space-y-1">
             {realtimeWarnings.map((warning, index) => (
-              <li key={index} className="text-sm">
-                {warning}
-              </li>
+              <li key={index}>{warning}</li>
             ))}
           </ul>
         </div>
       )}
 
-      {/* Show submit message */}
+      {/* Submit message */}
       {submitMessage && (
         <div
-          className={`text-center p-3 rounded mb-4 ${
+          className={`text-center p-3 rounded ${
             submitMessage.includes("✅")
-              ? "bg-green-100 text-green-700 border border-green-300"
-              : "bg-red-100 text-red-700 border border-red-300"
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : "bg-red-50 text-red-700 border border-red-200"
           }`}>
-          <div className="font-medium">{submitMessage}</div>
+          {submitMessage}
         </div>
       )}
 
@@ -357,23 +321,11 @@ const EditOfficer = ({ onClose, onSuccess }) => {
             <option
               key={club.documentId || club.id}
               value={club.documentId || club.id}>
-              {club.clubName} ({club.clubID})
+              {club.clubName}
             </option>
           ))}
         </select>
       </div>
-
-      {/* Selected Club Info */}
-      {selectedClub && (
-        <div className="bg-blue-50 border border-blue-200 rounded p-3">
-          <p className="text-sm text-blue-800">
-            <strong>Selected Club:</strong> {selectedClub.clubName}
-          </p>
-          {selectedClub.clubAddress && (
-            <p className="text-xs text-blue-600">{selectedClub.clubAddress}</p>
-          )}
-        </div>
-      )}
 
       {/* Officer Name */}
       <div>
@@ -386,7 +338,7 @@ const EditOfficer = ({ onClose, onSuccess }) => {
           value={formData.Name}
           onChange={handleInputChange}
           className={`w-full p-3 border rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent ${
-            realtimeWarnings.some((w) => w.includes("Officer"))
+            realtimeWarnings.length > 0
               ? "border-yellow-400 bg-yellow-50"
               : "border-gray-300"
           }`}
@@ -396,23 +348,27 @@ const EditOfficer = ({ onClose, onSuccess }) => {
         />
       </div>
 
-      {/* Officer Positions */}
+      {/* Officer Position - Updated to dropdown */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Position(s) *
+          Position *
         </label>
-        <input
-          type="text"
+        <select
           name="Positions"
           value={formData.Positions}
           onChange={handleInputChange}
           className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
-          placeholder="e.g., Captain, Secretary, Treasurer"
           required
-          disabled={isSubmitting}
-        />
+          disabled={isSubmitting}>
+          <option value="">Select a position...</option>
+          {OFFICER_POSITIONS.map((position) => (
+            <option key={position} value={position}>
+              {position}
+            </option>
+          ))}
+        </select>
         <p className="text-xs text-gray-500 mt-1">
-          Multiple positions can be separated by commas
+          Choose the officer's primary position
         </p>
       </div>
 
