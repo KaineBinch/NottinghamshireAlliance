@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { createOfficer, getAllOfficers } from "../../../utils/api/officersApi"
 import { getAllGolfClubs } from "../../../utils/api/clubsApi"
+import { OFFICER_POSITIONS } from "../../../constants/officerPositions"
 
 const AddOfficer = ({ onClose, onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -25,8 +26,8 @@ const AddOfficer = ({ onClose, onSuccess }) => {
         ])
         setExistingOfficers(officers)
         setGolfClubs(clubs)
-        console.log("Loaded existing officers:", officers) // Debug log
-        console.log("Loaded golf clubs:", clubs) // Debug log
+        console.log("Loaded existing officers:", officers)
+        console.log("Loaded golf clubs:", clubs)
       } catch (error) {
         console.error("Error loading data:", error)
       }
@@ -98,7 +99,7 @@ const AddOfficer = ({ onClose, onSuccess }) => {
       errors.push("Officer name is required")
     }
     if (!formData.Positions.trim()) {
-      errors.push("Position(s) are required")
+      errors.push("Position is required")
     }
     if (!formData.golfClubDocumentId) {
       errors.push("Please select a golf club")
@@ -131,10 +132,8 @@ const AddOfficer = ({ onClose, onSuccess }) => {
       if (error.validationErrors) {
         setValidationErrors(error.validationErrors)
         setSubmitMessage("❌ Please fix the validation errors above.")
-      } else if (error.response?.data?.error?.message) {
-        setSubmitMessage(`❌ Error: ${error.response.data.error.message}`)
       } else {
-        setSubmitMessage(`❌ Failed to create officer: ${error.message}`)
+        setSubmitMessage(`❌ Error adding officer: ${error.message}`)
       }
     } finally {
       setIsSubmitting(false)
@@ -147,74 +146,48 @@ const AddOfficer = ({ onClose, onSuccess }) => {
     }
   }
 
-  const selectedClub = golfClubs.find(
-    (club) =>
-      club.documentId === formData.golfClubDocumentId ||
-      club.id === formData.golfClubDocumentId
-  )
-
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 bg-gray-100 p-6 rounded-lg shadow-lg border border-gray-300">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium text-gray-800">Add New Officer</h3>
-        <button
-          type="button"
-          onClick={handleCancel}
-          className="text-gray-500 hover:text-gray-700">
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-      </div>
+      className="space-y-6 bg-gray-100 p-6 rounded-lg shadow-lg border border-gray-300">
+      <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
+        Add New Officer
+      </h2>
 
-      {/* Show validation errors */}
+      {/* Display validation errors */}
       {validationErrors.length > 0 && (
-        <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded mb-4">
-          <h4 className="font-bold mb-2">Please fix these errors:</h4>
-          <ul className="list-disc list-inside space-y-1">
+        <div className="bg-red-50 border border-red-200 rounded p-4">
+          <h4 className="font-medium text-red-800 mb-2">
+            Please fix the following errors:
+          </h4>
+          <ul className="list-disc list-inside text-red-700 space-y-1">
             {validationErrors.map((error, index) => (
-              <li key={index} className="text-sm">
-                {error}
-              </li>
+              <li key={index}>{error}</li>
             ))}
           </ul>
         </div>
       )}
 
-      {/* Show real-time warnings */}
+      {/* Display realtime warnings */}
       {realtimeWarnings.length > 0 && (
-        <div className="bg-yellow-100 border border-yellow-300 text-yellow-700 px-4 py-3 rounded mb-4">
-          <h4 className="font-bold mb-2">Warnings:</h4>
-          <ul className="list-disc list-inside space-y-1">
+        <div className="bg-yellow-50 border border-yellow-200 rounded p-4">
+          <ul className="text-yellow-700 space-y-1">
             {realtimeWarnings.map((warning, index) => (
-              <li key={index} className="text-sm">
-                {warning}
-              </li>
+              <li key={index}>{warning}</li>
             ))}
           </ul>
         </div>
       )}
 
-      {/* Show submit message */}
+      {/* Submit message */}
       {submitMessage && (
         <div
-          className={`text-center p-3 rounded mb-4 ${
+          className={`text-center p-3 rounded ${
             submitMessage.includes("✅")
-              ? "bg-green-100 text-green-700 border border-green-300"
-              : "bg-red-100 text-red-700 border border-red-300"
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : "bg-red-50 text-red-700 border border-red-200"
           }`}>
-          <div className="font-medium">{submitMessage}</div>
+          {submitMessage}
         </div>
       )}
 
@@ -235,23 +208,11 @@ const AddOfficer = ({ onClose, onSuccess }) => {
             <option
               key={club.documentId || club.id}
               value={club.documentId || club.id}>
-              {club.clubName} ({club.clubID})
+              {club.clubName}
             </option>
           ))}
         </select>
       </div>
-
-      {/* Selected Club Info */}
-      {selectedClub && (
-        <div className="bg-blue-50 border border-blue-200 rounded p-3">
-          <p className="text-sm text-blue-800">
-            <strong>Selected Club:</strong> {selectedClub.clubName}
-          </p>
-          {selectedClub.clubAddress && (
-            <p className="text-xs text-blue-600">{selectedClub.clubAddress}</p>
-          )}
-        </div>
-      )}
 
       {/* Officer Name */}
       <div>
@@ -264,7 +225,7 @@ const AddOfficer = ({ onClose, onSuccess }) => {
           value={formData.Name}
           onChange={handleInputChange}
           className={`w-full p-3 border rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent ${
-            realtimeWarnings.some((w) => w.includes("Officer"))
+            realtimeWarnings.length > 0
               ? "border-yellow-400 bg-yellow-50"
               : "border-gray-300"
           }`}
@@ -274,23 +235,27 @@ const AddOfficer = ({ onClose, onSuccess }) => {
         />
       </div>
 
-      {/* Officer Positions */}
+      {/* Officer Position - Updated to dropdown */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Position(s) *
+          Position *
         </label>
-        <input
-          type="text"
+        <select
           name="Positions"
           value={formData.Positions}
           onChange={handleInputChange}
           className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-[#214A27] focus:border-transparent"
-          placeholder="e.g., Captain, Secretary, Treasurer"
           required
-          disabled={isSubmitting}
-        />
+          disabled={isSubmitting}>
+          <option value="">Select a position...</option>
+          {OFFICER_POSITIONS.map((position) => (
+            <option key={position} value={position}>
+              {position}
+            </option>
+          ))}
+        </select>
         <p className="text-xs text-gray-500 mt-1">
-          Multiple positions can be separated by commas
+          Choose the officer's primary position
         </p>
       </div>
 
