@@ -1,13 +1,13 @@
 import ExcelJS from "exceljs"
 
 const DownloadTemplateButton = ({
-  eventDate,
+  selectedEvent,
   startTime,
   endTime,
   minuteIncrement,
 }) => {
   const downloadTemplate = async () => {
-    if (!eventDate || !startTime || !endTime || !minuteIncrement) {
+    if (!selectedEvent || !startTime || !endTime || !minuteIncrement) {
       alert("Please select an event date, start time, end time, and interval.")
       return
     }
@@ -75,13 +75,15 @@ const DownloadTemplateButton = ({
     }
 
     teeTimes.forEach((time) => {
-      const [eventYear, eventMonth, eventDay] = eventDate.split("-").map(Number)
+      const [eventYear, eventMonth, eventDay] = selectedEvent.date
+        .split("-")
+        .map(Number)
       const [teeHour, teeMinute] = time.split(":").map(Number)
       const teeDatetime = new Date(
         Date.UTC(eventYear, eventMonth - 1, eventDay, teeHour, teeMinute)
       )
 
-      worksheet.addRow([eventDate, teeDatetime, "", "", "", "", ""])
+      worksheet.addRow([selectedEvent.date, teeDatetime, "", "", "", "", ""])
     })
 
     worksheet.getColumn(2).numFmt = "hh:mm"
@@ -135,7 +137,14 @@ const DownloadTemplateButton = ({
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `event_template_${eventDate}.xlsx`
+
+      // Create filename using event name instead of generic template name
+      const cleanEventName = selectedEvent.eventName.replace(
+        /[^a-zA-Z0-9]/g,
+        "_"
+      )
+      a.download = `${cleanEventName}_${selectedEvent.date}.xlsx`
+
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
