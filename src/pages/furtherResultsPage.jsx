@@ -785,6 +785,11 @@ const FurtherResultsPage = () => {
         {/* Optional review text with ExpandableText component */}
         {event.eventReview && <ExpandableText text={event.eventReview} />}
 
+        {/* Print Results button */}
+        <div className="print-button-container">
+          <PrintButton contentId="results-sections" />
+        </div>
+
         {/* Divider between review and results tables */}
         <div className="border-b border-gray-300 my-5"></div>
 
@@ -841,11 +846,6 @@ const FurtherResultsPage = () => {
           {topSenior && (
             <IndividualWinnerTable player={topSenior} isSenior={true} />
           )}
-        </div>
-
-        {/* Add print button here */}
-        <div className="print-button-container">
-          <PrintButton contentId="results-sections" />
         </div>
 
         {/* Divider between results tables and all scores*/}
