@@ -5,7 +5,7 @@ import { queryBuilder } from "../../../utils/queryBuilder"
 import { MODELS, QUERIES } from "../../../constants/api"
 
 const TemplateCard = () => {
-  const [eventDate, setEventDate] = useState("")
+  const [selectedEvent, setSelectedEvent] = useState(null)
   const [startTime, setStartTime] = useState("07:30")
   const [endTime, setEndTime] = useState("14:00")
   const [minuteIncrement, setMinuteIncrement] = useState(10)
@@ -30,6 +30,7 @@ const TemplateCard = () => {
 
       return {
         id: event.id,
+        eventName: event.golf_club?.clubName || "TBC",
         label: `${
           event.golf_club?.clubName || "TBC"
         } - ${day}/${month}/${year}`,
@@ -48,8 +49,13 @@ const TemplateCard = () => {
         <div>
           <label className="text-sm font-medium mb-2">Choose an Event</label>
           <select
-            value={eventDate}
-            onChange={(e) => setEventDate(e.target.value)}
+            value={selectedEvent?.date || ""}
+            onChange={(e) => {
+              const selected = eventOptions.find(
+                (event) => event.date === e.target.value
+              )
+              setSelectedEvent(selected)
+            }}
             className="w-full p-2 border border-gray-300 rounded">
             <option value="" disabled>
               Select an event
@@ -110,7 +116,7 @@ const TemplateCard = () => {
 
         {/* Download Button */}
         <DownloadTemplateButton
-          eventDate={eventDate}
+          selectedEvent={selectedEvent}
           startTime={startTime}
           endTime={endTime}
           minuteIncrement={minuteIncrement}
