@@ -29,7 +29,7 @@ const DownloadTemplateButton = ({
 
     const header = worksheet.addRow(headerRow)
     header.height = 34.5
-    header.eachCell((cell) => {
+    header.eachCell((cell, colIndex) => {
       cell.font = { bold: true, size: 12, color: { argb: "FFFFFFFF" } }
       cell.alignment = {
         horizontal: "center",
@@ -41,12 +41,19 @@ const DownloadTemplateButton = ({
         pattern: "solid",
         fgColor: { argb: "214A27" },
       }
+      cell.protection = {
+        locked: colIndex <= 2,
+      }
     })
 
     const columnWidths = [15, 15, 20, 10, 10, 10, 10, 10, 10]
     columnWidths.forEach((width, index) => {
       worksheet.getColumn(index + 1).width = width
     })
+
+    worksheet.getColumn(1).hidden = true
+
+    worksheet.views = [{ state: "frozen", ySplit: 1 }]
 
     const teeTimes = []
     const [startHour, startMinute] = startTime.split(":").map(Number)
@@ -99,6 +106,10 @@ const DownloadTemplateButton = ({
       for (let colIndex = 1; colIndex <= 9; colIndex++) {
         const cell = worksheet.getCell(rowIndex, colIndex)
 
+        cell.protection = {
+          locked: colIndex <= 2,
+        }
+
         cell.fill = {
           type: "pattern",
           pattern: "solid",
@@ -129,6 +140,22 @@ const DownloadTemplateButton = ({
     worksheet.getCell(1, 9).border = {
       right: { style: "thin", color: { argb: "000000" } },
     }
+
+    await worksheet.protect(`${import.meta.env.VITE_SPREADSHEET_PASS}`, {
+      selectLockedCells: true,
+      selectUnlockedCells: true,
+      formatCells: false,
+      formatColumns: false,
+      formatRows: false,
+      insertColumns: false,
+      insertRows: false,
+      insertHyperlinks: false,
+      deleteColumns: false,
+      deleteRows: false,
+      sort: false,
+      autoFilter: false,
+      pivotTables: false,
+    })
 
     await workbook.xlsx.writeBuffer().then((buffer) => {
       const blob = new Blob([buffer], {
