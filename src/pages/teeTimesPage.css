@@ -54,7 +54,7 @@
 }
 
 .tee-times-container {
-  @apply flex justify-center;
+  @apply flex justify-center -mt-8;
 }
 
 .tee-times-wrapper {
