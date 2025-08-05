@@ -2,6 +2,7 @@ import { useState } from "react"
 import PageHeader from "../components/pageHeader"
 import TeeTimesTable from "../components/teeTimes/teeTime"
 import ListView from "../components/teeTimes/teeTimeListView"
+import PrintTeeTimesButton from "../components/teeTimes/printTeeTimes"
 import { queryBuilder } from "../utils/queryBuilder"
 import { MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
@@ -73,9 +74,23 @@ const TeeTimesPage = () => {
 
   const filteredTeeTimes = nextEvent?.golfers || []
 
+  // Prepare data for print button - group by tee time
+  const teeTimesForPrint =
+    data?.data?.filter((entry) => entry.event?.eventDate === nextEventDate) ||
+    []
+
   const handleToggleView = () => {
     setIsListView(!isListView)
   }
+
+  const eventDetails = nextEvent
+    ? {
+        title: "Nottinghamshire Amateur & Professional Golfers' Alliance",
+        details: `Order of play at ${
+          nextEvent.event?.golf_club?.clubName || "Golf Club"
+        } ${eventDate || ""}`,
+      }
+    : null
 
   return (
     <>
@@ -112,10 +127,22 @@ const TeeTimesPage = () => {
                 )}
               </div>
             </div>
-            <div className="view-toggle-container">
-              <button onClick={handleToggleView} className="view-toggle-button">
-                {isListView ? "Tee Time View" : "Club View"}
-              </button>
+            <div className="flex justify-end max-w-5xl mx-auto py-4">
+              <div className="flex flex-col gap-10 items-center">
+                {/* Add Print Button - only show if we have tee times */}
+                {teeTimesForPrint.length > 0 && (
+                  <PrintTeeTimesButton
+                    teeTimesData={teeTimesForPrint}
+                    eventDetails={eventDetails}
+                  />
+                )}
+                {/* Toggle view */}
+                <button
+                  onClick={handleToggleView}
+                  className="bg-[#214A27] text-white px-6 py-2 rounded-lg shadow-md">
+                  {isListView ? "Tee Time View" : "Club View"}
+                </button>
+              </div>
             </div>
           </>
         ) : (
