@@ -193,6 +193,11 @@ const IndividualWinnerTable = ({
         <tr className="bg-[#d9d9d9]">
           <td className="border border-gray-300 p-1">
             {player.golfer?.golferName || "Unknown Player"}
+            {player.isNIT && (
+              <span className="text-orange-600 ml-1 text-xs font-medium">
+                (NIT)
+              </span>
+            )}
           </td>
           <td className="border border-gray-300 p-1">
             {player.golfer?.golf_club?.clubName || "Unknown Club"}
@@ -287,6 +292,11 @@ const ProfessionalsTable = ({ scores }) => {
               </td>
               <td className="border border-gray-300 p-1">
                 {row.player.golfer?.golferName || "Unknown"}
+                {row.player.isNIT && (
+                  <span className="text-orange-600 ml-1 text-xs font-medium">
+                    (NIT)
+                  </span>
+                )}
               </td>
               <td className="border border-gray-300 p-1">{row.club}</td>
               <td className="border border-gray-300 p-1 text-center">
@@ -455,7 +465,7 @@ const FurtherResultsPage = () => {
     // Group all players (both amateurs and professionals) by club for teams
     const clubScores = {}
     sortedScores.forEach((score) => {
-      if (!score.golfer?.golf_club) return
+      if (!score.golfer?.golf_club || score.isNIT) return
 
       const clubName = score.golfer.golf_club.clubName || "Unaffiliated"
       if (!clubScores[clubName]) {
@@ -587,6 +597,11 @@ const FurtherResultsPage = () => {
           {score.golfer?.golferName || "Unknown"}
           {score.golfer?.isSenior && (
             <span className="golfer-senior-tag">Senior</span>
+          )}
+          {score.isNIT && (
+            <span className="text-orange-600 ml-1 text-xs font-medium">
+              NIT
+            </span>
           )}
         </>,
         score.golfer?.golf_club?.clubName || "Unaffiliated",
@@ -737,7 +752,14 @@ const FurtherResultsPage = () => {
           headers={["Position", "Golfer Name", "Club", "Points"]}
           data={processedData.professionalScores.map((score, index) => [
             `${index + 1}${getOrdinal(index + 1)}`,
-            score.golfer?.golferName || "Unknown",
+            <>
+              {score.golfer?.golferName || "Unknown"}
+              {score.isNIT && (
+                <span className="text-orange-600 ml-1 text-xs font-medium">
+                  NIT
+                </span>
+              )}
+            </>,
             score.golfer?.golf_club?.clubName || "Unaffiliated",
             {
               content: score.golferEventScore?.toString() || "0",

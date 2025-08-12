@@ -228,6 +228,10 @@
   margin-left: 0.5rem;
 }
 
+.golfer-nit-tag {
+  @apply text-orange-600 ml-1 text-xs font-medium;
+}
+
 /* Team results */
 .team-title {
   @apply text-center font-semibold;
