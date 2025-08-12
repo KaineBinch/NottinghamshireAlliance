@@ -193,11 +193,7 @@ const IndividualWinnerTable = ({
         <tr className="bg-[#d9d9d9]">
           <td className="border border-gray-300 p-1">
             {player.golfer?.golferName || "Unknown Player"}
-            {player.isNIT && (
-              <span className="text-orange-600 ml-1 text-xs font-medium">
-                (NIT)
-              </span>
-            )}
+            {player.isNIT && <span className="golfer-nit-tag">(NIT)</span>}
           </td>
           <td className="border border-gray-300 p-1">
             {player.golfer?.golf_club?.clubName || "Unknown Club"}
@@ -293,9 +289,7 @@ const ProfessionalsTable = ({ scores }) => {
               <td className="border border-gray-300 p-1">
                 {row.player.golfer?.golferName || "Unknown"}
                 {row.player.isNIT && (
-                  <span className="text-orange-600 ml-1 text-xs font-medium">
-                    (NIT)
-                  </span>
+                  <span className="golfer-nit-tag">(NIT)</span>
                 )}
               </td>
               <td className="border border-gray-300 p-1">{row.club}</td>
@@ -598,11 +592,7 @@ const FurtherResultsPage = () => {
           {score.golfer?.isSenior && (
             <span className="golfer-senior-tag">Senior</span>
           )}
-          {score.isNIT && (
-            <span className="text-orange-600 ml-1 text-xs font-medium">
-              NIT
-            </span>
-          )}
+          {score.isNIT && <span className="golfer-nit-tag">NIT</span>}
         </>,
         score.golfer?.golf_club?.clubName || "Unaffiliated",
         {
@@ -754,11 +744,7 @@ const FurtherResultsPage = () => {
             `${index + 1}${getOrdinal(index + 1)}`,
             <>
               {score.golfer?.golferName || "Unknown"}
-              {score.isNIT && (
-                <span className="text-orange-600 ml-1 text-xs font-medium">
-                  NIT
-                </span>
-              )}
+              {score.isNIT && <span className="golfer-nit-tag">NIT</span>}
             </>,
             score.golfer?.golf_club?.clubName || "Unaffiliated",
             {
