@@ -1,4 +1,3 @@
-import { useEffect } from "react"
 import defaultImage from "../../assets/Logo.png"
 
 const TeeTimeCard = ({
@@ -9,26 +8,6 @@ const TeeTimeCard = ({
   golfers,
   golferScores = {}, // Accept golferScores as prop with default empty object
 }) => {
-  // Debug logging
-  useEffect(() => {
-    console.log("=== TeeTimeCard Debug Info ===")
-    console.log("golferScores prop:", golferScores)
-    console.log("golfers:", golfers)
-
-    if (golfers && golfers.length > 0) {
-      golfers.forEach((golfer, index) => {
-        console.log(`Golfer ${index}:`, {
-          id: golfer?.id,
-          documentId: golfer?.documentId,
-          name: golfer?.golferName,
-          hasScoreData: !!golferScores[golfer?.id],
-          scoreValue: golferScores[golfer?.id],
-        })
-      })
-    }
-    console.log("=== End Debug Info ===")
-  }, [golfers, golferScores])
-
   const getOrdinalSuffix = (day) => {
     if (day > 3 && day < 21) return "th"
     switch (day % 10) {
@@ -138,15 +117,6 @@ const TeeTimeCard = ({
                 golferScores[golfer?.id] ||
                 golferScores[golfer?.documentId] ||
                 false
-
-              // Debug log for each golfer
-              console.log(`Rendering golfer ${golfer?.golferName}:`, {
-                id: golfer?.id,
-                documentId: golfer?.documentId,
-                isNIT: isNIT,
-                golferScoresForThisId: golferScores[golfer?.id],
-                golferScoresForThisDocumentId: golferScores[golfer?.documentId],
-              })
 
               return (
                 <div key={golferKey} className="golfer-item text-center">

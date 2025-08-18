@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import PageHeader from "../components/pageHeader"
 import TeeTimesTable from "../components/teeTimes/teeTime"
 import ListView from "../components/teeTimes/teeTimeListView"
@@ -48,9 +48,39 @@ const formatDateWithOrdinal = (dateString) => {
 
 const TeeTimesPage = () => {
   const [isListView, setIsListView] = useState(false)
+  const [golferScores, setGolferScores] = useState({})
 
   const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery)
   const { isLoading, isError, data, error } = useFetch(query)
+
+  // Fetch scores to get NIT status
+  const scoresQuery = queryBuilder(MODELS.scores, "?populate=golfer")
+  const {
+    data: scoresData,
+    isLoading: scoresLoading,
+    isError: scoresError,
+  } = useFetch(scoresQuery)
+
+  // Process scores data to create a lookup for NIT status
+  useEffect(() => {
+    if (scoresData?.data) {
+      const scoreMap = {}
+
+      scoresData.data.forEach((score) => {
+        if (score.golfer) {
+          // Try both id and documentId
+          if (score.golfer.id && score.isNIT) {
+            scoreMap[score.golfer.id] = score.isNIT
+          }
+          if (score.golfer.documentId && score.isNIT) {
+            scoreMap[score.golfer.documentId] = score.isNIT
+          }
+        }
+      })
+
+      setGolferScores(scoreMap)
+    }
+  }, [scoresData])
 
   if (isLoading) {
     return <TeeTimesPageSkeleton isListView={isListView} />
@@ -134,6 +164,7 @@ const TeeTimesPage = () => {
                   <PrintTeeTimesButton
                     teeTimesData={teeTimesForPrint}
                     eventDetails={eventDetails}
+                    golferScores={golferScores} // Pass golfer scores for NIT tags
                   />
                 )}
                 {/* Toggle view */}
@@ -158,11 +189,13 @@ const TeeTimesPage = () => {
                   <ListView
                     teeTimes={filteredTeeTimes}
                     isPastEvent={isPastEvent}
+                    golferScores={golferScores} // Pass golfer scores
                   />
                 ) : (
                   <TeeTimesTable
                     teeTimes={filteredTeeTimes}
                     isPastEvent={isPastEvent}
+                    golferScores={golferScores} // Pass golfer scores
                   />
                 )}
               </>
