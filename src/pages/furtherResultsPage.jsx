@@ -1,317 +1,22 @@
-import { useState, useMemo } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useParams } from "react-router-dom"
 import { Trophy, Users, User } from "lucide-react"
-import { MODELS, QUERIES } from "../constants/api"
+import { MODELS } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
 import ExpandableText from "../components/expandableText"
 import SearchFilter from "../components/SearchFilter"
 import PrintButton from "../components/printButton"
+import { useLiveScore } from "../constants/LiveScoreContext"
+import { useResultsData } from "../utils/hooks/useResultsData"
+import TabButton from "../components/furtherResults/TabButton"
+import ResultsTable from "../components/furtherResults/ResultsTable"
+import TopWinnersTable from "../components/furtherResults/TopWinnersTable"
+import TeamScoresTable from "../components/furtherResults/TeamScoresTable"
+import IndividualWinnerTable from "../components/furtherResults/IndividualWinnerTable"
+import ProfessionalsTable from "../components/furtherResults/ProfessionalsTable"
+import LiveScoreScreen from "../components/liveScore/LiveScoreScreen"
 import "./furtherResultsPage.css"
-
-const TabButton = ({ id, label, icon: Icon, activeTab, onClick }) => (
-  <button
-    onClick={() => onClick(id)}
-    className={`tab-button ${
-      activeTab === id ? "tab-button-active" : "tab-button-inactive"
-    }`}>
-    <Icon className="tab-icon" size={20} />
-    {label}
-  </button>
-)
-
-const ResultsTable = ({ headers, data }) => (
-  <div className="results-table-container">
-    <table className="results-table">
-      <thead>
-        <tr className="results-table-header">
-          {headers.map((header, index) => (
-            <th key={index} className="results-table-header-cell">
-              {header}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((row, rowIndex) => (
-          <tr
-            key={rowIndex}
-            className={
-              rowIndex % 2 === 0
-                ? "results-table-row-even"
-                : "results-table-row-odd"
-            }>
-            {row.map((cell, cellIndex) => (
-              <td key={cellIndex} className="results-table-cell">
-                {typeof cell === "object" && cell?.content ? (
-                  <div className="flex items-center">
-                    <span>{cell.content}</span>
-                    {cell.usedTiebreaker && (
-                      <span
-                        className="text-blue-700 ml-1 text-xs font-medium"
-                        title="Back 9: {cell.back9Score}">
-                        (B9: {cell.back9Score})
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  cell
-                )}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)
-
-const TopWinnersTable = ({ data, title }) => (
-  <div className="mb-5">
-    <h3 className="text-[#214A27] font-bold text-sm mb-1">{title}</h3>
-    <table className="w-full border-collapse">
-      <thead>
-        <tr className="bg-[#214A27] text-white">
-          {data.headerRow.map((cell, index) => (
-            <th key={index} className="border border-gray-300 p-1 text-center">
-              {cell}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.rows.map((row, rowIndex) => (
-          <tr
-            key={rowIndex}
-            className={rowIndex % 2 === 0 ? "bg-[#d9d9d9]" : "bg-white"}>
-            {row.map((cell, cellIndex) => (
-              <td key={cellIndex} className="border border-gray-300 p-1">
-                {typeof cell === "object" && cell?.content ? (
-                  <div className="flex items-center">
-                    <span>{cell.content}</span>
-                    {cell.usedTiebreaker && (
-                      <span
-                        className="text-blue-700 ml-1 text-xs font-medium"
-                        title="Back 9: {cell.back9Score}">
-                        (B9: {cell.back9Score})
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  cell
-                )}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)
-
-const TeamScoresTable = ({ team, title, position }) => {
-  const headerTitle = position
-    ? `${position} Team - ${team.clubName} ${team.totalPoints} Points${
-        team.usedTiebreaker ? ` (B9: ${team.totalBack9})` : ""
-      }`
-    : `${title} - ${team.clubName} ${team.totalPoints} Points${
-        team.usedTiebreaker ? ` (B9: ${team.totalBack9})` : ""
-      }`
-
-  return (
-    <div className="mb-5 h-full">
-      <h3 className="text-[#214A27] font-bold text-sm mb-1">{headerTitle}</h3>
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="bg-[#214A27] text-white">
-            <th className="border border-gray-300 p-1">Golfer Name</th>
-            <th className="border border-gray-300 p-1 text-center">
-              Individual points
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {team.scores.map((score, index) => (
-            <tr
-              key={index}
-              className={index % 2 === 0 ? "bg-[#d9d9d9]" : "bg-white"}>
-              <td className="border border-gray-300 p-1">
-                {score.golfer?.golferName || "Unknown Player"}
-                {score.golfer?.isPro && (
-                  <span className="text-blue-600 ml-1 text-xs font-medium">
-                    (Pro)
-                  </span>
-                )}
-              </td>
-              <td className="border border-gray-300 p-1 text-center">
-                {typeof score.golferEventScore === "number" ? (
-                  <div className="flex items-center justify-center">
-                    <span>{score.golferEventScore}</span>
-                    {score.usedTiebreaker && (
-                      <span
-                        className="text-blue-700 ml-1 text-xs font-medium"
-                        title={`Back 9: ${score.back9Score || 0}`}>
-                        (B9: {score.back9Score || 0})
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  "N/A"
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
-const IndividualWinnerTable = ({
-  player,
-  position,
-  isNTP = false,
-  isSenior = false,
-}) => (
-  <div className="mb-5">
-    <h3 className="text-[#214A27] font-bold text-sm mb-1">
-      {isNTP
-        ? "NTP"
-        : isSenior
-        ? "Senior Winner"
-        : `${position} Individual (not in Winning Teams)`}
-    </h3>
-    <table className="w-full border-collapse">
-      <thead>
-        <tr className="bg-[#214A27] text-white">
-          <th className="border border-gray-300 p-1">Golfer Name</th>
-          <th className="border border-gray-300 p-1">Club</th>
-          <th className="border border-gray-300 p-1 text-center">Points</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr className="bg-[#d9d9d9]">
-          <td className="border border-gray-300 p-1">
-            {player.golfer?.golferName || "Unknown Player"}
-            {player.isNIT && <span className="golfer-nit-tag">(NIT)</span>}
-          </td>
-          <td className="border border-gray-300 p-1">
-            {player.golfer?.golf_club?.clubName || "Unknown Club"}
-          </td>
-          <td className="border border-gray-300 p-1 text-center">
-            {typeof player.golferEventScore === "number" ? (
-              <div className="flex items-center justify-center">
-                <span>{player.golferEventScore}</span>
-                {player.usedTiebreaker && (
-                  <span
-                    className="text-blue-700 ml-1 text-xs font-medium"
-                    title={`Back 9: ${player.back9Score || 0}`}>
-                    (B9: {player.back9Score || 0})
-                  </span>
-                )}
-              </div>
-            ) : (
-              player.specialScore || "N/A"
-            )}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-)
-
-const ProfessionalsTable = ({ scores }) => {
-  const scoreGroups = {}
-  scores.forEach((score) => {
-    const eventScore = score.golferEventScore || 0
-    if (!scoreGroups[eventScore]) {
-      scoreGroups[eventScore] = []
-    }
-    scoreGroups[eventScore].push(score)
-  })
-
-  const sortedScores = Object.keys(scoreGroups)
-    .map(Number)
-    .sort((a, b) => b - a)
-
-  let currentPosition = 1
-  const proRows = []
-  let displayedCount = 0
-
-  sortedScores.forEach((score) => {
-    const playersWithScore = scoreGroups[score]
-
-    playersWithScore.sort((a, b) => (b.back9Score || 0) - (a.back9Score || 0))
-
-    // Check if we should include this score group
-    // Include if we haven't reached 5 players yet, or if this ties for 5th position
-    const shouldInclude = displayedCount < 5 || currentPosition <= 5
-
-    if (shouldInclude) {
-      playersWithScore.forEach((player) => {
-        proRows.push({
-          position: currentPosition,
-          player: player,
-          club: player.golfer?.golf_club?.clubName || "Unknown Club",
-          score: player.golferEventScore || 0,
-          back9: player.back9Score || 0,
-          usedTiebreaker: player.usedTiebreaker,
-        })
-        displayedCount++
-      })
-    }
-
-    currentPosition += playersWithScore.length
-  })
-
-  return (
-    <div className="mb-5">
-      <h3 className="text-[#214A27] font-bold text-sm mb-1">
-        PGA Professionals / Assistants
-      </h3>
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="bg-[#214A27] text-white">
-            <th className="border border-gray-300 p-1 text-center">Position</th>
-            <th className="border border-gray-300 p-1">Golfer Name</th>
-            <th className="border border-gray-300 p-1">Club</th>
-            <th className="border border-gray-300 p-1 text-center">Points</th>
-          </tr>
-        </thead>
-        <tbody>
-          {proRows.map((row, index) => (
-            <tr
-              key={index}
-              className={index % 2 === 0 ? "bg-[#d9d9d9]" : "bg-white"}>
-              <td className="border border-gray-300 p-1 text-center">
-                {row.position}
-              </td>
-              <td className="border border-gray-300 p-1">
-                {row.player.golfer?.golferName || "Unknown"}
-                {row.player.isNIT && (
-                  <span className="golfer-nit-tag">(NIT)</span>
-                )}
-              </td>
-              <td className="border border-gray-300 p-1">{row.club}</td>
-              <td className="border border-gray-300 p-1 text-center">
-                <div className="flex items-center justify-center">
-                  <span>{row.score}</span>
-                  {row.usedTiebreaker && (
-                    <span
-                      className="text-blue-700 ml-1 text-xs font-medium"
-                      title={`Back 9: ${row.back9}`}>
-                      (B9: {row.back9})
-                    </span>
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
-}
 
 const formatDate = (dateString) => {
   if (!dateString) return "Date not available"
@@ -321,334 +26,45 @@ const formatDate = (dateString) => {
 
 const FurtherResultsPage = () => {
   const [activeTab, setActiveTab] = useState("amateur")
-
+  const { eventId } = useParams()
   const [filteredAmateurData, setFilteredAmateurData] = useState([])
   const [filteredTeamData, setFilteredTeamData] = useState([])
-
-  const { clubName } = useParams()
-
-  const query = queryBuilder(MODELS.events, QUERIES.resultsQuery)
+  const { getEventStatus } = useLiveScore()
+  const query = queryBuilder(
+    MODELS.events,
+    "?sort[0]=eventDate:desc&populate=scores.golfer.golf_club&populate=golf_club&populate=golf_club.clubImage"
+  )
   const { isLoading, data } = useFetch(query)
-
-  const processedData = useMemo(() => {
-    if (!data?.data || isLoading) {
-      return {
-        event: null,
-        amateurScores: [],
-        professionalScores: [],
-        topAmateur: null,
-        seniorScores: [],
-        topSenior: null,
-        sortedTeams: [],
-        winningTeam: null,
-        secondTeam: null,
-        firstIndividual: null,
-        secondIndividual: null,
-        allAmateurData: { headers: [], rows: [] },
-        allTeamData: { headers: [], rows: [] },
-        topAmateurData: { headerRow: [], rows: [] },
-        uniqueAmateurClubs: [],
-        uniqueTeamClubs: [],
-      }
+  const currentEvent = useMemo(() => {
+    return data?.data?.find((e) => e.id.toString() === eventId)
+  }, [data, eventId])
+  const eventStatus = useMemo(() => {
+    return getEventStatus(eventId, currentEvent?.eventDate)
+  }, [getEventStatus, eventId, currentEvent?.eventDate])
+  const processedData = useResultsData(data, eventId, isLoading)
+  const shouldBlockAccess = useMemo(() => {
+    if (isLoading || !data || !processedData.event) {
+      return false
     }
-
-    const event = data?.data?.find((e) => e.id.toString() === clubName)
-
-    if (!event) {
-      return {
-        event: null,
-        amateurScores: [],
-        professionalScores: [],
-        topAmateur: null,
-        seniorScores: [],
-        topSenior: null,
-        sortedTeams: [],
-        winningTeam: null,
-        secondTeam: null,
-        firstIndividual: null,
-        secondIndividual: null,
-        allAmateurData: { headers: [], rows: [] },
-        allTeamData: { headers: [], rows: [] },
-        topAmateurData: { headerRow: [], rows: [] },
-        uniqueAmateurClubs: [],
-        uniqueTeamClubs: [],
-      }
+    const event = processedData.event
+    const hasScores = event.scores && event.scores.length > 0
+    if (!hasScores) {
+      return true
     }
+    const eventDate = new Date(event.eventDate)
+    const today = new Date()
+    const eventDateNormalized = new Date(eventDate).setHours(0, 0, 0, 0)
+    const todayNormalized = new Date(today).setHours(0, 0, 0, 0)
+    const isToday = eventDateNormalized === todayNormalized
+    const shouldAllowAccess =
+      eventStatus.resultsReleased ||
+      eventStatus.isLegacyEvent ||
+      !eventStatus.lastUpdated ||
+      (isToday && hasScores)
+    return !shouldAllowAccess && !eventStatus.isLive
+  }, [isLoading, data, processedData.event, eventStatus])
 
-    const getOrdinal = (n) => {
-      if (n <= 0) return ""
-      const s = ["th", "st", "nd", "rd"]
-      const v = n % 100
-      if (v >= 11 && v <= 13) return "th"
-      const lastDigit = n % 10
-      return s[lastDigit] || "th"
-    }
-
-    const findTiedScores = (scores) => {
-      const scoreGroups = {}
-      scores.forEach((score) => {
-        const eventScore = score.golferEventScore || 0
-        if (!scoreGroups[eventScore]) {
-          scoreGroups[eventScore] = []
-        }
-        scoreGroups[eventScore].push(score)
-      })
-      return Object.values(scoreGroups).filter((group) => group.length > 1)
-    }
-
-    const sortScoresWithTiebreaker = (scores) => {
-      const tiedGroups = findTiedScores(scores)
-      const tiedScoreValues = new Set(
-        tiedGroups.map((group) => group[0].golferEventScore || 0)
-      )
-
-      return [...scores].sort((a, b) => {
-        const scoreA = a.golferEventScore || 0
-        const scoreB = b.golferEventScore || 0
-        const scoreDiff = scoreB - scoreA
-
-        if (scoreDiff !== 0) return scoreDiff
-
-        if (tiedScoreValues.has(scoreA)) {
-          return (b.back9Score || 0) - (a.back9Score || 0)
-        }
-
-        return 0
-      })
-    }
-
-    const applyTiebreakerFlags = (sortedScores) => {
-      const tiedGroups = findTiedScores(sortedScores)
-
-      tiedGroups.forEach((group) => {
-        const uniqueBack9Scores = new Set(
-          group.map((score) => score.back9Score || 0)
-        )
-        if (uniqueBack9Scores.size <= 1) return
-
-        const sortedGroup = [...group].sort(
-          (a, b) => (b.back9Score || 0) - (a.back9Score || 0)
-        )
-
-        sortedGroup.forEach((score) => {
-          score.usedTiebreaker = true
-        })
-      })
-
-      return sortedScores
-    }
-
-    const sortedScores = applyTiebreakerFlags(
-      sortScoresWithTiebreaker(event.scores || [])
-    )
-
-    const amateurScores = sortedScores.filter(
-      (score) => score.golfer && !score.golfer.isPro
-    )
-
-    const topAmateur = amateurScores.length > 0 ? amateurScores[0] : null
-
-    const professionalScores = sortedScores.filter(
-      (score) => score.golfer?.isPro
-    )
-
-    const seniorScores = amateurScores.filter(
-      (score) => score.golfer && score.golfer.isSenior
-    )
-
-    // Group all players (both amateurs and professionals) by club for teams
-    const clubScores = {}
-    sortedScores.forEach((score) => {
-      if (!score.golfer?.golf_club || score.isNIT) return
-
-      const clubName = score.golfer.golf_club.clubName || "Unaffiliated"
-      if (!clubScores[clubName]) {
-        clubScores[clubName] = []
-      }
-      clubScores[clubName].push(score)
-    })
-
-    const teamScores = Object.entries(clubScores).map(([clubName, scores]) => {
-      const sortedClubScores = [...scores].sort(
-        (a, b) => (b.golferEventScore || 0) - (a.golferEventScore || 0)
-      )
-
-      const topScores = sortedClubScores.slice(0, 4)
-
-      const totalPoints = topScores.reduce(
-        (sum, score) => sum + (score.golferEventScore || 0),
-        0
-      )
-
-      const totalBack9 = topScores.reduce(
-        (sum, score) => sum + (score.back9Score || 0),
-        0
-      )
-
-      return {
-        clubName,
-        scores: topScores,
-        totalPoints,
-        totalBack9,
-      }
-    })
-
-    const sortedTeams = [...teamScores].sort((a, b) => {
-      const pointsDiff = b.totalPoints - a.totalPoints
-      if (pointsDiff !== 0) return pointsDiff
-      return b.totalBack9 - a.totalBack9
-    })
-
-    const teamPointGroups = {}
-    sortedTeams.forEach((team) => {
-      if (!teamPointGroups[team.totalPoints]) {
-        teamPointGroups[team.totalPoints] = []
-      }
-      teamPointGroups[team.totalPoints].push(team)
-    })
-
-    Object.values(teamPointGroups)
-      .filter((group) => group.length > 1)
-      .forEach((group) => {
-        const uniqueBack9 = new Set(group.map((team) => team.totalBack9))
-        if (uniqueBack9.size <= 1) return
-
-        group.forEach((team) => {
-          team.usedTiebreaker = true
-        })
-      })
-
-    const winningTeam = sortedTeams.length > 0 ? sortedTeams[0] : null
-    const secondTeam = sortedTeams.length > 1 ? sortedTeams[1] : null
-
-    // Get all players who are in winning teams (both amateurs and professionals)
-    const playersInWinningTeams = new Set()
-
-    if (winningTeam) {
-      winningTeam.scores.forEach((score) => {
-        if (score.golfer) playersInWinningTeams.add(score.golfer.golferName)
-      })
-    }
-
-    if (secondTeam) {
-      secondTeam.scores.forEach((score) => {
-        if (score.golfer) playersInWinningTeams.add(score.golfer.golferName)
-      })
-    }
-
-    // Individual winners must be amateurs not in winning teams and not the overall amateur winner
-    const eligibleIndividuals = amateurScores.filter(
-      (score) =>
-        score.golfer &&
-        !playersInWinningTeams.has(score.golfer.golferName) &&
-        score !== topAmateur // Exclude the overall amateur winner
-    )
-
-    const firstIndividual =
-      eligibleIndividuals.length > 0 ? eligibleIndividuals[0] : null
-    const secondIndividual =
-      eligibleIndividuals.length > 1 ? eligibleIndividuals[1] : null
-
-    // Senior winner must be amateur senior who hasn't won anything else (lowest priority)
-    const eligibleSeniors = seniorScores.filter(
-      (score) =>
-        score.golfer &&
-        !playersInWinningTeams.has(score.golfer.golferName) &&
-        score !== topAmateur && // Not the overall amateur winner
-        score !== firstIndividual && // Not the 1st individual winner
-        score !== secondIndividual // Not the 2nd individual winner
-    )
-
-    const topSenior =
-      eligibleSeniors.length > 0
-        ? [...eligibleSeniors].sort(
-            (a, b) => (b.golferEventScore || 0) - (a.golferEventScore || 0)
-          )[0]
-        : null
-
-    const topAmateurData = {
-      headerRow: ["Golfer Name", "Club", "Points"],
-      rows: topAmateur
-        ? [
-            [
-              topAmateur.golfer?.golferName || "Unknown",
-              topAmateur.golfer?.golf_club?.clubName || "Unknown",
-              {
-                content: topAmateur.golferEventScore || 0,
-                usedTiebreaker: topAmateur.usedTiebreaker,
-                back9Score: topAmateur.back9Score || 0,
-              },
-            ],
-          ]
-        : [["No Amateur Scores", "", ""]],
-    }
-
-    const allAmateurData = {
-      headers: ["Position", "Golfer Name", "Club", "Points"],
-      rows: amateurScores.map((score, index) => [
-        `${index + 1}${getOrdinal(index + 1)}`,
-        <>
-          {score.golfer?.golferName || "Unknown"}
-          {score.golfer?.isSenior && (
-            <span className="golfer-senior-tag">Senior</span>
-          )}
-          {score.isNIT && <span className="golfer-nit-tag">NIT</span>}
-        </>,
-        score.golfer?.golf_club?.clubName || "Unaffiliated",
-        {
-          content: score.golferEventScore?.toString() || "0",
-          usedTiebreaker: score.usedTiebreaker,
-          back9Score: score.back9Score || 0,
-        },
-      ]),
-    }
-
-    const allTeamData = {
-      headers: ["Position", "Club", "Total Points"],
-      rows: sortedTeams.map((team, index) => [
-        `${index + 1}${getOrdinal(index + 1)}`,
-        team.clubName,
-        {
-          content: team.totalPoints.toString(),
-          usedTiebreaker: team.usedTiebreaker,
-          back9Score: team.totalBack9,
-        },
-      ]),
-    }
-
-    const uniqueAmateurClubs = [
-      ...new Set(
-        amateurScores.map(
-          (score) => score.golfer?.golf_club?.clubName || "No Club"
-        )
-      ),
-    ].sort()
-
-    const uniqueTeamClubs = [
-      ...new Set(sortedTeams.map((team) => team.clubName || "No Club")),
-    ].sort()
-
-    return {
-      event,
-      amateurScores,
-      professionalScores,
-      topAmateur,
-      seniorScores,
-      topSenior,
-      sortedTeams,
-      winningTeam,
-      secondTeam,
-      firstIndividual,
-      secondIndividual,
-      allAmateurData,
-      allTeamData,
-      topAmateurData,
-      uniqueAmateurClubs,
-      uniqueTeamClubs,
-    }
-  }, [data, clubName, isLoading])
-
-  useMemo(() => {
+  useEffect(() => {
     if (processedData.allAmateurData?.rows) {
       setFilteredAmateurData(processedData.allAmateurData.rows)
     }
@@ -657,12 +73,87 @@ const FurtherResultsPage = () => {
     }
   }, [processedData.allAmateurData, processedData.allTeamData])
 
+  if (!isLoading && currentEvent && eventStatus.isLive) {
+    return <LiveScoreScreen eventId={eventId} eventData={currentEvent} />
+  }
+
+  if (shouldBlockAccess) {
+    const event = processedData.event
+    const hasScores = event?.scores && event.scores.length > 0
+
+    if (!event) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center p-8">
+            <Trophy className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Event Not Found
+            </h2>
+            <p className="text-gray-600">
+              The requested event could not be found.
+            </p>
+          </div>
+        </div>
+      )
+    }
+
+    if (!hasScores) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center p-8">
+            <Trophy className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              No Results Available
+            </h2>
+            <p className="text-gray-600 mb-2">
+              This event doesn&apos;t have any scores yet.
+            </p>
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center p-8">
+          <Trophy className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Results Not Yet Available
+          </h2>
+          <p className="text-gray-600 mb-2">
+            Results for this event will be available once scoring is complete.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  const getOrdinal = (n) => {
+    if (n <= 0) return ""
+    const s = ["th", "st", "nd", "rd"]
+    const v = n % 100
+    if (v >= 11 && v <= 13) return "th"
+    return s[n % 10] || "th"
+  }
+
   if (isLoading) {
     return <div className="loading-container">Loading results...</div>
   }
 
   if (!processedData.event) {
-    return null
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center p-8">
+          <Trophy className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Event Not Found
+          </h2>
+          <p className="text-gray-600">
+            The requested event could not be found.
+          </p>
+        </div>
+      </div>
+    )
   }
 
   const tabs = [
@@ -748,7 +239,7 @@ const FurtherResultsPage = () => {
             </>,
             score.golfer?.golf_club?.clubName || "Unaffiliated",
             {
-              content: score.golferEventScore?.toString() || "0",
+              content: score.golferEventScore.toString(), // Removed null check since we filtered earlier
               usedTiebreaker: score.usedTiebreaker,
               back9Score: score.back9Score || 0,
             },
@@ -757,15 +248,6 @@ const FurtherResultsPage = () => {
       ),
     },
   ]
-
-  const getOrdinal = (n) => {
-    if (n <= 0) return ""
-    const s = ["th", "st", "nd", "rd"]
-    const v = n % 100
-    if (v >= 11 && v <= 13) return "th"
-    const lastDigit = n % 10
-    return s[lastDigit] || "th"
-  }
 
   const {
     event,
@@ -781,7 +263,6 @@ const FurtherResultsPage = () => {
   return (
     <div className="page-container">
       <div className="content-card">
-        {/* Original header style */}
         <header className="event-header">
           <h1 className="event-title">
             {event.golf_club?.clubName || "Golf Event"}
@@ -789,47 +270,29 @@ const FurtherResultsPage = () => {
           <p className="event-type">{event.eventType || "Competition"}</p>
           <p className="event-date">Date: {formatDate(event.eventDate)}</p>
         </header>
-
-        {/* Optional review text with ExpandableText component */}
         {event.eventReview && <ExpandableText text={event.eventReview} />}
-
-        {/* Print Results button */}
         <div className="print-button-container">
           <PrintButton contentId="results-sections" />
         </div>
-
-        {/* Divider between review and results tables */}
         <div className="border-b border-gray-300 my-5"></div>
-
         <div id="results-sections" className="results-sections">
-          {/* TOP AMATEUR - First section */}
           <TopWinnersTable data={topAmateurData} title="Amateur Winner" />
-
-          {/* PROFESSIONALS - Second section */}
           {professionalScores.length > 0 && (
             <ProfessionalsTable scores={professionalScores} />
           )}
-
-          {/* TEAMS - Third section, side by side */}
           <div className="flex flex-col md:flex-row md:gap-3">
-            {/* Winning Team */}
             <div className="md:flex-1">
               {winningTeam && (
                 <TeamScoresTable team={winningTeam} title="Winning Team" />
               )}
             </div>
-
-            {/* 2nd Team */}
             <div className="md:flex-1">
               {secondTeam && (
                 <TeamScoresTable team={secondTeam} position="2nd" />
               )}
             </div>
           </div>
-
-          {/* INDIVIDUALS NOT IN WINNING TEAMS - Fourth section, side by side */}
           <div className="flex flex-col md:flex-row md:gap-3">
-            {/* 1st Individual (not in winning teams) */}
             <div className="md:flex-1">
               {firstIndividual && (
                 <IndividualWinnerTable
@@ -838,8 +301,6 @@ const FurtherResultsPage = () => {
                 />
               )}
             </div>
-
-            {/* 2nd Individual (not in winning teams) */}
             <div className="md:flex-1">
               {secondIndividual && (
                 <IndividualWinnerTable
@@ -849,21 +310,13 @@ const FurtherResultsPage = () => {
               )}
             </div>
           </div>
-
-          {/* SENIOR - Fifth section */}
           {topSenior && (
             <IndividualWinnerTable player={topSenior} isSenior={true} />
           )}
         </div>
-
-        {/* Divider between results tables and all scores*/}
         <div className="border-b border-gray-300"></div>
-
-        {/* Tabbed section for all scores */}
         <div className="h-1 bg-[#e5e7eb]"></div>
-
         <h2 className="section-title">All Scores</h2>
-
         <nav className="tabs-navigation">
           {tabs.map((tab) => (
             <TabButton
@@ -874,7 +327,6 @@ const FurtherResultsPage = () => {
             />
           ))}
         </nav>
-
         <main>{tabs.find((tab) => tab.id === activeTab).component()}</main>
       </div>
     </div>

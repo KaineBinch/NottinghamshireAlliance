@@ -1,11 +1,11 @@
 import defaultImage from "../../assets/Logo.png"
-
 const TeeTimeCard = ({
   clubName,
   clubLogo,
   eventDate,
   golferTeeTime,
   golfers,
+  golferScores = {}, // Accept golferScores as prop
 }) => {
   const getOrdinalSuffix = (day) => {
     if (day > 3 && day < 21) return "th"
@@ -107,36 +107,46 @@ const TeeTimeCard = ({
         <p className="font-semibold text-black mb-2">Golfers:</p>
         {golfers.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 w-full">
-            {golfers.map((golfer) => (
-              <div key={golfer.id} className="golfer-item text-center">
-                {/* First line: Name and status side by side */}
-                <div className="flex items-center justify-center gap-2">
-                  <p className="golfer-name font-medium text-black">
-                    {golfer.golferName || "Unnamed Player"}
+            {golfers.map((golfer) => {
+              const isNIT = golferScores[golfer?.id] || false
+
+              return (
+                <div key={golfer.id} className="golfer-item text-center">
+                  {/* First line: Name and status side by side */}
+                  <div className="flex items-center justify-center gap-2">
+                    {isNIT && (
+                      <span className="text-sm font-semibold text-purple-700">
+                        NIT
+                      </span>
+                    )}
+                    <p className="golfer-name font-medium text-black">
+                      {golfer.golferName || "Unnamed Player"}
+                    </p>
+
+                    {/* Status indicators on same line as name with no background */}
+
+                    {golfer.isPro && (
+                      <span className="text-sm font-semibold text-blue-700">
+                        Pro
+                      </span>
+                    )}
+                    {golfer.isSenior && (
+                      <span className="text-sm font-semibold text-red-500">
+                        Senior
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Second line: Club name */}
+                  <p className="golfer-club text-sm text-gray-700">
+                    {golfer?.golf_club?.clubName || "No Club"}
+                    {golfer?.golf_club?.clubID
+                      ? ` (${golfer.golf_club.clubID})`
+                      : ""}
                   </p>
-
-                  {/* Status indicators on same line as name with no background */}
-                  {golfer.isPro && (
-                    <span className="text-sm font-semibold text-blue-700">
-                      Pro
-                    </span>
-                  )}
-                  {golfer.isSenior && (
-                    <span className="text-sm font-semibold text-red-500">
-                      Senior
-                    </span>
-                  )}
                 </div>
-
-                {/* Second line: Club name */}
-                <p className="golfer-club text-sm text-gray-700">
-                  {golfer?.golf_club?.clubName || "No Club"}
-                  {golfer?.golf_club?.clubID
-                    ? ` (${golfer.golf_club.clubID})`
-                    : ""}
-                </p>
-              </div>
-            ))}
+              )
+            })}
           </div>
         ) : (
           <p>No golfers found</p>

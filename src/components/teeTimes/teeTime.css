@@ -71,6 +71,10 @@
   @apply text-xs font-medium text-blue-700 px-1;
 }
 
+.player-nit-tag {
+  @apply text-orange-600 ml-1 text-xs font-medium;
+}
+
 .loading-container {
   @apply pt-[85px];
 }
