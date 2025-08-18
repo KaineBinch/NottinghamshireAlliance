@@ -1,12 +1,34 @@
+import { useEffect } from "react"
 import defaultImage from "../../assets/Logo.png"
+
 const TeeTimeCard = ({
   clubName,
   clubLogo,
   eventDate,
   golferTeeTime,
   golfers,
-  golferScores = {}, // Accept golferScores as prop
+  golferScores = {}, // Accept golferScores as prop with default empty object
 }) => {
+  // Debug logging
+  useEffect(() => {
+    console.log("=== TeeTimeCard Debug Info ===")
+    console.log("golferScores prop:", golferScores)
+    console.log("golfers:", golfers)
+
+    if (golfers && golfers.length > 0) {
+      golfers.forEach((golfer, index) => {
+        console.log(`Golfer ${index}:`, {
+          id: golfer?.id,
+          documentId: golfer?.documentId,
+          name: golfer?.golferName,
+          hasScoreData: !!golferScores[golfer?.id],
+          scoreValue: golferScores[golfer?.id],
+        })
+      })
+    }
+    console.log("=== End Debug Info ===")
+  }, [golfers, golferScores])
+
   const getOrdinalSuffix = (day) => {
     if (day > 3 && day < 21) return "th"
     switch (day % 10) {
@@ -105,32 +127,44 @@ const TeeTimeCard = ({
       </p>
       <div className="flex flex-col items-start text-base">
         <p className="font-semibold text-black mb-2">Golfers:</p>
-        {golfers.length > 0 ? (
+        {golfers && golfers.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 w-full">
-            {golfers.map((golfer) => {
-              const isNIT = golferScores[golfer?.id] || false
+            {golfers.map((golfer, index) => {
+              // Use index as fallback key if golfer.id doesn't exist
+              const golferKey = golfer?.id || golfer?.documentId || index
+
+              // Try both id and documentId for NIT lookup
+              const isNIT =
+                golferScores[golfer?.id] ||
+                golferScores[golfer?.documentId] ||
+                false
+
+              // Debug log for each golfer
+              console.log(`Rendering golfer ${golfer?.golferName}:`, {
+                id: golfer?.id,
+                documentId: golfer?.documentId,
+                isNIT: isNIT,
+                golferScoresForThisId: golferScores[golfer?.id],
+                golferScoresForThisDocumentId: golferScores[golfer?.documentId],
+              })
 
               return (
-                <div key={golfer.id} className="golfer-item text-center">
+                <div key={golferKey} className="golfer-item text-center">
                   {/* First line: Name and status side by side */}
                   <div className="flex items-center justify-center gap-2">
-                    {isNIT && (
-                      <span className="text-sm font-semibold text-purple-700">
-                        NIT
-                      </span>
-                    )}
+                    {isNIT && <span className="golfer-nit-tag">NIT</span>}
                     <p className="golfer-name font-medium text-black">
-                      {golfer.golferName || "Unnamed Player"}
+                      {golfer?.golferName || "Unnamed Player"}
                     </p>
 
                     {/* Status indicators on same line as name with no background */}
 
-                    {golfer.isPro && (
+                    {golfer?.isPro && (
                       <span className="text-sm font-semibold text-blue-700">
                         Pro
                       </span>
                     )}
-                    {golfer.isSenior && (
+                    {golfer?.isSenior && (
                       <span className="text-sm font-semibold text-red-500">
                         Senior
                       </span>
