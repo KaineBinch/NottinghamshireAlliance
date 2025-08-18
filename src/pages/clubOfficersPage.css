@@ -18,25 +18,10 @@
 
 /* Main content */
 .officers-container {
-  @apply max-w-5xl mx-auto py-5 px-4 sm:px-6 lg:px-8 text-black;
+  @apply max-w-6xl mx-auto py-5 px-4 sm:px-6 lg:px-8 text-black;
 }
 
-/* President section */
-.president-title {
-  @apply font-semibold text-2xl pt-5;
-}
-
-/* Committee section */
-.committee-title {
-  @apply font-semibold text-2xl pt-10;
-}
-
-/* Secretary section */
-.secretary-title {
-  @apply font-semibold text-2xl pt-10;
-}
-
-/* Officer items */
+/* Officer items - Legacy styles kept for backward compatibility */
 .officer-item {
   @apply py-2;
 }
@@ -45,11 +30,34 @@
   @apply py-2 pb-10;
 }
 
+.treasurer-item {
+  @apply py-2 pb-10;
+}
+
 /* Officer details */
 .officer-name {
-  @apply font-semibold pr-5;
+  @apply font-semibold text-lg text-gray-800;
 }
 
 .officer-club {
-  @apply inline;
+  @apply text-gray-500 text-xs;
+}
+
+/* Card hover effects */
+.officer-card:hover {
+  @apply transform scale-105 shadow-lg transition-all duration-300;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .president-title,
+  .secretary-title,
+  .treasurer-title,
+  .committee-title {
+    @apply text-xl pt-8;
+  }
+
+  .officers-container {
+    @apply px-2;
+  }
 }
