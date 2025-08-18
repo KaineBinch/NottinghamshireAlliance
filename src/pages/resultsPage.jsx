@@ -127,29 +127,18 @@ const ResultsPage = () => {
                   to={`/results/${event.id}`}
                   key={event.id}
                   className="results-card-link">
-                  <div className="relative">
-                    <ResultsCard
-                      name={event.golf_club?.clubName || "Event"}
-                      courseImage={
-                        event.golf_club?.clubImage?.[0]?.url
-                          ? `${BASE_URL}${event.golf_club.clubImage[0].url}`
-                          : "default-image.jpg"
-                      }
-                      comp={event.eventType || "Competition"}
-                      date={formatDate(event.eventDate) || "Date TBD"}
-                    />
-                    {isLive && (
-                      <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center">
-                        <div className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></div>
-                        LIVE
-                      </div>
-                    )}
-                    {!isLive && isToday && (
-                      <div className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                        TODAY
-                      </div>
-                    )}
-                  </div>
+                  <ResultsCard
+                    name={event.golf_club?.clubName || "Event"}
+                    courseImage={
+                      event.golf_club?.clubImage?.[0]?.url
+                        ? `${BASE_URL}${event.golf_club.clubImage[0].url}`
+                        : "default-image.jpg"
+                    }
+                    comp={event.eventType || "Competition"}
+                    date={formatDate(event.eventDate) || "Date TBD"}
+                    isLive={isLive}
+                    isToday={isToday}
+                  />
                 </Link>
               )
             })
