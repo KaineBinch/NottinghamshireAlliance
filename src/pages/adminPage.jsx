@@ -82,6 +82,13 @@ const AdminPage = () => {
                 <UnifiedManagement />
               </div>
             </div>
+
+            {/* Media Library Section */}
+            <div className="mt-6">
+              <div className="card-container">
+                <MediaLibrary />
+              </div>
+            </div>
           </>
         )}
 
