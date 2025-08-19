@@ -9,9 +9,14 @@ import "./teeTime.css"
 const TeeTimesTable = () => {
   const [filteredTeeTimes, setFilteredTeeTimes] = useState([])
   const [teeTimesData, setTeeTimesData] = useState([])
+  const [golferScores, setGolferScores] = useState({}) // Store NIT status
 
   const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery)
   const { isLoading, isError, data, error } = useFetch(query)
+
+  // Fetch scores to get NIT status
+  const scoresQuery = queryBuilder(MODELS.scores, "?populate=golfer")
+  const { data: scoresData } = useFetch(scoresQuery)
 
   const nextEventDate = getNextEventDate(data)
 
@@ -23,6 +28,19 @@ const TeeTimesTable = () => {
       setTeeTimesData(Array.isArray(filtered) ? filtered : [])
     }
   }, [data, nextEventDate])
+
+  // Process scores data to create a lookup for NIT status
+  useEffect(() => {
+    if (scoresData?.data) {
+      const scoreMap = {}
+      scoresData.data.forEach((score) => {
+        if (score.golfer && score.isNIT) {
+          scoreMap[score.golfer.id] = score.isNIT
+        }
+      })
+      setGolferScores(scoreMap)
+    }
+  }, [scoresData])
 
   const uniqueClubs = useMemo(() => {
     return [
@@ -88,27 +106,36 @@ const TeeTimesTable = () => {
 
   const displayData = sortedTeeTimes.length >= 0 ? sortedTeeTimes : teeTimesData
 
-  const GolferInfo = ({ player }) => (
-    <div className="golfer-info-container">
-      {/* Golfer name on first line */}
-      <p className="golfer-name">{player?.golferName || "Unnamed Player"}</p>
+  const GolferInfo = ({ player }) => {
+    const isNIT = golferScores[player?.id] || false
 
-      {/* Club name on second line */}
-      <p className="golfer-club">{player?.golf_club?.clubName || "No Club"}</p>
+    return (
+      <div className="golfer-info-container">
+        {/* Golfer name on first line with NIT tag */}
+        <p className="golfer-name">
+          {isNIT && <span className="player-nit-tag mr-1">NIT</span>}
+          {player?.golferName || "Unnamed Player"}
+        </p>
 
-      {/* Status indicators on third line if applicable */}
-      {(player?.isSenior || player?.isPro) && (
-        <div className="golfer-status">
-          {player?.isSenior && (
-            <span className="player-senior-tag">Senior</span>
-          )}
-          {player?.isPro && (
-            <span className="player-pro-tag">Professional</span>
-          )}
-        </div>
-      )}
-    </div>
-  )
+        {/* Club name on second line */}
+        <p className="golfer-club">
+          {player?.golf_club?.clubName || "No Club"}
+        </p>
+
+        {/* Status indicators on third line if applicable */}
+        {(player?.isSenior || player?.isPro) && (
+          <div className="golfer-status">
+            {player?.isSenior && (
+              <span className="player-senior-tag">Senior</span>
+            )}
+            {player?.isPro && (
+              <span className="player-pro-tag">Professional</span>
+            )}
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="teetimes-container">

@@ -20,6 +20,7 @@ import Navbar from "./components/navbar"
 import MobFoot from "./components/footer/mobileFooter"
 import { PosthogPageViewTracker } from "./components/posthogPageViewTracker"
 import { Auth0Provider } from "@auth0/auth0-react"
+import { LiveScoreProvider } from "./constants/LiveScoreContext"
 
 const domain = import.meta.env.VITE_AUTH0_DOMAIN
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID
@@ -64,7 +65,7 @@ const router = createBrowserRouter(
             </Auth0Provider>
           ),
         },
-        { path: "/results/:clubName", element: <FurtherResultsPage /> },
+        { path: "/results/:eventId", element: <FurtherResultsPage /> },
         { path: appRoutes.notFound, element: <NotFound /> },
         { path: "*", element: <NotFound /> },
       ],
@@ -79,7 +80,11 @@ const router = createBrowserRouter(
 )
 
 function App() {
-  return <RouterProvider router={router} />
+  return (
+    <LiveScoreProvider>
+      <RouterProvider router={router} />
+    </LiveScoreProvider>
+  )
 }
 
 export default App

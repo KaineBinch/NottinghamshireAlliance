@@ -7,9 +7,14 @@ import "./teeTimeListView.css"
 
 const ListView = () => {
   const [teeTimesData, setTeeTimesData] = useState([])
+  const [golferScores, setGolferScores] = useState({})
 
   const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery)
   const { isLoading, isError, data, error } = useFetch(query)
+
+  // Fetch scores to get NIT status
+  const scoresQuery = queryBuilder(MODELS.scores, "?populate=golfer")
+  const { data: scoresData } = useFetch(scoresQuery)
 
   const nextEventDate = getNextEventDate(data)
 
@@ -21,6 +26,19 @@ const ListView = () => {
       setTeeTimesData(Array.isArray(filtered) ? filtered : [])
     }
   }, [data, nextEventDate])
+
+  // Process scores data to create a lookup for NIT status
+  useEffect(() => {
+    if (scoresData?.data) {
+      const scoreMap = {}
+      scoresData.data.forEach((score) => {
+        if (score.golfer && score.isNIT) {
+          scoreMap[score.golfer.id] = score.isNIT
+        }
+      })
+      setGolferScores(scoreMap)
+    }
+  }, [scoresData])
 
   const clubNameLookup = useMemo(() => {
     if (!data?.data) return {}
@@ -43,10 +61,12 @@ const ListView = () => {
         const club = player?.golf_club?.clubID || "No Club"
         if (!acc[club]) acc[club] = []
         acc[club].push({
+          id: player?.id,
           name: player?.golferName || "Unnamed Player",
           time: teeTime.golferTeeTime || "00:00",
           isSenior: player?.isSenior || false,
           isPro: player?.isPro || false,
+          isNIT: golferScores[player?.id] || false, // Add NIT status
         })
       })
       return acc
@@ -72,7 +92,7 @@ const ListView = () => {
     })
 
     return sortedGrouped
-  }, [teeTimesData, clubNameLookup])
+  }, [teeTimesData, clubNameLookup, golferScores])
 
   const formatTime = (time) => {
     if (!time || !time.includes(":")) return "Invalid Time"
@@ -105,6 +125,9 @@ const ListView = () => {
               <ul>
                 {players.map((player, playerIndex) => (
                   <li key={playerIndex} className="player-item">
+                    {player.isNIT && (
+                      <span className="player-nit-tag mr-1"> NIT</span>
+                    )}
                     <span className="player-name">{player.name}</span>
 
                     {player.isSenior && (

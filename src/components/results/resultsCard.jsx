@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 
-const ResultsCard = ({ courseImage, name, comp, date }) => {
+const ResultsCard = ({ courseImage, name, comp, date, isLive, isToday }) => {
+  // Add isLive and isToday props
   const [imageLoaded, setImageLoaded] = useState(false)
   const [cardReady, setCardReady] = useState(false)
   const [textReady, setTextReady] = useState(false)
@@ -47,6 +48,26 @@ const ResultsCard = ({ courseImage, name, comp, date }) => {
         cardReady ? visibleClass : hiddenClass
       }`}>
       <div className="flex flex-col bg-[#D9D9D9] text-black border border-black relative w-full">
+        {/* ADD THIS: Status Pills - Now inside the card structure */}
+        {(isLive || isToday) && (
+          <div
+            className={`absolute top-2 right-2 z-10 ${fadeInClass} ${
+              cardReady ? visibleClass : hiddenClass
+            }`}>
+            {isLive && (
+              <div className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center">
+                <div className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></div>
+                LIVE
+              </div>
+            )}
+            {!isLive && isToday && (
+              <div className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                TODAY
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Image Section */}
         <div className="relative">
           <div className="w-full h-[250px] bg-gray-300 absolute top-0 left-0" />

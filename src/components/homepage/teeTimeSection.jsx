@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { BASE_URL, MODELS, QUERIES } from "../../constants/api.js"
 import useFetch from "../../utils/hooks/useFetch.js"
 import { queryBuilder } from "../../utils/queryBuilder.js"
@@ -10,6 +10,30 @@ const TeeTimesSection = () => {
   const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery)
   const { isLoading, isError, data, error } = useFetch(query)
   const [searchQuery, setSearchQuery] = useState("")
+  const [golferScores, setGolferScores] = useState({})
+
+  // Fetch scores to get NIT status
+  const scoresQuery = queryBuilder(MODELS.scores, "?populate=golfer")
+  const { data: scoresData } = useFetch(scoresQuery)
+
+  // Process scores data to create a lookup for NIT status
+  useEffect(() => {
+    if (scoresData?.data) {
+      const scoreMap = {}
+      scoresData.data.forEach((score) => {
+        if (score.golfer && score.isNIT) {
+          // Try both id and documentId for compatibility
+          if (score.golfer.id) {
+            scoreMap[score.golfer.id] = score.isNIT
+          }
+          if (score.golfer.documentId) {
+            scoreMap[score.golfer.documentId] = score.isNIT
+          }
+        }
+      })
+      setGolferScores(scoreMap)
+    }
+  }, [scoresData])
 
   if (isLoading) {
     return <TeeTimeSectionSkeleton />
@@ -85,11 +109,13 @@ const TeeTimesSection = () => {
       "the most recent event"
   }
 
+  // FIXED: Added null check for golferName to prevent crashes
   const golfersToDisplay = (teeTime) => {
     return Array.isArray(teeTime?.golfers)
-      ? teeTime.golfers.filter((golfer) =>
-          golfer.golferName.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+      ? teeTime.golfers.filter((golfer) => {
+          const golferName = golfer?.golferName || ""
+          return golferName.toLowerCase().includes(searchQuery.toLowerCase())
+        })
       : []
   }
 
@@ -131,6 +157,7 @@ const TeeTimesSection = () => {
             eventDate=""
             golferTeeTime=""
             golfers={[]}
+            golferScores={golferScores} // Pass golfer scores
           />
         </div>
       ) : (
@@ -151,6 +178,7 @@ const TeeTimesSection = () => {
               eventDate={teeTime.event.eventDate}
               golferTeeTime={teeTime.golferTeeTime}
               golfers={golfersToDisplay(teeTime)}
+              golferScores={golferScores} // Pass golfer scores for NIT tags
             />
           ))}
         </div>

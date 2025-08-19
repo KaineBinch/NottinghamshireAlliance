@@ -1,11 +1,12 @@
 import { useAuth0 } from "@auth0/auth0-react"
-import PageHeader from "../components/pageHeader"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import DownloadCSVFile from "../components/admin/import/downloadCSV"
-import TemplateCard from "../components/admin/template/TemplateCard"
 import CSVPreview from "../components/admin/import/csvPreview"
+import DownloadCSVFile from "../components/admin/import/downloadCSV"
+import LiveScoreControls from "../components/admin/LiveScoreControls"
+import TemplateCard from "../components/admin/template/TemplateCard"
 import UnifiedManagement from "../components/admin/unifiedManagement"
-import { useState, useEffect } from "react"
+import PageHeader from "../components/pageHeader"
 import "./adminPage.css"
 
 const AdminPage = () => {
@@ -56,6 +57,11 @@ const AdminPage = () => {
         {isAuthenticated && (
           <>
             {/* Existing Import/Template Section */}
+            <div className="my-6">
+              <div className="card-container">
+                <LiveScoreControls />
+              </div>
+            </div>
             <div className="card-layout">
               <div className="card-container">
                 <TemplateCard />
