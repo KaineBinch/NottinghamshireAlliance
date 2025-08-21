@@ -4,6 +4,7 @@ import {
   getGolferById,
   updateGolfer,
 } from "../../../utils/api/golfersApi"
+import { formatClubName } from "../../../utils/formatClubName"
 import { getAllGolfClubs } from "../../../utils/api/clubsApi"
 
 const EditGolfer = ({ onClose, onSuccess }) => {
@@ -396,7 +397,7 @@ const EditGolfer = ({ onClose, onSuccess }) => {
             <option
               key={club.documentId || club.id}
               value={club.documentId || club.id}>
-              {club.clubName}
+              {formatClubName(club.clubName)}
             </option>
           ))}
         </select>

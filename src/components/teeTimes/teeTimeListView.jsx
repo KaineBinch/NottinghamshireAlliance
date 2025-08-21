@@ -3,6 +3,7 @@ import { queryBuilder } from "../../utils/queryBuilder"
 import { MODELS, QUERIES } from "../../constants/api"
 import useFetch from "../../utils/hooks/useFetch"
 import { getNextEventDate } from "../../utils/getNextEventDate"
+import { formatClubName } from "../../utils/formatClubName"
 import "./teeTimeListView.css"
 
 const ListView = () => {
@@ -46,9 +47,9 @@ const ListView = () => {
     return data.data.reduce((acc, item) => {
       item.golfers.forEach((golfer) => {
         if (golfer.golf_club) {
-          acc[
-            golfer.golf_club.clubID
-          ] = `${golfer.golf_club.clubName} Golf Club`
+          acc[golfer.golf_club.clubID] = formatClubName(
+            golfer.golf_club.clubName
+          )
         }
       })
       return acc

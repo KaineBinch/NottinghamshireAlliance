@@ -56,12 +56,6 @@ const AdminPage = () => {
       <div className="admin-container">
         {isAuthenticated && (
           <>
-            {/* Existing Import/Template Section */}
-            <div className="my-6">
-              <div className="card-container">
-                <LiveScoreControls />
-              </div>
-            </div>
             <div className="card-layout">
               <div className="card-container">
                 <TemplateCard />
@@ -86,6 +80,13 @@ const AdminPage = () => {
             <div className="mt-6">
               <div className="card-container">
                 <UnifiedManagement />
+              </div>
+            </div>
+
+            {/* Existing Import/Template Section */}
+            <div className="my-6">
+              <div className="card-container">
+                <LiveScoreControls />
               </div>
             </div>
           </>

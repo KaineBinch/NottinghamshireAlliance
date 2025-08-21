@@ -1,14 +1,25 @@
-import { useState, useEffect, useCallback } from "react"
-import { Trophy, Monitor, X } from "lucide-react"
+// LiveScoreScreen.jsx - Optimized Version
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { useLiveScore } from "../../constants/LiveScoreContext"
 import { MODELS, QUERIES } from "../../constants/api"
 import useFetch from "../../utils/hooks/useFetch"
 import { queryBuilder } from "../../utils/queryBuilder"
 
+// Import all the new components
+import { Header } from "./Header"
+import { TopClubs } from "./TopClubs"
+import { ClubCard } from "./ClubCard"
+import { LoadingState } from "./LoadingState"
+import { TVControls } from "./TVControls"
+import { TVHeader } from "./TVHeader"
+import { Styles } from "./Styles"
+import VerticalInfiniteScroll from "./VerticalInfiniteScroll"
+
 const LiveScoreScreen = ({ eventId, eventData }) => {
   const { getEventStatus, updateEventResults } = useLiveScore()
-  const [autoRefreshEnabled] = useState(true) // Only need the value, not the setter
+  const [autoRefreshEnabled] = useState(true)
   const [tvViewMode, setTvViewMode] = useState(false)
+  const [isScrolling, setIsScrolling] = useState(true)
 
   // Fetch event data with scores
   const eventQuery = queryBuilder(MODELS.events, QUERIES.resultsQuery)
@@ -38,11 +49,16 @@ const LiveScoreScreen = ({ eventId, eventData }) => {
     await refetch()
   }, [refetch])
 
+  // Optimized refresh intervals - slower when TV scrolling to prevent jumpiness
   useEffect(() => {
     if (!autoRefreshEnabled) return
-    const interval = setInterval(handleRefresh, 60000)
-    return () => clearInterval(interval)
-  }, [autoRefreshEnabled, handleRefresh])
+
+    // Use longer interval during TV auto-scroll to prevent jumpiness
+    const interval = tvViewMode && isScrolling ? 120000 : 60000 // 2 min vs 1 min
+
+    const refreshTimer = setInterval(handleRefresh, interval)
+    return () => clearInterval(refreshTimer)
+  }, [autoRefreshEnabled, handleRefresh, tvViewMode, isScrolling])
 
   // Handle escape key to exit TV view
   useEffect(() => {
@@ -62,11 +78,11 @@ const LiveScoreScreen = ({ eventId, eventData }) => {
     // Initialize clubs from tee times
     if (teeTimes?.data) {
       teeTimes.data.forEach((teeTime) => {
-        const golfers = teeTime.golfers || []
+        const golfers = teeTime?.golfers || []
         golfers.forEach((golfer) => {
-          const golferAttributes = golfer.attributes || golfer
+          const golferAttributes = golfer?.attributes || golfer || {}
           const clubName =
-            golferAttributes.golf_club?.clubName || "Unaffiliated"
+            golferAttributes?.golf_club?.clubName || "Unaffiliated"
 
           if (!clubGroups[clubName]) {
             clubGroups[clubName] = {
@@ -101,8 +117,8 @@ const LiveScoreScreen = ({ eventId, eventData }) => {
     // Update with scores from event data
     if (eventData?.scores) {
       eventData.scores.forEach((score) => {
-        if (score.golfer) {
-          const clubName = score.golfer.golf_club?.clubName || "Unaffiliated"
+        if (score?.golfer) {
+          const clubName = score.golfer?.golf_club?.clubName || "Unaffiliated"
 
           if (!clubGroups[clubName]) {
             clubGroups[clubName] = {
@@ -162,12 +178,83 @@ const LiveScoreScreen = ({ eventId, eventData }) => {
     return { clubGroups: sortedClubGroups }
   }, [])
 
+  const getTop4Clubs = useCallback((clubGroups) => {
+    const clubScores = {}
+
+    clubGroups.forEach((club) => {
+      club.players.forEach((player) => {
+        if (!player.hasScores || player.isNIT) return
+
+        const clubName = club.clubName
+        if (!clubScores[clubName]) {
+          clubScores[clubName] = []
+        }
+
+        clubScores[clubName].push({
+          golferEventScore: player.total,
+          back9Score: player.backNine,
+          golferName: player.name,
+        })
+      })
+    })
+
+    const teamScores = Object.entries(clubScores).map(([clubName, scores]) => {
+      const sortedClubScores = [...scores].sort(
+        (a, b) => b.golferEventScore - a.golferEventScore
+      )
+
+      const topScores = sortedClubScores.slice(0, 4)
+
+      const totalPoints = topScores.reduce(
+        (sum, score) => sum + score.golferEventScore,
+        0
+      )
+
+      const totalBack9 = topScores.reduce(
+        (sum, score) => sum + (score.back9Score != null ? score.back9Score : 0),
+        0
+      )
+
+      return {
+        clubName,
+        totalPoints,
+        totalBack9,
+        playersCount: topScores.length,
+        totalPlayersWithScores: scores.length,
+      }
+    })
+
+    const sortedTeams = [...teamScores].sort((a, b) => {
+      const pointsDiff = b.totalPoints - a.totalPoints
+      if (pointsDiff !== 0) return pointsDiff
+      return b.totalBack9 - a.totalBack9
+    })
+
+    return sortedTeams.slice(0, 4).map((team) => ({
+      clubName: team.clubName,
+      averageScore: team.totalPoints,
+      playersWithScores: team.totalPlayersWithScores,
+      totalPlayers:
+        clubGroups.find((c) => c.clubName === team.clubName)?.totalPlayers || 0,
+      teamTotal: team.totalPoints,
+      playersInTeam: team.playersCount,
+    }))
+  }, [])
+
   const currentEventData = liveEventData || eventData
-  const { clubGroups } = processClubGroupedScores(
-    currentEventData,
-    teeTimesData
+
+  // Memoize expensive calculations to prevent unnecessary re-renders
+  const { clubGroups } = useMemo(
+    () => processClubGroupedScores(currentEventData, teeTimesData),
+    [currentEventData, teeTimesData, processClubGroupedScores]
   )
 
+  const top4Clubs = useMemo(
+    () => getTop4Clubs(clubGroups),
+    [clubGroups, getTop4Clubs]
+  )
+
+  // Debounced update to prevent rapid changes during scrolling
   useEffect(() => {
     if (clubGroups.length > 0) {
       const flatScores = clubGroups.flatMap((club) =>
@@ -184,287 +271,135 @@ const LiveScoreScreen = ({ eventId, eventData }) => {
       )
 
       const currentScores = eventStatus.liveResults || []
+
+      // Only update if there are actual changes
       if (JSON.stringify(flatScores) !== JSON.stringify(currentScores)) {
-        updateEventResults(eventId, flatScores)
+        // Delay updates during TV auto-scroll to prevent jumpiness
+        const updateDelay = tvViewMode && isScrolling ? 1000 : 0
+
+        setTimeout(() => {
+          updateEventResults(eventId, flatScores)
+        }, updateDelay)
       }
     }
-  }, [clubGroups, eventId, eventStatus.liveResults, updateEventResults])
+  }, [clubGroups, eventId, updateEventResults, tvViewMode, isScrolling])
 
-  // TV View Component
+  const handleScrollToggle = useCallback(() => {
+    setIsScrolling(!isScrolling)
+  }, [isScrolling])
+
   const TVView = () => (
-    <div className="fixed inset-0 bg-[#D9D9D9] z-[9999] overflow-auto">
-      {/* Exit button */}
-      <button
-        onClick={() => setTvViewMode(false)}
-        className="fixed top-4 right-8 z-[10000] bg-red-600 hover:bg-red-700 text-white p-3 rounded-full shadow-lg transition-colors"
-        title="Exit TV View (ESC)">
-        <X className="w-6 h-6" />
-      </button>
+    <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 z-[9999] overflow-hidden">
+      <TVControls
+        onExit={() => setTvViewMode(false)}
+        isScrolling={isScrolling}
+        onScrollToggle={handleScrollToggle}
+      />
 
-      {/* TV View Header */}
-      <div className="bg-[#214A27] text-white py-6 px-8">
-        <div className="text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2">
-            {currentEventData?.golf_club?.clubName
-              ? `${currentEventData.golf_club.clubName} Golf Club`
-              : "Live Tournament"}
-          </h1>
-          <p className="text-xl md:text-2xl lg:text-3xl mb-2">
-            {currentEventData?.eventType || "Competition"}
-          </p>
-          <p className="text-lg md:text-xl lg:text-2xl">
-            {currentEventData?.eventDate || eventData?.eventDate}
-          </p>
-        </div>
-      </div>
+      <TVHeader currentEventData={currentEventData} eventData={eventData} />
+      <TopClubs top4Clubs={top4Clubs} />
 
-      {/* TV View Content */}
-      <div className="p-6 md:p-8 lg:p-12">
+      <div className="h-full overflow-hidden bg-gradient-to-b from-slate-50 to-gray-100">
         {teeTimesError ? (
-          <div className="text-center py-16">
-            <Trophy className="w-24 h-24 mx-auto mb-8 text-gray-400" />
-            <p className="text-3xl font-medium text-gray-700">
-              Error loading tee times data
-            </p>
-            <p className="text-xl mt-4 text-gray-600">
-              Unable to fetch club information. Please try again later.
-            </p>
-          </div>
+          <LoadingState
+            hasError
+            errorMessage="Unable to load tournament data"
+          />
         ) : clubGroups.length > 0 && !isTeeTimesLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 md:gap-6 lg:gap-8">
-            {clubGroups.map((club) => (
-              <div
-                key={club.clubName}
-                className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div className="bg-[#214A27] text-white p-3 md:p-4">
-                  <h3 className="font-bold text-sm md:text-base lg:text-lg text-center truncate">
-                    {club.clubName}
-                  </h3>
-                  <p className="text-xs md:text-sm text-center mt-1 opacity-90">
-                    ({club.playersWithScores}/{club.totalPlayers} finished)
-                  </p>
-                </div>
-                <div className="p-2 md:p-3">
-                  <table className="w-full text-xs md:text-sm">
-                    <thead>
-                      <tr className="bg-gray-100">
-                        <th className="text-left p-1 font-semibold">Player</th>
-                        <th className="text-center p-1 font-semibold w-12">
-                          F9
-                        </th>
-                        <th className="text-center p-1 font-semibold w-12">
-                          B9
-                        </th>
-                        <th className="text-center p-1 font-semibold w-12">
-                          Tot
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {club.players.map((player, index) => (
-                        <tr
-                          key={`${player.name}-${index}`}
-                          className={
-                            index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                          }>
-                          <td className="p-1 text-left text-xs md:text-sm">
-                            <div className="truncate">
-                              {player.isNIT && (
-                                <span className="text-orange-500 font-bold mr-2">
-                                  NIT
-                                </span>
-                              )}
-                              {player.name}
-                              {player.isPro && (
-                                <span className="text-blue-600 font-bold ml-1">
-                                  P
-                                </span>
-                              )}
-                              {player.isSenior && (
-                                <span className="text-red-500 font-bold ml-1">
-                                  S
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="text-center p-1">
-                            {player.hasScores ? player.frontNine : "-"}
-                          </td>
-                          <td className="text-center p-1">
-                            {player.hasScores ? player.backNine : "-"}
-                          </td>
-                          <td className="text-center p-1 font-bold">
-                            {player.hasScores ? player.total : "-"}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+          <VerticalInfiniteScroll
+            velocity={-50}
+            isScrolling={isScrolling}
+            onScrollToggle={handleScrollToggle}
+            containerHeight="calc(100vh - 200px)">
+            {" "}
+            {/* Adjusted for taller bottom bar */}
+            <div className="p-8 pb-20">
+              {" "}
+              {/* Extra bottom padding */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {clubGroups.map((club) => (
+                  <ClubCard key={club.clubName} club={club} />
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          </VerticalInfiniteScroll>
         ) : (
-          <div className="text-center py-16">
-            <Trophy className="w-24 h-24 mx-auto mb-8 text-gray-400" />
-            <p className="text-3xl font-medium text-gray-700">
-              {isEventLoading || isTeeTimesLoading
-                ? "Loading tournament data..."
-                : "No clubs registered yet"}
-            </p>
-            <p className="text-xl mt-4 text-gray-600">
-              {isEventLoading || isTeeTimesLoading
-                ? "Please wait..."
-                : "Clubs will appear here once players are registered"}
-            </p>
-          </div>
+          <LoadingState
+            isLoading={isEventLoading || isTeeTimesLoading}
+            hasError={false}
+          />
         )}
 
-        {/* Live update indicator */}
-        <div className="text-center mt-8">
-          <p className="text-lg md:text-xl text-gray-700">
-            📺 TV View Mode • Updates every minute • Press ESC to exit
-          </p>
+        <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-sm text-white py-4 px-8">
+          {" "}
+          {/* Changed py-2 to py-4 */}
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                <span>Live Tournament Coverage</span>
+              </div>
+            </div>
+            <div className="text-slate-300">
+              {isScrolling
+                ? "Auto-scrolling • Click button to pause and enable manual scroll"
+                : "Manual scroll enabled • Click button to resume auto-scroll"}{" "}
+              • ESC to exit • SPACE to pause
+            </div>
+          </div>
         </div>
       </div>
     </div>
   )
 
-  // Regular View Component
   const RegularView = () => (
     <div className="page-container">
       <div className="content-card">
-        <header className="event-header relative">
-          {/* TV View Button - Absolute positioned in top right of header */}
-          <button
-            onClick={() => setTvViewMode(true)}
-            className="absolute top-4 right-4 bg-[#214A27] text-white px-4 py-2 rounded-lg shadow-md hover:bg-[#17331B] transition-colors flex items-center gap-2"
-            title="Switch to TV View for large displays">
-            <Monitor className="w-5 h-5" />
-            TV View
-          </button>
+        <Header
+          currentEventData={currentEventData}
+          eventData={eventData}
+          onTvViewToggle={() => setTvViewMode(true)}
+        />
 
-          <div className="flex justify-center items-center">
-            <div>
-              <h1 className="event-title">
-                {currentEventData?.golf_club?.clubName || "Live Tournament"}
-              </h1>
-              <p className="event-type">
-                {currentEventData?.eventType || "Competition"}
-              </p>
-              <p className="event-date">
-                Date: {currentEventData?.eventDate || eventData?.eventDate}
-              </p>
+        <TopClubs top4Clubs={top4Clubs} isRegularView />
+
+        <h2 className="text-lg font-bold text-slate-700 mb-4 flex items-center space-x-2">
+          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+          <span>Live Leaderboard - By Club</span>
+        </h2>
+
+        <div
+          className="regular-view-content"
+          style={{
+            maxHeight: "",
+            overflowY: "auto",
+          }}>
+          {teeTimesError ? (
+            <LoadingState
+              hasError
+              errorMessage="Error loading tee times data"
+            />
+          ) : clubGroups.length > 0 && !isTeeTimesLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {clubGroups.map((club) => (
+                <ClubCard key={club.clubName} club={club} isRegularView />
+              ))}
             </div>
-          </div>
-        </header>
-
-        <h2 className="section-title">Live Leaderboard - By Club</h2>
-
-        {teeTimesError ? (
-          <div className="text-center py-8 text-gray-500">
-            <Trophy className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-            <p className="text-lg font-medium">Error loading tee times data</p>
-            <p className="text-sm">
-              Unable to fetch club information. Please try again later.
-            </p>
-          </div>
-        ) : clubGroups.length > 0 && !isTeeTimesLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {clubGroups.map((club) => (
-              <div key={club.clubName} className="mb-5">
-                <h3 className="text-[#214A27] font-bold text-sm mb-1">
-                  {club.clubName}
-                  <span className="text-gray-600 font-normal text-xs ml-2">
-                    ({club.playersWithScores}/{club.totalPlayers} finished)
-                  </span>
-                </h3>
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="bg-[#214A27] text-white">
-                      <th className="border border-gray-300 p-1 text-xs">
-                        Player
-                      </th>
-                      <th className="border border-gray-300 p-1 text-center text-xs">
-                        F9
-                      </th>
-                      <th className="border border-gray-300 p-1 text-center text-xs">
-                        B9
-                      </th>
-                      <th className="border border-gray-300 p-1 text-center text-xs">
-                        Total
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {club.players.map((player, index) => (
-                      <tr
-                        key={`${player.name}-${index}`}
-                        className={
-                          index % 2 === 0 ? "bg-[#d9d9d9]" : "bg-white"
-                        }>
-                        <td className="border border-gray-300 p-1 text-xs">
-                          <div>
-                            {player.isNIT && (
-                              <span className="golfer-nit-tag mr-1">NIT</span>
-                            )}
-                            {player.name}
-                            {player.isPro && (
-                              <span className="golfer-pro-tag">Pro</span>
-                            )}
-                            {player.isSenior && (
-                              <span className="golfer-senior-tag">Senior</span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="border border-gray-300 p-1 text-center text-sm">
-                          {player.hasScores ? player.frontNine : "-"}
-                        </td>
-                        <td className="border border-gray-300 p-1 text-center text-sm">
-                          {player.hasScores ? player.backNine : "-"}
-                        </td>
-                        <td className="border border-gray-300 p-1 text-center">
-                          <div className="text-sm font-bold">
-                            {player.hasScores ? player.total : "-"}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                    {club.players.length === 0 && (
-                      <tr className="bg-white">
-                        <td
-                          colSpan="4"
-                          className="border border-gray-300 p-2 text-center text-xs text-gray-500 italic">
-                          No players registered yet
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            <Trophy className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-            <p className="text-lg font-medium">
-              {isEventLoading || isTeeTimesLoading
-                ? "Loading tournament data..."
-                : "No clubs registered yet"}
-            </p>
-            <p className="text-sm">
-              {isEventLoading || isTeeTimesLoading
-                ? "Please wait..."
-                : "Clubs will appear here once players are registered"}
-            </p>
-          </div>
-        )}
+          ) : (
+            <LoadingState
+              isLoading={isEventLoading || isTeeTimesLoading}
+              hasError={false}
+            />
+          )}
+        </div>
 
         <div className="border-b border-gray-300 my-5"></div>
         <div className="text-center text-gray-600 text-sm">
           Scores update automatically every minute • Results will be officially
           released once tournament is complete
         </div>
+
+        <Styles />
       </div>
     </div>
   )

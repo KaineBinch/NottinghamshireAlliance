@@ -165,20 +165,56 @@ const FurtherResultsPage = () => {
         <>
           <div className="results-search-filter">
             <SearchFilter
-              data={processedData.allAmateurData.rows.map((row) => ({
-                name:
-                  typeof row[1] === "object"
-                    ? row[1].props.children[0]
-                    : row[1],
-                club: row[2],
-              }))}
+              data={processedData.allAmateurData.rows.map((row) => {
+                // Extract name from JSX structure
+                let playerName = ""
+
+                if (
+                  typeof row[1] === "object" &&
+                  row[1].props &&
+                  row[1].props.children
+                ) {
+                  // Find the actual player name in the children array
+                  const children = row[1].props.children
+                  if (Array.isArray(children)) {
+                    // Look for the string that's not a JSX element
+                    playerName =
+                      children.find((child) => typeof child === "string") || ""
+                  } else if (typeof children === "string") {
+                    playerName = children
+                  }
+                } else if (typeof row[1] === "string") {
+                  playerName = row[1]
+                }
+
+                return {
+                  name: playerName,
+                  club: row[2],
+                }
+              })}
               onFilteredDataChange={(filteredData) => {
                 const newFilteredRows =
                   processedData.allAmateurData.rows.filter((row) => {
-                    const rowName =
-                      typeof row[1] === "object"
-                        ? row[1].props.children[0]
-                        : row[1]
+                    // Extract name the same way
+                    let rowName = ""
+
+                    if (
+                      typeof row[1] === "object" &&
+                      row[1].props &&
+                      row[1].props.children
+                    ) {
+                      const children = row[1].props.children
+                      if (Array.isArray(children)) {
+                        rowName =
+                          children.find((child) => typeof child === "string") ||
+                          ""
+                      } else if (typeof children === "string") {
+                        rowName = children
+                      }
+                    } else if (typeof row[1] === "string") {
+                      rowName = row[1]
+                    }
+
                     const rowClub = row[2]
                     return filteredData.some(
                       (item) => item.name === rowName && item.club === rowClub
@@ -234,12 +270,16 @@ const FurtherResultsPage = () => {
           data={processedData.professionalScores.map((score, index) => [
             `${index + 1}${getOrdinal(index + 1)}`,
             <>
+              {score.isNIT && (
+                <span className="text-orange-600 mr-1 text-xs font-medium">
+                  NIT
+                </span>
+              )}
               {score.golfer?.golferName || "Unknown"}
-              {score.isNIT && <span className="golfer-nit-tag">NIT</span>}
             </>,
             score.golfer?.golf_club?.clubName || "Unaffiliated",
             {
-              content: score.golferEventScore.toString(), // Removed null check since we filtered earlier
+              content: score.golferEventScore.toString(),
               usedTiebreaker: score.usedTiebreaker,
               back9Score: score.back9Score || 0,
             },

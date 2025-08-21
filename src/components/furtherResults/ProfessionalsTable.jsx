@@ -63,12 +63,12 @@ const ProfessionalsTable = ({ scores }) => {
                 {row.position}
               </td>
               <td className="border border-gray-300 p-1">
-                {row.player.golfer?.golferName || "Unknown"}
                 {row.player.isNIT && (
-                  <span className="text-orange-600 ml-1 text-xs font-medium">
-                    (NIT)
+                  <span className="text-orange-600 mr-1 text-xs font-medium">
+                    NIT
                   </span>
                 )}
+                {row.player.golfer?.golferName || "Unknown"}
               </td>
               <td className="border border-gray-300 p-1">{row.club}</td>
               <td className="border border-gray-300 p-1 text-center">

@@ -3,6 +3,7 @@ import PageHeader from "../components/pageHeader"
 import { BASE_URL, MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
+import { formatClubName } from "../utils/formatClubName"
 import { CoursesPageSkeleton } from "../components/skeletons"
 import "./coursesPage.css"
 
@@ -44,7 +45,7 @@ const CoursesPage = () => {
             {data.data.map((club) => (
               <CourseCard
                 key={club.id}
-                name={`${club.clubName} Golf Club`}
+                name={formatClubName(club.clubName)}
                 address={club.clubAddress}
                 contact={club.clubContactNumber}
                 link={club.clubURL}
@@ -66,4 +67,5 @@ const CoursesPage = () => {
     </>
   )
 }
+
 export default CoursesPage

@@ -2,6 +2,7 @@ import PageHeader from "../components/pageHeader"
 import { BASE_URL, MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
+import { formatClubName } from "../utils/formatClubName"
 import { ClubOfficersPageSkeleton } from "../components/skeletons"
 import { useState, useEffect } from "react"
 import "./clubOfficersPage.css"
@@ -94,7 +95,7 @@ const ClubOfficersPage = () => {
         {officer.Name}
       </span>
       <span className="block text-gray-500 text-xs mt-1 officer-club">
-        {officer.golf_club?.clubName} Golf Club
+        {formatClubName(officer.golf_club?.clubName)}
       </span>
     </div>
   )

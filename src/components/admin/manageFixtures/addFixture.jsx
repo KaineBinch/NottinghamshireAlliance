@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { MODELS, QUERIES } from "../../../constants/api"
 import useFetch from "../../../utils/hooks/useFetch"
 import { queryBuilder } from "../../../utils/queryBuilder"
+import { formatClubName } from "../../../utils/formatClubName"
 import { createFixture, getAllFixtures } from "../../../utils/api/fixturesApi"
 
 const AddFixture = ({ onClose, onSuccess }) => {
@@ -403,7 +404,7 @@ const AddFixture = ({ onClose, onSuccess }) => {
           <option value="">Select Golf Club</option>
           {golfClubsData?.data?.map((club) => (
             <option key={club.id} value={club.id}>
-              {club.clubName} Golf Club
+              {formatClubName(club.clubName)}
             </option>
           ))}
         </select>

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { BASE_URL, MODELS, QUERIES } from "../../constants/api.js"
 import useFetch from "../../utils/hooks/useFetch.js"
 import { queryBuilder } from "../../utils/queryBuilder.js"
+import { formatClubName } from "../../utils/formatClubName.js"
 import HomePageHeader from "./homepageHeader.jsx"
 import TeeTimeCard from "../teeTimes/teeTimeCard.jsx"
 import TeeTimeSectionSkeleton from "./teeTimeSectionSkeleton.jsx"
@@ -167,7 +168,7 @@ const TeeTimesSection = () => {
               key={teeTime.id}
               clubName={
                 teeTime.event.golf_club?.clubName
-                  ? `${teeTime.event.golf_club.clubName} Golf Club`
+                  ? formatClubName(teeTime.event.golf_club.clubName)
                   : "Location to be confirmed"
               }
               clubLogo={

@@ -266,14 +266,14 @@ export const useResultsData = (data, eventId, isLoading) => {
       rows: amateurScores.map((score, index) => [
         `${index + 1}${getOrdinal(index + 1)}`,
         <>
+          {score.isNIT && (
+            <span className="text-orange-600 mr-1 text-xs font-medium">
+              NIT
+            </span>
+          )}
           {score.golfer?.golferName || "Unknown"}
           {score.golfer?.isSenior && (
             <span className="golfer-senior-tag">Senior</span>
-          )}
-          {score.isNIT && (
-            <span className="text-orange-600 ml-1 text-xs font-medium">
-              NIT
-            </span>
           )}
         </>,
         score.golfer?.golf_club?.clubName || "Unaffiliated",
