@@ -63,6 +63,7 @@ const ProfessionalsTable = ({ scores }) => {
                 {row.position}
               </td>
               <td className="border border-gray-300 p-1">
+
                 {row.player.isNIT && (
                   <span className="text-orange-600 mr-1 text-xs font-medium">
                     NIT

@@ -1,11 +1,9 @@
-// LiveScoreScreen.jsx - Optimized Version
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { useLiveScore } from "../../constants/LiveScoreContext"
 import { MODELS, QUERIES } from "../../constants/api"
 import useFetch from "../../utils/hooks/useFetch"
 import { queryBuilder } from "../../utils/queryBuilder"
 
-// Import all the new components
 import { Header } from "./Header"
 import { TopClubs } from "./TopClubs"
 import { ClubCard } from "./ClubCard"
@@ -119,6 +117,7 @@ const LiveScoreScreen = ({ eventId, eventData }) => {
       eventData.scores.forEach((score) => {
         if (score?.golfer) {
           const clubName = score.golfer?.golf_club?.clubName || "Unaffiliated"
+
 
           if (!clubGroups[clubName]) {
             clubGroups[clubName] = {
@@ -254,7 +253,6 @@ const LiveScoreScreen = ({ eventId, eventData }) => {
     [clubGroups, getTop4Clubs]
   )
 
-  // Debounced update to prevent rapid changes during scrolling
   useEffect(() => {
     if (clubGroups.length > 0) {
       const flatScores = clubGroups.flatMap((club) =>
@@ -392,6 +390,7 @@ const LiveScoreScreen = ({ eventId, eventData }) => {
             />
           )}
         </div>
+
 
         <div className="border-b border-gray-300 my-5"></div>
         <div className="text-center text-gray-600 text-sm">

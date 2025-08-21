@@ -280,6 +280,7 @@ const FurtherResultsPage = () => {
             score.golfer?.golf_club?.clubName || "Unaffiliated",
             {
               content: score.golferEventScore.toString(),
+
               usedTiebreaker: score.usedTiebreaker,
               back9Score: score.back9Score || 0,
             },

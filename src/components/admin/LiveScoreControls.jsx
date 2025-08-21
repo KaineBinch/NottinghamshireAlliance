@@ -61,6 +61,7 @@ const SimplifiedLiveScoreControls = () => {
       }, 500)
     } catch (error) {
       console.error("❌ Error finishing event:", error)
+
       setButtonStates((prev) => ({ ...prev, [eventId]: "error" }))
     }
   }

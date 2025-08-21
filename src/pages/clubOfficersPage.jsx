@@ -96,6 +96,7 @@ const ClubOfficersPage = () => {
       </span>
       <span className="block text-gray-500 text-xs mt-1 officer-club">
         {formatClubName(officer.golf_club?.clubName)}
+
       </span>
     </div>
   )

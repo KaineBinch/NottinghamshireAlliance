@@ -47,6 +47,7 @@ export const LiveScoreProvider = ({ children }) => {
         [eventId]: {
           ...prev[eventId],
           isLive,
+
           resultsReleased: false, // Reset results when starting live
           lastUpdated: new Date().toISOString(),
           isLegacyEvent: false,
@@ -162,6 +163,7 @@ export const LiveScoreProvider = ({ children }) => {
     }
 
     // Default status for events without date
+
     return {
       isLive: false,
       resultsReleased: false,
@@ -171,6 +173,7 @@ export const LiveScoreProvider = ({ children }) => {
       manuallyManaged: false,
       autoStarted: false,
       finished: false,
+
     }
   }
 

@@ -271,10 +271,12 @@ export const useResultsData = (data, eventId, isLoading) => {
               NIT
             </span>
           )}
+
           {score.golfer?.golferName || "Unknown"}
           {score.golfer?.isSenior && (
             <span className="golfer-senior-tag">Senior</span>
           )}
+
         </>,
         score.golfer?.golf_club?.clubName || "Unaffiliated",
         {

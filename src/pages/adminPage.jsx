@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import CSVPreview from "../components/admin/import/csvPreview"
 import DownloadCSVFile from "../components/admin/import/downloadCSV"
 import SimplifiedLiveScoreControls from "../components/admin/LiveScoreControls"
+
 import TemplateCard from "../components/admin/template/TemplateCard"
 import UnifiedManagement from "../components/admin/unifiedManagement"
 import PageHeader from "../components/pageHeader"
@@ -56,6 +57,7 @@ const AdminPage = () => {
       <div className="admin-container">
         {isAuthenticated && (
           <>
+
             <div className="card-layout">
               <div className="card-container">
                 <TemplateCard />
