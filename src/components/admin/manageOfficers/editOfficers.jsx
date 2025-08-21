@@ -5,6 +5,7 @@ import {
   updateOfficer,
 } from "../../../utils/api/officersApi"
 import { getAllGolfClubs } from "../../../utils/api/clubsApi"
+import { formatClubName } from "../../../utils/formatClubName"
 import { OFFICER_POSITIONS } from "../../../constants/officerPositions"
 
 const EditOfficer = ({ onClose, onSuccess }) => {
@@ -321,7 +322,7 @@ const EditOfficer = ({ onClose, onSuccess }) => {
             <option
               key={club.documentId || club.id}
               value={club.documentId || club.id}>
-              {club.clubName}
+              {formatClubName(club.clubName)}
             </option>
           ))}
         </select>
@@ -368,7 +369,7 @@ const EditOfficer = ({ onClose, onSuccess }) => {
           ))}
         </select>
         <p className="text-xs text-gray-500 mt-1">
-          Choose the officer's primary position
+          Choose the officer&apos;s primary position
         </p>
       </div>
 

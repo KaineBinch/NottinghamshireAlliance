@@ -23,12 +23,12 @@ const IndividualWinnerTable = ({
       <tbody>
         <tr className="bg-[#d9d9d9]">
           <td className="border border-gray-300 p-1">
-            {player.golfer?.golferName || "Unknown Player"}
             {player.isNIT && (
               <span className="text-orange-600 ml-1 text-xs font-medium">
-                (NIT)
+                NIT
               </span>
             )}
+            {player.golfer?.golferName || "Unknown Player"}
           </td>
           <td className="border border-gray-300 p-1">
             {player.golfer?.golf_club?.clubName || "Unknown Club"}

@@ -3,6 +3,7 @@ import CalendarButton from "./calendarButton"
 import useFetch from "../../utils/hooks/useFetch"
 import { queryBuilder } from "../../utils/queryBuilder"
 import { MODELS, QUERIES } from "../../constants/api"
+import { formatClubName } from "../../utils/formatClubName"
 import FixturesListViewSkeleton from "./fixturesListViewSkeleton"
 
 const getOrdinalSuffix = (day) => {
@@ -90,7 +91,7 @@ const FixturesListView = () => {
             <tbody className="bg-[#D9D9D9] divide-y divide-gray-400 text-xs sm:text-sm text-gray-900 text-center">
               {sortedData.map((event) => {
                 const venue = event.golf_club
-                  ? `${event.golf_club.clubName} Golf Club`
+                  ? formatClubName(event.golf_club.clubName)
                   : "Location To Be Confirmed"
                 const eventType =
                   event.eventType || "Event type to be confirmed"

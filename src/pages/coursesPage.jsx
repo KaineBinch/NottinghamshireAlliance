@@ -3,6 +3,7 @@ import PageHeader from "../components/pageHeader"
 import { BASE_URL, MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
+import { formatClubName } from "../utils/formatClubName"
 import { CoursesPageSkeleton } from "../components/skeletons"
 import "./coursesPage.css"
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { MODELS, QUERIES } from "../../../constants/api"
 import useFetch from "../../../utils/hooks/useFetch"
 import { queryBuilder } from "../../../utils/queryBuilder"
+import { formatClubName } from "../../../utils/formatClubName"
 import {
   getAllFixtures,
   getFixtureById,
@@ -43,7 +44,6 @@ const EditFixture = ({ onClose, onSuccess }) => {
     isLoading: clubsLoading,
     isError,
     data: golfClubsData,
-    error,
   } = useFetch(query)
 
   // Load all fixtures on component mount
@@ -288,17 +288,6 @@ const EditFixture = ({ onClose, onSuccess }) => {
     if (onClose) onClose()
   }
 
-  const formatDate = (dateString) => {
-    if (!dateString) return ""
-    const date = new Date(dateString)
-    return date.toLocaleDateString("en-GB", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  }
-
   const formatDateShort = (dateString) => {
     if (!dateString) return ""
     const date = new Date(dateString)
@@ -528,7 +517,7 @@ const EditFixture = ({ onClose, onSuccess }) => {
             <option value="">Select Golf Club</option>
             {golfClubsData?.data?.map((club) => (
               <option key={club.id} value={club.documentId || club.id}>
-                {club.clubName} Golf Club
+                {formatClubName(club.clubName)}
               </option>
             ))}
           </select>

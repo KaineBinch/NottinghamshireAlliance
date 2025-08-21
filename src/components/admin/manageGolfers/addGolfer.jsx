@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { createGolfer, getAllGolfers } from "../../../utils/api/golfersApi"
+import { formatClubName } from "../../../utils/formatClubName"
 import { getAllGolfClubs } from "../../../utils/api/clubsApi"
 
 const AddGolfer = ({ onClose, onSuccess }) => {
@@ -252,7 +253,7 @@ const AddGolfer = ({ onClose, onSuccess }) => {
             <option
               key={club.documentId || club.id}
               value={club.documentId || club.id}>
-              {club.clubName}
+              {formatClubName(club.clubName)}
             </option>
           ))}
         </select>

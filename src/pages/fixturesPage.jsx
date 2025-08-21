@@ -5,6 +5,7 @@ import FixturesListView from "../components/fixtures/FixturesListView"
 import { queryBuilder } from "../utils/queryBuilder"
 import { BASE_URL, MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
+import { formatClubName } from "../utils/formatClubName"
 import defaultImage from "../assets/background.jpg"
 import ToggleViewButton from "../components/toggleViewButton"
 import { FixturesPageSkeleton } from "../components/skeletons"
@@ -101,7 +102,7 @@ const FixturesPage = () => {
               <div className="card-grid">
                 {sortedData?.map((club) => {
                   const clubName = club.golf_club
-                    ? `${club.golf_club.clubName} Golf Club`
+                    ? formatClubName(club.golf_club.clubName)
                     : "Location To be Confirmed"
                   const clubAddress = club.golf_club
                     ? club.golf_club.clubAddress

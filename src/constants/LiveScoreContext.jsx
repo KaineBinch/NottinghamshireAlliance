@@ -47,10 +47,12 @@ export const LiveScoreProvider = ({ children }) => {
         [eventId]: {
           ...prev[eventId],
           isLive,
-          resultsReleased: false,
+
+          resultsReleased: false, // Reset results when starting live
           lastUpdated: new Date().toISOString(),
           isLegacyEvent: false,
           manuallyManaged: true,
+          autoStarted: isLive, // Track if this was auto-started
         },
       }
       return newSettings
@@ -70,6 +72,8 @@ export const LiveScoreProvider = ({ children }) => {
   }
 
   const releaseResults = (eventId) => {
+    console.log(`LiveScore Context: Finishing event ${eventId}`)
+
     setLiveScoreSettings((prev) => ({
       ...prev,
       [eventId]: {
@@ -77,7 +81,9 @@ export const LiveScoreProvider = ({ children }) => {
         resultsReleased: true,
         isLive: false, // Stop live scoring when results are released
         releasedAt: new Date().toISOString(),
+        lastUpdated: new Date().toISOString(),
         isLegacyEvent: false,
+        finished: true,
       },
     }))
   }
@@ -95,31 +101,69 @@ export const LiveScoreProvider = ({ children }) => {
         releasedAt: eventSettings.releasedAt || null,
         isLegacyEvent: eventSettings.isLegacyEvent || false,
         manuallyManaged: eventSettings.manuallyManaged || false,
+        autoStarted: eventSettings.autoStarted || false,
+        finished: eventSettings.finished || false,
       }
     }
 
-    // Default behavior for events with no settings - auto-release past events
+    // For events without settings, determine status based on date
     if (eventDate) {
       const eventDateObj = new Date(eventDate)
       const today = new Date()
+
+      // Set both dates to start of day for comparison
       today.setHours(0, 0, 0, 0)
       eventDateObj.setHours(0, 0, 0, 0)
 
+      const isToday = eventDateObj.getTime() === today.getTime()
       const isPastEvent = eventDateObj < today
+      const isFutureEvent = eventDateObj > today
 
-      if (isPastEvent) {
+      if (isToday) {
+        // Today's events should be ready to auto-start
         return {
           isLive: false,
           resultsReleased: false,
           liveResults: [],
           lastUpdated: null,
+          isLegacyEvent: false,
+          manuallyManaged: false,
+          autoStarted: false,
+          finished: false,
+        }
+      }
+
+      if (isPastEvent) {
+        // Past events are considered legacy/finished
+        return {
+          isLive: false,
+          resultsReleased: false, // Don't auto-release, let user decide
+          liveResults: [],
+          lastUpdated: null,
           isLegacyEvent: true,
           manuallyManaged: false,
+          autoStarted: false,
+          finished: false,
+        }
+      }
+
+      if (isFutureEvent) {
+        // Future events are not ready
+        return {
+          isLive: false,
+          resultsReleased: false,
+          liveResults: [],
+          lastUpdated: null,
+          isLegacyEvent: false,
+          manuallyManaged: false,
+          autoStarted: false,
+          finished: false,
         }
       }
     }
 
-    // For future events or events without date
+    // Default status for events without date
+
     return {
       isLive: false,
       resultsReleased: false,
@@ -127,6 +171,9 @@ export const LiveScoreProvider = ({ children }) => {
       lastUpdated: null,
       isLegacyEvent: false,
       manuallyManaged: false,
+      autoStarted: false,
+      finished: false,
+
     }
   }
 
@@ -144,11 +191,39 @@ export const LiveScoreProvider = ({ children }) => {
   }
 
   const resetEvent = (eventId) => {
+    console.log(`LiveScore Context: Resetting event ${eventId}`)
+
     setLiveScoreSettings((prev) => {
       const newSettings = { ...prev }
       delete newSettings[eventId]
       return newSettings
     })
+  }
+
+  // Helper function to check if an event should auto-start today
+  const shouldAutoStartToday = (eventId, eventDate) => {
+    const eventSettings = liveScoreSettings[eventId]
+
+    // Don't auto-start if already managed or finished
+    if (
+      eventSettings?.manuallyManaged ||
+      eventSettings?.finished ||
+      eventSettings?.resultsReleased
+    ) {
+      return false
+    }
+
+    if (eventDate) {
+      const eventDateObj = new Date(eventDate)
+      const today = new Date()
+
+      today.setHours(0, 0, 0, 0)
+      eventDateObj.setHours(0, 0, 0, 0)
+
+      return eventDateObj.getTime() === today.getTime()
+    }
+
+    return false
   }
 
   return (
@@ -161,6 +236,7 @@ export const LiveScoreProvider = ({ children }) => {
         getEventStatus,
         markEventAsLegacy,
         resetEvent,
+        shouldAutoStartToday,
         isLoading,
       }}>
       {children}

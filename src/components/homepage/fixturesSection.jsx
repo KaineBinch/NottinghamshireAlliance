@@ -1,6 +1,7 @@
 import { BASE_URL, MODELS, QUERIES } from "../../constants/api.js"
 import useFetch from "../../utils/hooks/useFetch.js"
 import { queryBuilder } from "../../utils/queryBuilder.js"
+import { formatClubName } from "../../utils/formatClubName.js"
 import FixtureCard from "../fixtures/fixtureCard.jsx"
 import HomePageHeader from "./homepageHeader.jsx"
 import defaultImage from "../../assets/background.jpg"
@@ -68,7 +69,7 @@ const FixturesSection = () => {
               key={nextFixture.id}
               name={
                 nextFixture?.golf_club
-                  ? `${nextFixture.golf_club.clubName} Golf Club`
+                  ? formatClubName(nextFixture.golf_club.clubName)
                   : "Location To Be Confirmed"
               }
               address={nextFixture?.golf_club?.clubAddress}
@@ -100,7 +101,7 @@ const FixturesSection = () => {
           {upcomingFixtures?.length > 0 ? (
             upcomingFixtures.map((club) => {
               const clubName = club?.golf_club
-                ? `${club.golf_club.clubName} Golf Club`
+                ? formatClubName(club.golf_club.clubName)
                 : "Location To Be Confirmed"
               const clubAddress = club?.golf_club?.clubAddress
               const clubImage = club?.golf_club?.clubImage?.[0]?.url

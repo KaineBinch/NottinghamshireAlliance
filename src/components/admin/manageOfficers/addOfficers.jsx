@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { createOfficer, getAllOfficers } from "../../../utils/api/officersApi"
 import { getAllGolfClubs } from "../../../utils/api/clubsApi"
+import { formatClubName } from "../../../utils/formatClubName"
 import { OFFICER_POSITIONS } from "../../../constants/officerPositions"
 
 const AddOfficer = ({ onClose, onSuccess }) => {
@@ -208,7 +209,7 @@ const AddOfficer = ({ onClose, onSuccess }) => {
             <option
               key={club.documentId || club.id}
               value={club.documentId || club.id}>
-              {club.clubName}
+              {formatClubName(club.clubName)}
             </option>
           ))}
         </select>
@@ -255,7 +256,7 @@ const AddOfficer = ({ onClose, onSuccess }) => {
           ))}
         </select>
         <p className="text-xs text-gray-500 mt-1">
-          Choose the officer's primary position
+          Choose the officer&apos;s primary position
         </p>
       </div>
 
