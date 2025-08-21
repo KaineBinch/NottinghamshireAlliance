@@ -16,8 +16,10 @@ export const PlayerRow = ({ player, index, isRegularView }) => {
       <td
         className={`${cellClass} text-left text-base ${
           isRegularView ? "text-xs" : ""
-        }`}>
-        <PlayerBadges player={player} isRegularView={isRegularView} />
+        } min-w-0`}>
+        <div className="whitespace-nowrap overflow-hidden">
+          <PlayerBadges player={player} isRegularView={isRegularView} />
+        </div>
       </td>
       <td
         className={`${cellClass} text-center text-base ${
