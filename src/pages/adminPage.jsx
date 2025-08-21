@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import CSVPreview from "../components/admin/import/csvPreview"
 import DownloadCSVFile from "../components/admin/import/downloadCSV"
-import LiveScoreControls from "../components/admin/LiveScoreControls"
+import SimplifiedLiveScoreControls from "../components/admin/LiveScoreControls"
 import TemplateCard from "../components/admin/template/TemplateCard"
 import UnifiedManagement from "../components/admin/unifiedManagement"
 import PageHeader from "../components/pageHeader"
@@ -83,10 +83,10 @@ const AdminPage = () => {
               </div>
             </div>
 
-            {/* Existing Import/Template Section */}
-            <div className="my-6">
+            {/* Live Score Controls - Now the primary feature */}
+            <div className="mt-6">
               <div className="card-container">
-                <LiveScoreControls />
+                <SimplifiedLiveScoreControls />
               </div>
             </div>
           </>
