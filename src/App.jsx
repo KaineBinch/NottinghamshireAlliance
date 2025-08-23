@@ -17,6 +17,7 @@ import {
 import { appRoutes } from "./constants/appRoutes"
 import ScrollToTop from "./utils/scrollToTop"
 import Navbar from "./components/navbar"
+import AdminNavbar from "./components/adminNavbar"
 import MobFoot from "./components/footer/mobileFooter"
 import { PosthogPageViewTracker } from "./components/posthogPageViewTracker"
 import { Auth0Provider } from "@auth0/auth0-react"
@@ -25,21 +26,34 @@ import { LiveScoreProvider } from "./constants/LiveScoreContext"
 const domain = import.meta.env.VITE_AUTH0_DOMAIN
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID
 
+const MainLayout = () => (
+  <>
+    <PosthogPageViewTracker />
+    <ScrollToTop />
+    <Navbar />
+    <div id="content">
+      <Outlet />
+    </div>
+    <MobFoot />
+  </>
+)
+
+const AdminLayout = () => (
+  <>
+    <PosthogPageViewTracker />
+    <ScrollToTop />
+    <AdminNavbar />
+    <div id="content">
+      <Outlet />
+    </div>
+  </>
+)
+
 const router = createBrowserRouter(
   [
     {
       path: "/",
-      element: (
-        <>
-          <PosthogPageViewTracker />
-          <ScrollToTop />
-          <Navbar />
-          <div id="content">
-            <Outlet />
-          </div>
-          <MobFoot />
-        </>
-      ),
+      element: <MainLayout />,
       children: [
         { path: appRoutes.home, element: <HomePage /> },
         { path: appRoutes.courses, element: <CoursesPage /> },
@@ -50,8 +64,17 @@ const router = createBrowserRouter(
         { path: appRoutes.rules, element: <RulesPage /> },
         { path: appRoutes.clubofficers, element: <ClubOfficersPage /> },
         { path: appRoutes.teeTimes, element: <TeeTimesPage /> },
+        { path: "/results/:eventId", element: <FurtherResultsPage /> },
+        { path: appRoutes.notFound, element: <NotFound /> },
+        { path: "*", element: <NotFound /> },
+      ],
+    },
+    {
+      path: appRoutes.admin,
+      element: <AdminLayout />,
+      children: [
         {
-          path: appRoutes.admin,
+          index: true,
           element: (
             <Auth0Provider
               domain={domain}
@@ -65,9 +88,6 @@ const router = createBrowserRouter(
             </Auth0Provider>
           ),
         },
-        { path: "/results/:eventId", element: <FurtherResultsPage /> },
-        { path: appRoutes.notFound, element: <NotFound /> },
-        { path: "*", element: <NotFound /> },
       ],
     },
   ],
