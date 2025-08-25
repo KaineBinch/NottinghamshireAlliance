@@ -99,164 +99,210 @@ const PrintTeeTimesButton = ({ teeTimesData, eventDetails }) => {
     `
 
     const printStyles = `
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-        }
-        
-        .event-header {
-          margin-bottom: 30px;
-          text-align: center;
-        }
-        
-        .event-title {
-          font-size: 18px;
-          font-weight: bold;
-          margin-bottom: 10px;
-          color: #1f2937;
-        }
-        
-        .event-type {
-          font-size: 14px;
-          font-weight: bold;
-          color: #374151;
-        }
-        
-        .tee-times-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 15px;
-        }
-        
-        .tee-times-table th, 
-        .tee-times-table td {
-          border: 2px solid #d1d5db;
-          padding: 12px 8px;
-          text-align: center;
-          vertical-align: middle;
-        }
-        
-        .tee-times-table th {
-          font-weight: bold;
-          font-size: 14px;
-        }
-        
-        .time-cell {
-          font-weight: bold;
-          font-size: 14px;
-          width: 15%;
-        }
-        
-        .player-cell {
-          width: 21.25%;
-          word-wrap: break-word;
-          line-height: 1.4;
-        }
-        
-        .player-name {
-          font-weight: bold;
-          font-size: 14px;
-          color: #1f2937;
-        }
-        
-        .club-name {
-          font-size: 11px;
-          color: #1f2937;
-          margin-top: 2px;
-          font-weight: normal;
-        }
-        
-        .status-senior {
-          color: #dc2626;
-          font-size: 11px;
-          font-weight: bold;
-        }
-        
-        .status-pro {
-          color: #1d4ed8;
-          font-size: 11px;
-          font-weight: bold;
-        }
-        
-        .empty-player {
-          color: #9ca3af;
-          font-style: italic;
-          font-size: 12px;
-        }
-        
-        .alternate-row {
-          background-color: #fafafa;
-        }
-        
-        @media print {
-          /* Table headers - uses your existing styling approach */
-          th, tr.bg-\\[\\#214A27\\], .bg-\\[\\#214A27\\] {
-            background-color: #e2e8f0 !important; /* gray-300 */
-            color: black !important;
-            font-weight: bold !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          
-          @page {
-            size: A4 portrait;
-            margin: 0.5cm;
-          }
-          
-          body {
-            padding: 20px;
-            margin: 0;
-          }
-          
-          /* Prevent table rows from breaking across pages */
-          .tee-times-table {
-            page-break-inside: auto;
-          }
-          
-          .tee-times-table tr {
-            page-break-inside: avoid;
-            page-break-after: auto;
-          }
-          
-          .tee-times-table thead {
-            display: table-header-group;
-          }
-          
-          .tee-times-table tbody {
-            display: table-row-group;
-          }
-          
-          /* Ensure table header repeats on each page */
-          .tee-times-table thead tr {
-            page-break-after: avoid;
-          }
-          
-          .tee-times-table th, 
-          .tee-times-table td {
-            padding: 8px 4px !important;
-            page-break-inside: avoid;
-          }
-          
-          .alternate-row {
-            background-color: #fafafa !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          
-          .status-senior {
-            color: #dc2626 !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          
-          .status-pro {
-            color: #1d4ed8 !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-        }
-      </style>
-    `
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    
+    .event-header {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .event-title {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #1f2937;
+    }
+    
+    .event-type {
+      font-size: 12px;
+      font-weight: bold;
+      color: #374151;
+    }
+    
+    .tee-times-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+    
+    .tee-times-table th, 
+    .tee-times-table td {
+      border: 2px solid #d1d5db;
+      padding: 12px 8px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    
+    .tee-times-table th {
+      font-weight: bold;
+      font-size: 12px;
+    }
+    
+    .time-cell {
+      font-weight: bold;
+      font-size: 12px;
+      width: 15%;
+    }
+    
+    .player-cell {
+      width: 21.25%;
+      word-wrap: break-word;
+      line-height: 1.4;
+    }
+    
+    .player-name {
+      font-weight: bold;
+      font-size: 12px;
+      color: #1f2937;
+    }
+    
+    .club-name {
+      font-size: 10px;
+      color: #1f2937;
+      margin-top: 2px;
+      font-weight: normal;
+    }
+    
+    .status-senior {
+      color: #dc2626;
+      font-size: 10px;
+      font-weight: bold;
+    }
+    
+    .status-pro {
+      color: #1d4ed8;
+      font-size: 10px;
+      font-weight: bold;
+    }
+    
+    .empty-player {
+      color: #9ca3af;
+      font-style: italic;
+      font-size: 10px;
+    }
+    
+    .alternate-row {
+      background-color: #fafafa;
+    }
+    
+    @media print {
+      body {
+        padding: 10px;
+        margin: 0;
+        font-size: 11px !important; /* global downscale */
+      }
+
+      .event-header {
+        margin-bottom: 10px !important;
+      }
+
+      .event-title {
+        font-size: 13px !important;
+        margin-bottom: 4px !important;
+      }
+
+      .event-type {
+        font-size: 11px !important;
+      }
+
+      .tee-times-table th,
+      .tee-times-table td {
+        font-size: 11px !important;
+        padding: 4px 2px !important; /* tighter cells */
+      }
+
+      .time-cell,
+      .player-name {
+        font-size: 11px !important;
+      }
+
+      .tee-times-table .time-cell {
+        font-size: 14px !important
+      } 
+
+      .tee-times-table .player-cell {
+        line-height: 1.1 !important; /* squeeze rows */
+        padding: 9px 4px !important; /* override td padding, with more breathing room */
+      }
+
+      .tee-times-table .club-name {
+        font-size: 9px !important;
+        margin-top: 7px !important; /* remove extra spacing */
+        line-height: 1 !important;
+      }
+
+      .club-name,
+      .status-senior,
+      .status-pro,
+      .empty-player {
+        font-size: 9px !important;
+      }
+
+      /* Table headers */
+      th, tr.bg-\\[\\#214A27\\], .bg-\\[\\#214A27\\] {
+        background-color: #e2e8f0 !important; /* gray-300 */
+        color: black !important;
+        font-weight: bold !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      
+      @page {
+        size: A4 portrait;
+        margin: 0.5cm;
+      }
+      
+      /* Prevent table rows from breaking across pages */
+      .tee-times-table {
+        page-break-inside: auto;
+      }
+      
+      .tee-times-table tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+      }
+      
+      .tee-times-table thead {
+        display: table-header-group;
+      }
+      
+      .tee-times-table tbody {
+        display: table-row-group;
+      }
+      
+      /* Ensure table header repeats on each page */
+      .tee-times-table thead tr {
+        page-break-after: avoid;
+      }
+      
+      .tee-times-table th, 
+      .tee-times-table td {
+        page-break-inside: avoid;
+      }
+      
+      .alternate-row {
+        background-color: #fafafa !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      
+      .status-senior {
+        color: #dc2626 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      
+      .status-pro {
+        color: #1d4ed8 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+  </style>
+`
 
     document.body.innerHTML = printStyles + printContent
     window.print()
