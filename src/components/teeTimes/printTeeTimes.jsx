@@ -243,7 +243,7 @@ const PrintTeeTimesButton = ({ teeTimesData, eventDetails }) => {
 
       /* Table headers */
       th, tr.bg-\\[\\#214A27\\], .bg-\\[\\#214A27\\] {
-        background-color: #e2e8f0 !important; /* gray-300 */
+        background-color: #ffffff !important; /* gray-300 */
         color: black !important;
         font-weight: bold !important;
         -webkit-print-color-adjust: exact !important;
@@ -284,9 +284,7 @@ const PrintTeeTimesButton = ({ teeTimesData, eventDetails }) => {
       }
       
       .alternate-row {
-        background-color: #fafafa !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
+        
       }
       
       .status-senior {
