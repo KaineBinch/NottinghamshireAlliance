@@ -128,7 +128,10 @@ const ResultsPage = () => {
                   key={event.id}
                   className="results-card-link">
                   <ResultsCard
-                    name={event.golf_club?.clubName || "Event"}
+                    name={
+                      event.golf_club?.clubName?.replace("Admirals", "Park") ||
+                      "Event"
+                    }
                     courseImage={
                       event.golf_club?.clubImage?.[0]?.url
                         ? `${BASE_URL}${event.golf_club.clubImage[0].url}`

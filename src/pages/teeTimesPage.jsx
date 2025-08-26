@@ -55,11 +55,7 @@ const TeeTimesPage = () => {
 
   // Fetch scores to get NIT status
   const scoresQuery = queryBuilder(MODELS.scores, "?populate=golfer")
-  const {
-    data: scoresData,
-    isLoading: scoresLoading,
-    isError: scoresError,
-  } = useFetch(scoresQuery)
+  const { data: scoresData } = useFetch(scoresQuery)
 
   // Process scores data to create a lookup for NIT status
   useEffect(() => {

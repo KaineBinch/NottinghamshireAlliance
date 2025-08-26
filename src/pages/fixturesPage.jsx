@@ -102,7 +102,10 @@ const FixturesPage = () => {
               <div className="card-grid">
                 {sortedData?.map((club) => {
                   const clubName = club.golf_club
-                    ? formatClubName(club.golf_club.clubName)
+                    ? formatClubName(club.golf_club.clubName).replace(
+                        "Admirals",
+                        "Park"
+                      )
                     : "Location To be Confirmed"
                   const clubAddress = club.golf_club
                     ? club.golf_club.clubAddress

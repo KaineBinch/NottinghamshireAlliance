@@ -3,7 +3,6 @@ import PageHeader from "../components/pageHeader"
 import { BASE_URL, MODELS, QUERIES } from "../constants/api"
 import useFetch from "../utils/hooks/useFetch"
 import { queryBuilder } from "../utils/queryBuilder"
-import { formatClubName } from "../utils/formatClubName"
 import { CoursesPageSkeleton } from "../components/skeletons"
 import "./coursesPage.css"
 
@@ -52,25 +51,35 @@ const CoursesPage = () => {
       <div className="courses-section">
         <div className="courses-container">
           <div className="courses-grid">
-            {data.data.map((club) => (
-              <CourseCard
-                key={club.id}
-                name={formatClubName(club.clubName)}
-                address={club.clubAddress}
-                contact={club.clubContactNumber}
-                link={club.clubURL}
-                courseImage={
-                  club.clubImage?.[0]?.url
-                    ? `${BASE_URL}${club.clubImage[0].url}`
-                    : "default-image.jpg"
-                }
-                logo={
-                  club.clubLogo?.[0]?.url
-                    ? `${BASE_URL}${club.clubLogo[0].url}`
-                    : "default-logo.jpg"
-                }
-              />
-            ))}
+            {data.data
+              .filter(
+                (club, index, array) =>
+                  // Keep only the first occurrence of each unique address
+                  array.findIndex((c) => c.clubAddress === club.clubAddress) ===
+                  index
+              )
+              .map((club) => (
+                <CourseCard
+                  key={club.id}
+                  name={formatClubName(club.clubName).replace(
+                    "Admirals",
+                    "Park"
+                  )}
+                  address={club.clubAddress}
+                  contact={club.clubContactNumber}
+                  link={club.clubURL}
+                  courseImage={
+                    club.clubImage?.[0]?.url
+                      ? `${BASE_URL}${club.clubImage[0].url}`
+                      : "default-image.jpg"
+                  }
+                  logo={
+                    club.clubLogo?.[0]?.url
+                      ? `${BASE_URL}${club.clubLogo[0].url}`
+                      : "default-logo.jpg"
+                  }
+                />
+              ))}
           </div>
         </div>
       </div>
