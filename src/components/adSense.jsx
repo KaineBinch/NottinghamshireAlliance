@@ -24,7 +24,7 @@ const AdSense = ({ height = "250px" }) => {
 
   return (
     <div className="flex justify-center bg-[#d9d9d9] w-full">
-      <div className="max-w-5xl w-full">
+      <div className="w-full mt-5">
         <ins
           ref={adRef}
           className="adsbygoogle"
