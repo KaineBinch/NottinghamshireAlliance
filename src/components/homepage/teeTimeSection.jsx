@@ -13,36 +13,7 @@ const TeeTimesSection = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [golferScores, setGolferScores] = useState({})
 
-  // Fetch scores to get NIT status
-  const scoresQuery = queryBuilder(MODELS.scores, "?populate=golfer")
-  const { data: scoresData } = useFetch(scoresQuery)
-
-  // Process scores data to create a lookup for NIT status
-  useEffect(() => {
-    if (scoresData?.data) {
-      const scoreMap = {}
-      scoresData.data.forEach((score) => {
-        if (score.golfer && score.isNIT) {
-          // Try both id and documentId for compatibility
-          if (score.golfer.id) {
-            scoreMap[score.golfer.id] = score.isNIT
-          }
-          if (score.golfer.documentId) {
-            scoreMap[score.golfer.documentId] = score.isNIT
-          }
-        }
-      })
-      setGolferScores(scoreMap)
-    }
-  }, [scoresData])
-
-  if (isLoading) {
-    return <TeeTimeSectionSkeleton />
-  } else if (isError) {
-    console.error("Error:", error)
-    return <p className="pt-[85px]">Something went wrong...</p>
-  }
-
+  // Get next event date
   const today = new Date()
   const teeTimes = data?.data || []
 
@@ -74,6 +45,51 @@ const TeeTimesSection = () => {
       const timeB = b.golferTeeTime ? b.golferTeeTime : "23:59"
       return timeA.localeCompare(timeB)
     })
+
+  // Determine next event date
+  let nextEventDate = null
+  if (sortedUpcomingTeeTimes.length > 0) {
+    nextEventDate = sortedUpcomingTeeTimes[0]?.event?.eventDate
+  } else if (pastTeeTimes.length > 0) {
+    nextEventDate = pastTeeTimes[0]?.event?.eventDate
+  }
+
+  // FIXED: Fetch scores only for the current event
+  const scoresQuery = nextEventDate
+    ? queryBuilder(
+        MODELS.scores,
+        `?populate=golfer&filters[event][eventDate][$eq]=${nextEventDate}`
+      )
+    : null
+  const { data: scoresData } = useFetch(scoresQuery)
+
+  // FIXED: Process scores data to create a lookup for NIT status (current event only)
+  useEffect(() => {
+    if (scoresData?.data) {
+      const scoreMap = {}
+
+      scoresData.data.forEach((score) => {
+        if (score.golfer) {
+          // Always set the NIT status (true or false) for current event
+          if (score.golfer.id) {
+            scoreMap[score.golfer.id] = score.isNIT || false
+          }
+          if (score.golfer.documentId) {
+            scoreMap[score.golfer.documentId] = score.isNIT || false
+          }
+        }
+      })
+
+      setGolferScores(scoreMap)
+    }
+  }, [scoresData])
+
+  if (isLoading) {
+    return <TeeTimeSectionSkeleton />
+  } else if (isError) {
+    console.error("Error:", error)
+    return <p className="pt-[85px]">Something went wrong...</p>
+  }
 
   let teeTimesToDisplay = []
   let eventTitle = "the next event"

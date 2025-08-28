@@ -53,23 +53,31 @@ const TeeTimesPage = () => {
   const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery)
   const { isLoading, isError, data, error } = useFetch(query)
 
-  // Fetch scores to get NIT status
-  const scoresQuery = queryBuilder(MODELS.scores, "?populate=golfer")
+  // Get the next event date first
+  const nextEventDate = getNextEventDate(data)
+
+  // FIXED: Only fetch scores for the current event, and only when we have an event date
+  const scoresQuery = nextEventDate
+    ? queryBuilder(
+        MODELS.scores,
+        `?populate=golfer&filters[event][eventDate][$eq]=${nextEventDate}`
+      )
+    : null
   const { data: scoresData } = useFetch(scoresQuery)
 
-  // Process scores data to create a lookup for NIT status
+  // FIXED: Process scores data to create a lookup for NIT status (current event only)
   useEffect(() => {
     if (scoresData?.data) {
       const scoreMap = {}
 
       scoresData.data.forEach((score) => {
         if (score.golfer) {
-          // Try both id and documentId
-          if (score.golfer.id && score.isNIT) {
-            scoreMap[score.golfer.id] = score.isNIT
+          // Always set the NIT status (true or false) for current event
+          if (score.golfer.id) {
+            scoreMap[score.golfer.id] = score.isNIT || false
           }
-          if (score.golfer.documentId && score.isNIT) {
-            scoreMap[score.golfer.documentId] = score.isNIT
+          if (score.golfer.documentId) {
+            scoreMap[score.golfer.documentId] = score.isNIT || false
           }
         }
       })
@@ -85,7 +93,6 @@ const TeeTimesPage = () => {
     return <p className="error-message">Something went wrong...</p>
   }
 
-  const nextEventDate = getNextEventDate(data)
   const nextEvent = data?.data.find(
     (entry) => entry.event?.eventDate === nextEventDate
   )

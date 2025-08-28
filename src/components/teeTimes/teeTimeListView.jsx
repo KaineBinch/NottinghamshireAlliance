@@ -13,10 +13,6 @@ const ListView = () => {
   const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery)
   const { isLoading, isError, data, error } = useFetch(query)
 
-  // Fetch scores to get NIT status
-  const scoresQuery = queryBuilder(MODELS.scores, "?populate=golfer")
-  const { data: scoresData } = useFetch(scoresQuery)
-
   const nextEventDate = getNextEventDate(data)
 
   useEffect(() => {
@@ -28,15 +24,32 @@ const ListView = () => {
     }
   }, [data, nextEventDate])
 
-  // Process scores data to create a lookup for NIT status
+  // FIXED: Fetch scores only for the current event
+  const scoresQuery = nextEventDate
+    ? queryBuilder(
+        MODELS.scores,
+        `?populate=golfer&filters[event][eventDate][$eq]=${nextEventDate}`
+      )
+    : null
+  const { data: scoresData } = useFetch(scoresQuery)
+
+  // FIXED: Process scores data to create a lookup for NIT status (current event only)
   useEffect(() => {
     if (scoresData?.data) {
       const scoreMap = {}
+
       scoresData.data.forEach((score) => {
-        if (score.golfer && score.isNIT) {
-          scoreMap[score.golfer.id] = score.isNIT
+        if (score.golfer) {
+          // Always set the NIT status (true or false) for current event
+          if (score.golfer.id) {
+            scoreMap[score.golfer.id] = score.isNIT || false
+          }
+          if (score.golfer.documentId) {
+            scoreMap[score.golfer.documentId] = score.isNIT || false
+          }
         }
       })
+
       setGolferScores(scoreMap)
     }
   }, [scoresData])
@@ -63,11 +76,16 @@ const ListView = () => {
         if (!acc[club]) acc[club] = []
         acc[club].push({
           id: player?.id,
+          documentId: player?.documentId,
           name: player?.golferName || "Unnamed Player",
           time: teeTime.golferTeeTime || "00:00",
           isSenior: player?.isSenior || false,
           isPro: player?.isPro || false,
-          isNIT: golferScores[player?.id] || false, // Add NIT status
+          // FIXED: Check both id and documentId for NIT status
+          isNIT:
+            golferScores[player?.id] ||
+            golferScores[player?.documentId] ||
+            false,
         })
       })
       return acc

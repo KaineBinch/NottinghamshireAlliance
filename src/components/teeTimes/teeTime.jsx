@@ -14,10 +14,6 @@ const TeeTimesTable = () => {
   const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery)
   const { isLoading, isError, data, error } = useFetch(query)
 
-  // Fetch scores to get NIT status
-  const scoresQuery = queryBuilder(MODELS.scores, "?populate=golfer")
-  const { data: scoresData } = useFetch(scoresQuery)
-
   const nextEventDate = getNextEventDate(data)
 
   useEffect(() => {
@@ -29,15 +25,32 @@ const TeeTimesTable = () => {
     }
   }, [data, nextEventDate])
 
-  // Process scores data to create a lookup for NIT status
+  // FIXED: Fetch scores only for the current event
+  const scoresQuery = nextEventDate
+    ? queryBuilder(
+        MODELS.scores,
+        `?populate=golfer&filters[event][eventDate][$eq]=${nextEventDate}`
+      )
+    : null
+  const { data: scoresData } = useFetch(scoresQuery)
+
+  // FIXED: Process scores data to create a lookup for NIT status (current event only)
   useEffect(() => {
     if (scoresData?.data) {
       const scoreMap = {}
+
       scoresData.data.forEach((score) => {
-        if (score.golfer && score.isNIT) {
-          scoreMap[score.golfer.id] = score.isNIT
+        if (score.golfer) {
+          // Always set the NIT status (true or false) for current event
+          if (score.golfer.id) {
+            scoreMap[score.golfer.id] = score.isNIT || false
+          }
+          if (score.golfer.documentId) {
+            scoreMap[score.golfer.documentId] = score.isNIT || false
+          }
         }
       })
+
       setGolferScores(scoreMap)
     }
   }, [scoresData])
@@ -107,7 +120,8 @@ const TeeTimesTable = () => {
   const displayData = sortedTeeTimes.length >= 0 ? sortedTeeTimes : teeTimesData
 
   const GolferInfo = ({ player }) => {
-    const isNIT = golferScores[player?.id] || false
+    const isNIT =
+      golferScores[player?.id] || golferScores[player?.documentId] || false
 
     return (
       <div className="golfer-info-container">
