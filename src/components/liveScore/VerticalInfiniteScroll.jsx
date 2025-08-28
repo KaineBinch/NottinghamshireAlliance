@@ -12,44 +12,27 @@ const VerticalInfiniteScroll = ({
   const baseY = useMotionValue(0)
   const containerRef = useRef(null)
   const contentRef = useRef(null)
-  const [isReady, setIsReady] = useState(false)
-  const [needsDuplication, setNeedsDuplication] = useState(true)
-
-  // Initialize component and check if duplication is needed
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (contentRef.current && containerRef.current) {
-        const contentHeight = contentRef.current.scrollHeight / 2 // Assuming duplication initially
-        const containerHeight = containerRef.current.clientHeight
-
-        // Only duplicate if content is shorter than 2x container height
-        const shouldDuplicate = contentHeight < containerHeight * 2
-        setNeedsDuplication(shouldDuplicate)
-      }
-      setIsReady(true)
-    }, 200)
-    return () => clearTimeout(timer)
-  }, [])
 
   const getContentHeight = () => {
     if (!contentRef?.current) return 1000
     const scrollHeight = contentRef.current.scrollHeight
-    // When paused, don't divide by 2 since we're not showing duplicates
-    return needsDuplication && isScrolling ? scrollHeight / 2 : scrollHeight
+    // When scrolling, we always duplicate, so divide by 2
+    // When paused, we don't duplicate
+    return isScrolling ? scrollHeight / 2 : scrollHeight
   }
 
   useAnimationFrame((_, delta) => {
-    if (isScrolling && isReady && contentRef.current) {
+    if (isScrolling && contentRef.current) {
       const moveBy = velocity * (delta / 1000)
       const newY = baseY.get() + moveBy
       baseY.set(newY)
 
-      // Only reset if we're using duplication AND scrolling and scrolled past first copy
-      if (needsDuplication && isScrolling) {
-        const contentHeight = getContentHeight()
-        if (newY <= -contentHeight) {
-          baseY.set(0)
-        }
+      // Reset when we've scrolled past the first copy with a small buffer
+      const contentHeight = getContentHeight()
+      const resetBuffer = Math.abs(velocity) * 0.3 // Small buffer based on velocity
+
+      if (newY <= -(contentHeight + resetBuffer)) {
+        baseY.set(0)
       }
     }
   })
@@ -77,16 +60,16 @@ const VerticalInfiniteScroll = ({
       // When pausing, reset position if we're in the duplicate section
       const currentY = baseY.get()
       const singleContentHeight = contentRef.current
-        ? contentRef.current.scrollHeight / (needsDuplication ? 2 : 1)
+        ? contentRef.current.scrollHeight / 2
         : 0
 
-      if (needsDuplication && currentY < -singleContentHeight) {
+      if (currentY < -singleContentHeight) {
         // We're in the duplicate section, move back to equivalent position in original
         const equivalentPosition = currentY + singleContentHeight
         baseY.set(equivalentPosition)
       }
     }
-  }, [isScrolling, needsDuplication])
+  }, [isScrolling])
 
   // Handle keyboard controls
   useEffect(() => {
@@ -101,16 +84,6 @@ const VerticalInfiniteScroll = ({
     return () => document.removeEventListener("keydown", handleKeyPress)
   }, [onScrollToggle])
 
-  if (!isReady) {
-    return (
-      <div
-        className="w-full flex items-center justify-center bg-gray-100"
-        style={{ height: containerHeight }}>
-        <div className="text-gray-500">Loading...</div>
-      </div>
-    )
-  }
-
   return (
     <div
       ref={containerRef}
@@ -124,10 +97,8 @@ const VerticalInfiniteScroll = ({
         {/* Original content */}
         <div className="w-full pb-12">{children}</div>
 
-        {/* Only duplicate if needed for seamless loop AND currently scrolling */}
-        {needsDuplication && isScrolling && (
-          <div className="w-full">{children}</div>
-        )}
+        {/* Always duplicate when scrolling for seamless infinite loop */}
+        {isScrolling && <div className="w-full">{children}</div>}
       </m.div>
     </div>
   )

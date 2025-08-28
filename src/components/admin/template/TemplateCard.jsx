@@ -6,8 +6,8 @@ import { MODELS, QUERIES } from "../../../constants/api"
 
 const TemplateCard = () => {
   const [selectedEvent, setSelectedEvent] = useState(null)
-  const [startTime, setStartTime] = useState("07:30")
-  const [endTime, setEndTime] = useState("13:30")
+  const [startTime, setStartTime] = useState("07:00")
+  const [endTime, setEndTime] = useState("14:00")
   const [minuteIncrement, setMinuteIncrement] = useState(10)
 
   const query = queryBuilder(MODELS.events, QUERIES.eventsQuery)

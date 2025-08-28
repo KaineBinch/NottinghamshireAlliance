@@ -5,9 +5,7 @@ export const PlayerRow = ({ player, index, isRegularView }) => {
     ? index % 2 === 0
       ? "bg-[#d9d9d9]"
       : "bg-white"
-    : `border-b border-slate-100 last:border-b-0 ${
-        player.hasScores ? "bg-green-50/50" : "bg-slate-50/50"
-      }`
+    : `border-b border-slate-100 last:border-b-0`
 
   const cellClass = isRegularView ? "border border-gray-300 p-1" : "p-2"
 

@@ -33,6 +33,24 @@ const formatLogSummary = (originalSummary) => {
       }
     } else if (line.includes("Records Created:")) {
       return line.replace("Records Created:", "Records Processed:")
+    } else if (line.includes("score entries") && line.includes("blank")) {
+      // Parse line like "159 score entries (66 blank, 9 marked as NIT)"
+      const scoreMatch = line.match(
+        /(\d+) score entries \((\d+) blank, (\d+) marked as NIT\)/
+      )
+      if (scoreMatch) {
+        const totalScores = parseInt(scoreMatch[1])
+        const blankScores = parseInt(scoreMatch[2])
+        const nitScores = parseInt(scoreMatch[3])
+        const actualScores = totalScores - blankScores // Total minus blank = actual scores
+
+        return [
+          `- ${actualScores} actual scores entered${
+            nitScores > 0 ? ` (${nitScores} NIT)` : ""
+          }`,
+          `- ${blankScores} scores pending entry`,
+        ].join("\n")
+      }
     }
     return line
   })
@@ -243,12 +261,24 @@ Event Information:
 - Total tee time slots: ${processedTimeSlots}
 
 Records Processed:
-- ${processedGolfers} golfers updated
+- ${processedGolfers} golfers
 - ${
             typeof created === "object" ? created.teeTimes || 0 : 0
           } tee time assignments
-- ${typeof created === "object" ? created.scores || 0 : 0} score entries
-`
+- ${
+            typeof created === "object" ? created.actualScores || 0 : 0
+          } actual scores entered${
+            typeof created === "object" && created.actualScoresWithNIT
+              ? ` (${created.actualScoresWithNIT} NIT)`
+              : ""
+          }
+- ${
+            typeof created === "object" ? created.pendingScores || 0 : 0
+          } scores pending entry${
+            typeof created === "object" && created.pendingScoresWithNIT
+              ? ` (${created.pendingScoresWithNIT} NIT)`
+              : ""
+          }`
 
           if (errorCount > 0 || warningCount > 0) {
             summaryText += `
