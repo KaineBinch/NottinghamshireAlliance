@@ -5,7 +5,7 @@ export const Header = ({ currentEventData, eventData, onTvViewToggle }) => (
     <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
     <button
       onClick={onTvViewToggle}
-      className="absolute top-3 right-3 z-10 bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-lg shadow-md transition-all duration-300 flex items-center gap-2 text-sm backdrop-blur-sm border border-white/20"
+      className="hidden md:flex absolute top-3 right-3 z-10 bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-lg shadow-md transition-all duration-300 items-center gap-2 text-sm backdrop-blur-sm border border-white/20"
       title="Switch to TV View for large displays">
       <Monitor className="w-4 h-4" />
       TV View
