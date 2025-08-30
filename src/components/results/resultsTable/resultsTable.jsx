@@ -18,6 +18,7 @@ const ResultsTable = ({ limit }) => {
 
   const results = useMemo(() => {
     if (data?.data) {
+      // Filter out items that are null, undefined, or marked as NIT for calculations
       const validItems = data.data.filter(
         (item) =>
           item &&
@@ -27,6 +28,7 @@ const ResultsTable = ({ limit }) => {
           item.event.eventDate &&
           item.golferEventScore !== null &&
           item.golferEventScore !== undefined
+        // Note: We don't filter out NITs here because we want to track them for display
       )
 
       const playerScores = validItems.reduce((acc, item) => {
@@ -36,6 +38,7 @@ const ResultsTable = ({ limit }) => {
         const clubID = item.golfer.golf_club?.clubID || null
         const isPro = item.golfer.isPro || false
         const isSenior = item.golfer.isSenior || false
+        const isNIT = item.isNIT || false
         const eventDate = item.event.eventDate
 
         if (!acc[playerName]) {
@@ -45,28 +48,35 @@ const ResultsTable = ({ limit }) => {
             golferClubID: clubID,
             isPro: isPro,
             isSenior: isSenior,
+            isNIT: false, // Player-level NIT status (if any scores are NIT, we can show it)
             totalPoints: 0,
             scores: [],
           }
         }
 
-        // Store all scores but don't add to totalPoints yet
+        // Store all scores including NIT status
         acc[playerName].scores.push({
           date: eventDate,
           score: playerScore,
+          isNIT: isNIT,
         })
 
         return acc
       }, {})
 
-      // Now calculate totalPoints using only top 9 scores for each player
+      // Calculate totalPoints using only top 9 NON-NIT scores for each player
       Object.values(playerScores).forEach((player) => {
-        const sortedScores = player.scores
+        // Only count non-NIT scores for total points calculation
+        const nonNitScores = player.scores
+          .filter((scoreItem) => !scoreItem.isNIT)
           .map((scoreItem) => scoreItem.score)
           .sort((a, b) => b - a) // Sort highest to lowest
           .slice(0, 9) // Take only top 9 scores
 
-        player.totalPoints = sortedScores.reduce((sum, score) => sum + score, 0)
+        player.totalPoints = nonNitScores.reduce((sum, score) => sum + score, 0)
+
+        // Mark player as having NIT if any of their scores are NIT
+        player.hasNIT = player.scores.some((score) => score.isNIT)
       })
 
       return Object.values(playerScores)
@@ -109,11 +119,14 @@ const ResultsTable = ({ limit }) => {
 
       categorizedData = Object.values(clubMap).map(({ club, players }) => {
         const dateScores = players.reduce((dateAcc, player) => {
-          player.scores.forEach(({ date, score }) => {
+          player.scores.forEach(({ date, score, isNIT }) => {
             if (!dateAcc[date]) {
               dateAcc[date] = []
             }
-            dateAcc[date].push(score)
+            // Only include non-NIT scores in club calculations
+            if (!isNIT) {
+              dateAcc[date].push(score)
+            }
           })
           return dateAcc
         }, {})

@@ -17,7 +17,15 @@ const TableRow = ({
         }`}
         onClick={() => handleRowClick(row)}>
         <td className="p-2">{rowIndex + 1}</td>
-        <td className="p-2">{row.name}</td>
+        <td className="p-2">
+          {/* Show NIT label if player has any NIT scores */}
+          {row.hasNIT && (
+            <span className="text-orange-600 mr-1 text-xs font-medium">
+              NIT
+            </span>
+          )}
+          {row.name}
+        </td>
         {!isClubView && <td className="p-2">{row.club}</td>}
         <td className="p-2">
           {isClubView ? row.totalPoints : row.totalPoints}
@@ -45,4 +53,5 @@ const TableRow = ({
     </>
   )
 }
+
 export default TableRow

@@ -29,13 +29,17 @@ const ExpandedRowDetails = ({ result, isClubView }) => {
     const dateScores = result.reduce((acc, player) => {
       if (!player || !player.scores || !Array.isArray(player.scores)) return acc
 
-      player.scores.forEach(({ date, score }) => {
+      player.scores.forEach(({ date, score, isNIT }) => {
         if (!date || score === undefined || score === null) return
 
         if (!acc[date]) {
           acc[date] = []
         }
-        acc[date].push(score)
+
+        // Only include non-NIT scores in club totals
+        if (!isNIT) {
+          acc[date].push(score)
+        }
       })
       return acc
     }, {})
@@ -102,7 +106,9 @@ const ExpandedRowDetails = ({ result, isClubView }) => {
       .slice(0, 15)
 
     const MAX_HIGHLIGHT_SCORES = 9
-    const topScores = [...validScores]
+    // Only count non-NIT scores for highlighting top scores
+    const nonNitScores = validScores.filter((item) => !item.isNIT)
+    const topScores = nonNitScores
       .map((item) => parseInt(item.score, 10))
       .filter((score) => !isNaN(score))
       .sort((a, b) => b - a)
@@ -120,20 +126,37 @@ const ExpandedRowDetails = ({ result, isClubView }) => {
             const formattedDate = formatDate(res.date)
             if (!formattedDate) return null
 
-            const scoreIndex = highlightScoresTracker.indexOf(score)
+            const isNIT = res.isNIT || false
+
+            // Only highlight non-NIT scores
+            const scoreIndex = !isNIT
+              ? highlightScoresTracker.indexOf(score)
+              : -1
             const isTopScore = scoreIndex !== -1
 
             if (isTopScore) {
               highlightScoresTracker.splice(scoreIndex, 1)
             }
 
+            // Different styling for NIT scores vs regular vs top scores
+            const bgColor = isNIT
+              ? "bg-orange-100 border-orange-300"
+              : isTopScore
+              ? "bg-[#214A27] text-white"
+              : "bg-white"
+
             return (
               <div
                 key={index}
-                className={`flex flex-col w-1/2 sm:w-1/4 md:w-1/6 lg:w-1/10 border border-gray-300 p-1 text-center ${
-                  isTopScore ? "bg-[#214A27] text-white" : "bg-white"
-                }`}>
-                <div className="font-semibold">{formattedDate}</div>
+                className={`flex flex-col w-1/2 sm:w-1/4 md:w-1/6 lg:w-1/10 border border-gray-300 p-1 text-center ${bgColor}`}>
+                <div className="font-semibold">
+                  {formattedDate}
+                  {isNIT && (
+                    <div className="text-orange-600 text-xs font-medium">
+                      NIT
+                    </div>
+                  )}
+                </div>
                 <div>{score}</div>
               </div>
             )

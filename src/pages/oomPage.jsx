@@ -1,27 +1,8 @@
 import PageHeader from "../components/pageHeader"
-import { results } from "../constants/results"
-import { transformResults } from "../utils/transformResults"
 import ResultsTable from "../components/results/resultsTable/resultsTable"
-import { OOMPageSkeleton } from "../components/skeletons"
-import { useState, useEffect } from "react"
 import "./oomPage.css"
 
 const OrderOfMeritPage = () => {
-  const [loading, setLoading] = useState(true)
-  const { rows, columns } = transformResults(results)
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false)
-    }, 800)
-
-    return () => clearTimeout(timer)
-  }, [])
-
-  if (loading) {
-    return <OOMPageSkeleton />
-  }
-
   return (
     <>
       <PageHeader title="Order of Merit" />
@@ -45,7 +26,8 @@ const OrderOfMeritPage = () => {
       </div>
 
       <div className="results-container">
-        <ResultsTable columns={columns} rows={rows} />
+        {/* The dynamic ResultsTable handles its own loading and API calls */}
+        <ResultsTable />
       </div>
     </>
   )

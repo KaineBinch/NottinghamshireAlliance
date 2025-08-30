@@ -121,31 +121,44 @@ const ResultsHighlightCard = () => {
         const latest = pastEvents[0]
         setLatestEvent(latest)
 
-        const processedScores = applyTiebreakerFlags(
-          sortScoresWithTiebreaker(latest.scores || [])
+        // FIXED: Filter out NIT scores before processing
+        const nonNitScores = (latest.scores || []).filter(
+          (score) => !score.isNIT
         )
 
+        const processedScores = applyTiebreakerFlags(
+          sortScoresWithTiebreaker(nonNitScores)
+        )
+
+        // FIXED: Filter amateurs from NON-NIT scores only
         const amateurs = processedScores
           .filter((score) => score.golfer && !score.golfer.isPro)
           .slice(0, 3)
         setTopAmateurs(amateurs)
 
+        // FIXED: Filter professionals from NON-NIT scores only
         const pros = processedScores
           .filter((score) => score.golfer && score.golfer.isPro)
           .slice(0, 3)
         setTopPros(pros)
 
+        // FIXED: Club calculations excluding NIT scores
         if (latest.scores && latest.scores.length > 0) {
           const scoresByClub = {}
-          latest.scores.forEach((score) => {
-            if (!score.golfer) return
 
-            const clubName = score.golfer?.golf_club?.clubName || "Unaffiliated"
-            if (!scoresByClub[clubName]) {
-              scoresByClub[clubName] = []
-            }
-            scoresByClub[clubName].push(score)
-          })
+          // Only process non-NIT scores for club calculations
+          latest.scores
+            .filter((score) => !score.isNIT) // Filter out NITs
+            .forEach((score) => {
+              if (!score.golfer) return
+
+              const clubName =
+                score.golfer?.golf_club?.clubName || "Unaffiliated"
+              if (!scoresByClub[clubName]) {
+                scoresByClub[clubName] = []
+              }
+              scoresByClub[clubName].push(score)
+            })
 
           const clubResults = Object.entries(scoresByClub)
             .map(([clubName, scores]) => {
@@ -310,6 +323,12 @@ const ResultsHighlightCard = () => {
                       <h4
                         className="font-semibold break-words"
                         style={fontStyles.name}>
+                        {/* FIXED: Show NIT status if this score was originally NIT */}
+                        {score.wasNIT && (
+                          <span className="text-orange-600 mr-1 text-xs font-medium">
+                            NIT
+                          </span>
+                        )}
                         {score.golfer?.golferName}
                       </h4>
                       <p
@@ -366,6 +385,12 @@ const ResultsHighlightCard = () => {
                       <h4
                         className="font-semibold break-words"
                         style={fontStyles.name}>
+                        {/* FIXED: Show NIT status if this score was originally NIT */}
+                        {score.wasNIT && (
+                          <span className="text-orange-600 mr-1 text-xs font-medium">
+                            NIT
+                          </span>
+                        )}
                         {score.golfer?.golferName}
                       </h4>
                       <p
