@@ -118,7 +118,6 @@ const LiveScoreScreen = ({ eventId, eventData }) => {
         if (score?.golfer) {
           const clubName = score.golfer?.golf_club?.clubName || "Unaffiliated"
 
-
           if (!clubGroups[clubName]) {
             clubGroups[clubName] = {
               clubName,
@@ -234,7 +233,9 @@ const LiveScoreScreen = ({ eventId, eventData }) => {
       averageScore: team.totalPoints,
       playersWithScores: team.totalPlayersWithScores,
       totalPlayers:
-        clubGroups.find((c) => c.clubName === team.clubName)?.totalPlayers || 0,
+        clubGroups
+          .find((c) => c.clubName === team.clubName)
+          ?.players.filter((p) => !p.isNIT).length || 0,
       teamTotal: team.totalPoints,
       playersInTeam: team.playersCount,
     }))
@@ -390,7 +391,6 @@ const LiveScoreScreen = ({ eventId, eventData }) => {
             />
           )}
         </div>
-
 
         <div className="border-b border-gray-300 my-5"></div>
         <div className="text-center text-gray-600 text-sm">
