@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import ExcelJS from "exceljs"
 import FileUpload from "../import/fileUpload"
 import ActionButtons from "../import/actionButtons"
@@ -56,6 +56,35 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
   const handleEventReviewChange = (review) => {
     setEventReview(review)
   }
+
+  useEffect(() => {
+    console.log(
+      "🔄 useEffect triggered, uploadStatus:",
+      uploadStatus,
+      "view:",
+      view
+    )
+
+    if (
+      uploadStatus === "Uploading" ||
+      uploadStatus === "Success! ✅" ||
+      uploadStatus === "❌ Error" ||
+      view === "results"
+    ) {
+      console.log("✅ Condition met, setting up scroll timeout...")
+      setTimeout(() => {
+        console.log("📜 Executing scroll to top")
+        window.scrollTo(0, 0)
+      }, 100)
+    } else {
+      console.log(
+        "❌ No matching condition, uploadStatus:",
+        uploadStatus,
+        "view:",
+        view
+      )
+    }
+  }, [uploadStatus, view]) // Watch both uploadStatus AND view
 
   const formatLogSummary = (originalSummary) => {
     if (!originalSummary) return originalSummary
@@ -272,6 +301,8 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
 
   const handleUploadToStrapi = async () => {
     try {
+      console.log("🚀 handleUploadToStrapi started")
+
       setProgressLogs([])
       setErrorLogs([])
       setSummaryMessage("")
@@ -279,6 +310,8 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
       setShowOnlyIssues(false)
       setCopyStatus("Copy Logs")
       setView("processing")
+
+      console.log("📤 About to call uploadToStrapi")
 
       await uploadToStrapi(
         csvData,
@@ -291,6 +324,7 @@ const DownloadCSVFile = ({ csvData, setCsvData, setGroupedData }) => {
         setErrorLogs
       )
 
+      console.log("✅ uploadToStrapi completed, setting view to results")
       setView("results")
     } catch (error) {
       console.error("Upload error:", error)
