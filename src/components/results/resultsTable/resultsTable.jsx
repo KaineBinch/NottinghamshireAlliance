@@ -64,16 +64,15 @@ const ResultsTable = ({ limit }) => {
         return acc
       }, {})
 
-      // Calculate totalPoints using only top 9 NON-NIT scores for each player
+      // Calculate totalPoints using ALL scores (including NITs) for individual standings
       Object.values(playerScores).forEach((player) => {
-        // Only count non-NIT scores for total points calculation
-        const nonNitScores = player.scores
-          .filter((scoreItem) => !scoreItem.isNIT)
+        // Count ALL scores (including NITs) for individual Order of Merit
+        const allScores = player.scores
           .map((scoreItem) => scoreItem.score)
           .sort((a, b) => b - a) // Sort highest to lowest
           .slice(0, 9) // Take only top 9 scores
 
-        player.totalPoints = nonNitScores.reduce((sum, score) => sum + score, 0)
+        player.totalPoints = allScores.reduce((sum, score) => sum + score, 0)
 
         // Mark player as having NIT if any of their scores are NIT
         player.hasNIT = player.scores.some((score) => score.isNIT)

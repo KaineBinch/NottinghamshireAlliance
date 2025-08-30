@@ -121,22 +121,18 @@ const ResultsHighlightCard = () => {
         const latest = pastEvents[0]
         setLatestEvent(latest)
 
-        // FIXED: Filter out NIT scores before processing
-        const nonNitScores = (latest.scores || []).filter(
-          (score) => !score.isNIT
-        )
-
+        // FIXED: Include ALL scores (including NITs) for individual rankings
         const processedScores = applyTiebreakerFlags(
-          sortScoresWithTiebreaker(nonNitScores)
+          sortScoresWithTiebreaker(latest.scores || [])
         )
 
-        // FIXED: Filter amateurs from NON-NIT scores only
+        // FIXED: Include NITs in amateur individual rankings
         const amateurs = processedScores
           .filter((score) => score.golfer && !score.golfer.isPro)
           .slice(0, 3)
         setTopAmateurs(amateurs)
 
-        // FIXED: Filter professionals from NON-NIT scores only
+        // FIXED: Include NITs in professional individual rankings
         const pros = processedScores
           .filter((score) => score.golfer && score.golfer.isPro)
           .slice(0, 3)
@@ -323,8 +319,8 @@ const ResultsHighlightCard = () => {
                       <h4
                         className="font-semibold break-words"
                         style={fontStyles.name}>
-                        {/* FIXED: Show NIT status if this score was originally NIT */}
-                        {score.wasNIT && (
+                        {/* Show NIT status - score counts for individual but not team */}
+                        {score.isNIT && (
                           <span className="text-orange-600 mr-1 text-xs font-medium">
                             NIT
                           </span>
@@ -385,8 +381,8 @@ const ResultsHighlightCard = () => {
                       <h4
                         className="font-semibold break-words"
                         style={fontStyles.name}>
-                        {/* FIXED: Show NIT status if this score was originally NIT */}
-                        {score.wasNIT && (
+                        {/* Show NIT status - score counts for individual but not team */}
+                        {score.isNIT && (
                           <span className="text-orange-600 mr-1 text-xs font-medium">
                             NIT
                           </span>
