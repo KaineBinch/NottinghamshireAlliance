@@ -47,7 +47,17 @@ const formatDateWithOrdinal = (dateString) => {
 }
 
 const TeeTimesPage = () => {
-  const [isListView, setIsListView] = useState(false)
+  const getSavedViewPreference = () => {
+    try {
+      const savedPreference = localStorage.getItem("teeTimesListView")
+      return savedPreference === "true"
+    } catch (error) {
+      return false
+    }
+  }
+
+  const [isListView, setIsListView] = useState(getSavedViewPreference)
+  const [, setShowContent] = useState(false)
   const [golferScores, setGolferScores] = useState({})
 
   const query = queryBuilder(MODELS.teeTimes, QUERIES.teeTimesQuery)
@@ -64,6 +74,20 @@ const TeeTimesPage = () => {
       )
     : null
   const { data: scoresData } = useFetch(scoresQuery)
+
+  // Set default view based on screen size
+  useEffect(() => {
+    const checkScreenSizeAndSetDefault = () => {
+      const screenWidth = window.innerWidth
+      // Club view (list view = true) for sm & md (< 1024px)
+      // Tee time view (list view = false) for lg and up (>= 1024px)
+      if (screenWidth < 1024) {
+        setIsListView(true)
+      }
+    }
+
+    checkScreenSizeAndSetDefault()
+  }, [])
 
   // FIXED: Process scores data to create a lookup for NIT status (current event only)
   useEffect(() => {
@@ -85,6 +109,25 @@ const TeeTimesPage = () => {
       setGolferScores(scoreMap)
     }
   }, [scoresData])
+
+  useEffect(() => {
+    if (!isLoading && data) {
+      const timer = setTimeout(() => {
+        setShowContent(true)
+      }, 100)
+
+      return () => clearTimeout(timer)
+    }
+  }, [isLoading, data])
+
+  // Save view preference to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem("teeTimesListView", isListView.toString())
+    } catch (error) {
+      console.warn("Could not save view preference")
+    }
+  }, [isListView])
 
   if (isLoading) {
     return <TeeTimesPageSkeleton isListView={isListView} />
