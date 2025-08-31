@@ -42,7 +42,8 @@ const DownloadTemplateButton = ({
         fgColor: { argb: "214A27" },
       }
       cell.protection = {
-        locked: colIndex <= 2,
+        // Lock header cells for date, time, and formula columns
+        locked: colIndex <= 2 || colIndex === 9,
       }
     })
 
@@ -81,7 +82,7 @@ const DownloadTemplateButton = ({
       }
     }
 
-    teeTimes.forEach((time) => {
+    teeTimes.forEach((time, index) => {
       const [eventYear, eventMonth, eventDay] = selectedEvent.date
         .split("-")
         .map(Number)
@@ -90,7 +91,23 @@ const DownloadTemplateButton = ({
         Date.UTC(eventYear, eventMonth - 1, eventDay, teeHour, teeMinute)
       )
 
-      worksheet.addRow([selectedEvent.date, teeDatetime, "", "", "", "", ""])
+      const rowIndex = index + 2 // +2 because header is row 1, data starts at row 2
+
+      // Create the formula for this specific row - check for actual numbers
+      const formula = `IF(AND(ISNUMBER(G${rowIndex}),ISNUMBER(H${rowIndex})),G${rowIndex}+H${rowIndex},"")`
+
+      // Add the row data with the formula in the last column
+      worksheet.addRow([
+        selectedEvent.date,
+        teeDatetime,
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        { formula: formula },
+      ])
     })
 
     worksheet.getColumn(2).numFmt = "hh:mm"
@@ -107,7 +124,8 @@ const DownloadTemplateButton = ({
         const cell = worksheet.getCell(rowIndex, colIndex)
 
         cell.protection = {
-          locked: colIndex <= 2,
+          // Lock date, time, and formula columns
+          locked: colIndex <= 2 || colIndex === 9,
         }
 
         cell.fill = {
@@ -117,6 +135,14 @@ const DownloadTemplateButton = ({
         }
 
         if (colIndex <= 2) {
+          cell.alignment = { horizontal: "center", vertical: "middle" }
+          cell.font = {
+            name: "Aptos Narrow",
+            size: 12,
+            bold: true,
+          }
+        } else if (colIndex === 9) {
+          // Style the formula column
           cell.alignment = { horizontal: "center", vertical: "middle" }
           cell.font = {
             name: "Aptos Narrow",
